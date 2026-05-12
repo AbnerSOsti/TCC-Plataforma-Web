@@ -1,0 +1,23 @@
+<?php ob_start(); ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script src="js/dashboard.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <?php 
+        include "./Controller/controller.php";
+        
+        $controller = new Controller();
+        $controller->Dashboard();
+
+        ?>
+    </div>
+</body>
+</html>

@@ -1,0 +1,129 @@
+.recuperacao-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #ffffff;
+}
+
+.recuperacao-formulario {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+.recuperacao-inputs{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+
+    & input{
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+        margin-bottom: 10px;
+    }
+
+    & a{
+        color: var(--color-black);
+        margin-bottom: 5px;
+    }
+    
+}
+
+.recuperacao-btn {
+    /* background-color: turquoise; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px 20px;
+    
+    & input{
+        width: 120px;
+        transition: 0.4s;
+    }
+    & input:hover{
+        transform: scale(1.05);
+        background-color: var(--color-black);
+        color: var(--color-white);
+    }
+}
+
+.recuperacao-titulo {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.novasenha-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #ffffff;
+}
+
+.novasenha-card{
+    width: 400px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+.novasenha-titulo {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.novasenha-inputs{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+
+    & input{
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 15px;
+        margin-bottom: 10px;
+    }
+
+    & a{
+        color: var(--color-black);
+        margin-bottom: 5px;
+    }
+
+}
+.novasenha-btn{
+    /* background-color: turquoise; */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 10px 20px;
+    
+    & input{
+        width: 120px;
+        transition: 0.4s;
+    }
+    & input:hover{
+        transform: scale(1.05);
+        background-color: var(--color-black);
+        color: var(--color-white);
+    }
+}
