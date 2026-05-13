@@ -3,50 +3,38 @@
 ob_start();
 
 
-//  if(!isset($_SESSION["login"]) == true) {
-//         echo '
-//             <header class="navbar">
-//                 <div class="nav-container">
-//                 <a href="cadastro.php">Cadastro</a>
-//                 <a href="login.php">Login</a>
-//                 <a href="dashboard.php">Dashboard</a>
-                
-                    
-
-//                 </div>
-//             </header>
-//         ';
-//         } else {
-//             echo '
-//             <header class="navbar">
-//                 <div class="nav-container">
-//                     <a href="index.php">Home</a>
-//                     <a href="cadastro.php">Cadastro</a>
-//                     <a href="listar_modulos.php">Módulos</a>
-//                     '.(isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : '').'
-//                     <a href="sair.php">Sair</a>
-//                 </div>
-//             </header>
-//         ';
+ 
 
 class View{
 
     public function header($string){
-       echo '
-            <header class="header">
-                <div class="sidebar">
-                    <div class="sidebar-logo">
-                        <img src="imagens/nomelogo.png" alt="Nome do logo" class="sidebar-logo-img">
-                    </div>
-                    <nav class="sidebar-nav">
-                    <button type="button" class="menu-item '.($abaAtiva === 'aprender' ? 'active' : '').'" data-view="aprender">Aprender</button>
-                        <a href="index.php" class="sidebar-item">Aprender</a>
-                        <a href="perfil.php" class="sidebar-item">Perfil</a>
-                        <a href="mais.php" class="sidebar-item">Mais</a>
-                    </nav>
+        if(!isset($_SESSION["login"]) == true) {
+        echo '
+            <header class="navbar">
+                <div class="nav-container">
+                <a href="cadastro.php">Cadastro</a>
+                <a href="login.php">Login</a>
+                <a href="dashboard.php">Dashboard</a>
+                
+                    
+
                 </div>
             </header>
         ';
+        } else {
+            echo '
+            <header class="navbar">
+                <div class="nav-container">
+                    <a href="index.php">Home</a>
+                    <a href="cadastro.php">Cadastro</a>
+                    <a href="listar_modulos.php">Módulos</a>
+                    '.(isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : '').'
+                    <a href="sair.php">Sair</a>
+                </div>
+            </header>
+        ';
+        }
+      
     }
 
 
@@ -214,7 +202,7 @@ class View{
         $viewsPermitidas = ["modulo", "linguagem", "aula", "exercicio"];
 
         if (!in_array($abaAtiva, $viewsPermitidas, true)) {
-            $abaAtiva = 'modulo';
+            $abaAtiva = 'linguagem';
         }
 
         if (is_array($modulos)) {
@@ -467,19 +455,123 @@ class View{
     }
 
     public function SalaGeralPage($string){
-        echo '
-            <div class="modulo-container">
-                <div class="modulo-card">
+        
 
-                    <div class="modulo-titulo">
-                        <h2>Modulo 1</h2>
+       echo '
+            <div class="sala-container">
+                <div class="sala-menu">
+                    <div class="sidebar-logo">
+                        <img src="imagens/nomelogo.png" alt="Nome do logo" class="sidebar-logo-img">
                     </div>
+                    <nav class="sidebar-nav">
+                        <button type="button" class="menu-item" data-view="aprender">Aprender</button>
+                        <button type="button" class="menu-item" data-view="perfil">Perfil</button>
+                        <div class="dropdown">
+                            <button type="button" class="menu-item dropdown-btn" data-view="mais">Mais</button>
+                            <div class="dropdown-content">
+                                <button type="button" class="menu-item" data-view="config">Configurações</button>
+                                <button type="button" class="menu-item" data-view="editar">Editar</button>
+                                <a href="sair.php">Sair</a>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
 
-                    <div class="aula-conteudo">
-                        <p>1</p>
+                <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="aprender">
+                    <div class="sala-cabecalho">
+                        <h1 id="sala-titulo">Aprender</h1>
+                        <p>Bem-vindo à Sala Geral</p>
+                        <div class="sala-mensagem"></div>
                     </div>
+                    <div id="sala-formulario"></div>
                 </div>
             </div>
+
+            <template id="template-aprender">
+                <div class="conteudo-aprender">
+                    <h2>Módulos Disponíveis</h2>
+                    <div class="modulos-lista">
+                        <!-- Lista de módulos será carregada aqui -->
+                        <p>Carregando módulos...</p>
+                    </div>
+                    <h2>Exercícios Disponíveis</h2>
+                    <div class="exercicios-lista">
+                        <!-- Lista de exercícios será carregada aqui -->
+                        <p>Carregando exercícios...</p>
+                    </div>
+                </div>
+                
+                
+            </template>
+
+            <template id="template-perfil">
+                <div class="conteudo-perfil">
+                    <h2>Informações do Usuário</h2>
+                    <div class="perfil-info">
+                        <div class="campo-info">
+                            <label>Nome:</label>
+                            <span id="nome-usuario">Carregando...</span>
+                        </div>
+                        <div class="campo-info">
+                            <label>Email:</label>
+                            <span id="email-usuario">Carregando...</span>
+                        </div>
+                        <div class="campo-info">
+                            <label>Progresso Geral:</label>
+                            <div class="progresso-bar">
+                                <div class="progresso-fill" style="width: 0%;"></div>
+                            </div>
+                            <span id="progresso-percentual">0%</span>
+                        </div>
+                        <!-- Outras informações de progresso -->
+                    </div>
+                </div>
+            </template>
+
+            <template id="template-config">
+                <div class="conteudo-config">
+                    <h2>Configurações</h2>
+                    <form class="form-config">
+                        <div class="campo-formulario">
+                            <label for="notificacoes">Notificações:</label>
+                            <input type="checkbox" id="notificacoes" name="notificacoes">
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="tema">Tema:</label>
+                            <select id="tema" name="tema">
+                                <option value="claro">Claro</option>
+                                <option value="escuro">Escuro</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-salvar">Salvar Configurações</button>
+                    </form>
+                </div>
+            </template>
+
+            <template id="template-editar">
+                <div class="conteudo-editar">
+                    <h2>Editar Perfil</h2>
+                    <form class="form-editar">
+                        <div class="campo-formulario">
+                            <label for="nome-editar">Nome:</label>
+                            <input type="text" id="nome-editar" name="nome-editar" placeholder="Digite seu nome">
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="email-editar">Email:</label>
+                            <input type="email" id="email-editar" name="email-editar" placeholder="Digite seu email">
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="senha-atual">Senha Atual:</label>
+                            <input type="password" id="senha-atual" name="senha-atual" placeholder="Digite sua senha atual">
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="nova-senha">Nova Senha:</label>
+                            <input type="password" id="nova-senha" name="nova-senha" placeholder="Digite sua nova senha">
+                        </div>
+                        <button type="submit" class="btn-salvar">Salvar Alterações</button>
+                    </form>
+                </div>
+            </template>
         ';
     }
             

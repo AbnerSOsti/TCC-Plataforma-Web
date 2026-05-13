@@ -12,6 +12,7 @@
     <title>Inicio</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/sala.css">
+    <script src="js/SalaGeral.js" defer></script>
    
 </head>
 <body>

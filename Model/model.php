@@ -841,17 +841,7 @@ class Model {
     }
 
     public function listar_modulos(){
-        if (!$this->conn) {
-            return [];
-        }
-
-        try {
-            $query = "SELECT id_modulo, titulo_modulo FROM modulos ORDER BY ordem_modulo ASC, id_modulo ASC";
-            $stmt = $this->conn->query($query);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $e) {
-            return [];
-        }
+        
     }
 
     public function listar_aulas(){
@@ -883,6 +873,10 @@ class Model {
         } catch (PDOException $e) {
             return [];
         }
+    }
+
+    public function SalaGeral_model(){
+        
     }
 
     public function livre(){

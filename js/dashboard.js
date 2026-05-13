@@ -82,5 +82,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    carregarTela(conteudo.dataset.viewInicial || "modulo");
+    carregarTela(conteudo.dataset.viewInicial || "linguagem");
 });

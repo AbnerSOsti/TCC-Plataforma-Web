@@ -77,12 +77,17 @@ class Controller {
         $abaAtiva = $model->obter_aba_dashboard_ativa();
         $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens);
     }
-        public function SalaGeral(){
-            $model = new Model();
-            $visao = new View();
-            $visao->header("");
-            $string = $model->listar_modulos();
-            $visao->SalaGeralPage($string);
+
+
+    public function SalaGeral(){
+        $model = new Model();
+        $visao = new View();
+
+
+        //$visao->header("");
+       // $listar = $model->listar_exercicios();
+        $string = $model->listar_modulos();
+        $visao->SalaGeralPage($string);
     }
 
 
