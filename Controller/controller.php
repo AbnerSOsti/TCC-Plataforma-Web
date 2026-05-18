@@ -86,8 +86,10 @@ class Controller {
 
         //$visao->header("");
        // $listar = $model->listar_exercicios();
-        $string = $model->listar_modulos();
-        $visao->SalaGeralPage($string);
+        $modulos = $model->listar_modulo();
+        $aula = $model->listar_aulas();
+        $linguagens = $model->listar_linguagens();
+        $visao->SalaGeralPage($modulos, $aula, $linguagens);
     }
 
 

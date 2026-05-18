@@ -25,7 +25,7 @@ header{
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: aqua;
+    /* background-color: aqua; */
 }
 .texto-cabecalho-c {
     width: 80%;

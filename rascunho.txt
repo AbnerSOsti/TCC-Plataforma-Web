@@ -1,0 +1,52 @@
+<?php
+public function SalaGeralPage($modulos, $aulas, $linguagens){
+    
+    // 1. PROCESSAR MÓDULOS
+    $html_modulos = '';
+    foreach($modulos as $modulo) {
+        $html_modulos .= '
+            <div class="modulo-card">
+                <h3>'.$modulo['titulo_modulo'].'</h3>
+                <p>'.$modulo['descricao_modulo'].'</p>
+            </div>
+        ';
+    }
+
+    // 2. PROCESSAR AULAS
+    $html_aulas = '';
+    foreach($aulas as $aula) {
+        $html_aulas .= '
+            <div class="aula-item">
+                <strong>'.$aula['titulo_aula'].'</strong>
+                <p>Módulo: '.$aula['titulo_modulo'].'</p>
+            </div>
+        ';
+    }
+
+    // 3. PROCESSAR LINGUAGENS
+    $html_linguagens = '';
+    foreach($linguagens as $linguagem) {
+        $html_linguagens .= '
+            <div class="linguagem-tag">
+                '.$linguagem['nome_linguagem'].'
+            </div>
+        ';
+    }
+
+    // 4. COLOCAR NO HTML FINAL
+    echo '
+        <div class="sala-container">
+            ...
+            <div id="template-aprender">
+                <h2>Módulos</h2>
+                '.$html_modulos.'
+                
+                <h2>Aulas</h2>
+                '.$html_aulas.'
+                
+                <h2>Linguagens</h2>
+                '.$html_linguagens.'
+            </div>
+        </div>
+    ';
+}

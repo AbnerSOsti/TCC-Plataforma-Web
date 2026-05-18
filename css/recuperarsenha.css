@@ -127,3 +127,6 @@
         color: var(--color-white);
     }
 }
+.btn-atualizar{
+    background-color: rgb(250, 6, 185);
+}

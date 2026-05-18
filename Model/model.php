@@ -1,5 +1,5 @@
 <?php
-
+header('Content-Type: text/html; charset=utf-8');
 class Model {
     protected $conn;
     // protected $pdo;
@@ -197,6 +197,14 @@ class Model {
                 return "Email não encontrado ou inexistente";
             }
 
+            $sqlNome = "SELECT nome_usuario FROM cadastro_usuario WHERE email_usuario = :email LIMIT 1";
+            $stmtNome = $conn->prepare($sqlNome);
+            $stmtNome->bindParam(':email', $email);
+            $stmtNome->execute();
+            $resultado = $stmtNome->fetch(PDO::FETCH_ASSOC);
+            $nomeUsuario = $resultado ? $resultado['nome_usuario'] : "Usuário";
+
+
             // Gera token
             $tokenData = $this->getRecoveryTokenData();
             $token = $tokenData['token'];
@@ -219,25 +227,118 @@ class Model {
                 $mail->Host       = 'smtp.gmail.com';
                 $mail->SMTPAuth   = true;
                 $mail->Username   = 'abnersarilhoosti@gmail.com';
-                $mail->Password   = 'rhoellbwpybzhfnd';
+                //$mail->Password   = 'rhoellbwpybzhfnd'; original padrão
+                $mail->Password   = 'ftutzznooqcectuj'; // criei no emai abner
+                
                 $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port       = 587;
-
-                $mail->setFrom('abnersarilhoosti@gmail.com', 'Codexia');
+                $mail->setFrom('abnersarilhoosti@gmail.com', 'Suporte');
                 $mail->addAddress($email);
-
-                
+    
                 $link = "http://localhost/TCC/novasenha.php?token=" . rawurlencode($token);
 
                 $mail->isHTML(true);
-                $mail->Subject = 'Recuperar senha';
+                $mail->CharSet = 'UTF-8';
+                $mail->Subject = 'Mudança da Senha';
                 $mail->Body = "
-                    <h2>Recuperar Senha</h2>
-                    <p> Olá, recebemos uma solicitação para redefinir sua senha. Se você fez essa solicitação, clique no link abaixo para criar uma nova senha:</p>
-                    
-                    <a href='$link'>Redefinir Senha</a>
-                ";
+                <meta charset='UTF-8'>
+                    <div style='max-width:600px;margin:0 auto;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.08);font-family:Arial,Helvetica,sans-serif;color:#333;'>
 
+                        <div style='background:linear-gradient(135deg,#2563eb,#1e40af);padding:40px 20px;text-align:center;color:white;'>
+                            <h1 style='font-size:32px;margin:0 0 10px 0;'>
+                                Suporte de Recuperação de Senha
+                            </h1>
+
+                            <p style='font-size:16px;margin:0;opacity:0.9;'>
+                                Recuperação de Senha
+                            </p>
+                        </div>
+
+                        <div style='padding:40px 35px;'>
+
+                            <h2 style='font-size:24px;margin-bottom:20px;color:#111827;'>
+                                Olá, $nomeUsuario 👋
+                            </h2>
+
+                            <p style='font-size:16px;line-height:1.7;margin-bottom:20px;color:#4b5563;'>
+                                Recebemos uma solicitação para redefinir a senha da sua conta.
+                            </p>
+
+                            <p style='font-size:16px;line-height:1.7;margin-bottom:20px;color:#4b5563;'>
+                                Para criar uma nova senha, clique no botão abaixo:
+                            </p>
+
+                            <div style='text-align:center;margin:35px 0;'>
+
+                                <a 
+                                    href='$link'
+                                    style='
+                                        display:inline-block;
+                                        background:#2563eb;
+                                        color:#ffffff;
+                                        text-decoration:none;
+                                        padding:16px 32px;
+                                        border-radius:12px;
+                                        font-size:16px;
+                                        font-weight:bold;
+                                    '
+                                >
+                                    Redefinir Senha
+                                </a>
+
+                            </div>
+
+                            <p style='font-size:16px;line-height:1.7;margin-bottom:20px;color:#4b5563;'>
+                                Caso o botão não funcione, copie e cole o link abaixo no navegador:
+                            </p>
+
+                            <div style='
+                                background:#f3f4f6;
+                                border-radius:10px;
+                                padding:15px;
+                                word-break:break-all;
+                                font-size:14px;
+                                color:#374151;
+                                margin-bottom:25px;'>
+                                $link
+                            </div>
+
+                            <div style='
+                                background:#fff7ed;
+                                border-left:5px solid #f59e0b;
+                                padding:15px;
+                                border-radius:8px;
+                                font-size:14px;
+                                color:#92400e;
+                                margin-bottom:30px;
+                            '>
+                                ⚠️ Este link é válido por tempo limitado e poderá ser utilizado apenas uma vez.
+                            </div>
+
+                            <p style='font-size:16px;line-height:1.7;color:#4b5563;'>
+                                Se você não solicitou a recuperação de senha, ignore este email.
+                                Nenhuma alteração será realizada em sua conta.
+                            </p>
+
+                        </div>
+
+                        <div style='
+                            background:#f9fafb;
+                            text-align:center;
+                            padding:25px;
+                            font-size:14px;
+                            color:#6b7280;
+                            border-top:1px solid #e5e7eb;'>
+                            Atenciosamente,<br>
+
+                            <strong style='color:#111827;'>
+                            Equipe de Suporte
+                            </strong>
+                        </div>
+
+                    </div>
+                    ";
+                //$mail->SMTPDebug = 2;
                 $mail->send();
                 return "E-mail de recuperação enviado.";
 
@@ -840,8 +941,17 @@ class Model {
         return "";
     }
 
-    public function listar_modulos(){
-        
+    public function listar_modulo(){
+        if(!$this->conn) {
+            return [];
+        }
+        try { 
+            $query = "SELECT id_modulo, titulo_modulo FROM modulos ORDER BY ordem_modulo ASC, id_modulo ASC";
+            $stmt = $this->conn->query($query);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {
+            return [];
+        }
     }
 
     public function listar_aulas(){

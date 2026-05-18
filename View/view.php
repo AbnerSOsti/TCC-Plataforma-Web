@@ -116,9 +116,9 @@ class View{
 
                             <input type="password" placeholder="Digite sua senha" id="senha_usuario" name="senha_usuario" required><br>
 
-                            <a href="cadastro.php">Não tem uma conta? Cadastre-se</a> <br>
-                            <a href="index.php">Voltar para ao inicio</a> <br>
-                            <a href="recuperarsenha.php">Esqueceu sua senha?</a> <br>
+                            <a href="cadastro.php">Não tem uma conta? Cadastre-se</a>
+                            <a href="index.php">Voltar para ao inicio</a>
+                            <a href="recuperarsenha.php">Esqueceu sua senha?</a>
                             <div style="color: red;">'.$string.'</div>
 
                             <div class="login-btn">
@@ -454,8 +454,17 @@ class View{
         ';
     }
 
-    public function SalaGeralPage($string){
-        
+    public function SalaGeralPage($modulos, $aula, $linguagens){
+        $html_modulos = '';
+    foreach($modulos as $modulo) {
+        $html_modulos .= '
+            <div class="modulo-card">
+                <h3>'.$modulo['titulo_modulo'].'</h3>
+            </div>
+        ';
+    }
+
+        if(!isset($_SESSION["login"]) == false) {
 
        echo '
             <div class="sala-container">
@@ -479,8 +488,9 @@ class View{
 
                 <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="aprender">
                     <div class="sala-cabecalho">
-                        <h1 id="sala-titulo">Aprender</h1>
-                        <p>Bem-vindo à Sala Geral</p>
+                        <h1 id="sala-titulo">
+                        r</h1>
+                        <p>Bem-vindo à Sala Geral</p>'.(isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : '').'
                         <div class="sala-mensagem"></div>
                     </div>
                     <div id="sala-formulario"></div>
@@ -490,6 +500,9 @@ class View{
             <template id="template-aprender">
                 <div class="conteudo-aprender">
                     <h2>Módulos Disponíveis</h2>
+                    '
+                    .$html_modulos.
+                    '
                     <div class="modulos-lista">
                         <!-- Lista de módulos será carregada aqui -->
                         <p>Carregando módulos...</p>
@@ -573,6 +586,7 @@ class View{
                 </div>
             </template>
         ';
+        }
     }
             
 
