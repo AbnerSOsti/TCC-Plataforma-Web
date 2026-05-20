@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const titulos = {
-        aprender: "Aprender",
+        conteudo: "Conteúdo",
         perfil: "Perfil",
         config: "Configurações",
         editar: "Editar Perfil"
@@ -65,5 +65,5 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    carregarTela(conteudo.dataset.viewInicial || "aprender");
+    carregarTela(conteudo.dataset.viewInicial || "conteudo");
 });

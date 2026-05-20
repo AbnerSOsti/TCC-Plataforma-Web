@@ -147,7 +147,7 @@ class Model {
                         session_start();
                         $_SESSION["login"] = true;
                         $_SESSION["nome_usuario"] = $user['nome_usuario'];
-                        header("Location: index.php");
+                        header("Location: selecionar_linguagem.php");
                         exit();
                     } else {
                         $string = "Senha incorreta.";
@@ -977,12 +977,39 @@ class Model {
         }
 
         try {
-            $query = "SELECT id_linguagem, nome_linguagem FROM linguagens ORDER BY nome_linguagem ASC";
+            $query = "SELECT id_linguagem, nome_linguagem, nivel FROM linguagens ORDER BY nome_linguagem ASC";
             $stmt = $this->conn->query($query);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             return [];
         }
+    }
+
+    public function listar_modulo_por_linguagem($linguagem_id){
+        if (!$this->conn) return [];
+        
+        $query ="
+        SELECT id_modulo, titulo_modulo, descricao_modulo FROM modulos
+        WHERE id_linguagem = :id_linguagem ORDER BY ordem_modulo ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(":id_linguagem", $linguagem_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
+    public function listar_aulas_por_linguagem($id_linguagem){
+        if (!$this->conn || !$id_linguagem) return [];
+        $query = "
+            SELECT a.id_aula, a.titulo_aula, a.id_modulo, m.titulo_modulo
+            FROM aulas a
+            INNER JOIN modulos m ON m.id_modulo = a.id_modulo
+            WHERE m.id_linguagem = :id
+            ORDER BY m.ordem_modulo ASC, a.ordem_aula ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id', $id_linguagem, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function SalaGeral_model(){

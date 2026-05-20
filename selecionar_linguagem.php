@@ -9,9 +9,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio</title>
+    <title>linguagens</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/sala.css">
+    <link rel="stylesheet" href="css/selecionar.css">
     <script src="js/SalaGeral.js" defer></script>
    
 </head>
@@ -20,8 +20,7 @@
         include "./Controller/controller.php";
 
         $controller = new Controller();
-        $linguagem_id = isset($_GET['linguagem']) ? (int) $_GET['linguagem'] : null;
-        $controller->SalaGeral($linguagem_id);
+        $controller->Selecionar_Curso();
     ?>
 
 </body>

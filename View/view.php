@@ -454,15 +454,72 @@ class View{
         ';
     }
 
-    public function SalaGeralPage($modulos, $aula, $linguagens){
-        $html_modulos = '';
-    foreach($modulos as $modulo) {
-        $html_modulos .= '
-            <div class="modulo-card">
-                <h3>'.$modulo['titulo_modulo'].'</h3>
+    public function Selecionarcurso_Page($linguagens){
+        $html_linguagens = '';
+        foreach($linguagens as $linguagem){
+            $html_linguagens .= '
+                <div class="card">
+                    <div class="img">
+                    <img src="imagens/img_curso.jpg" alt="" >
+                    </div>
+                    <div class="card-info">
+                        <div class="titulo">
+                        <h3>'.$linguagem['nome_linguagem'].'</h3>
+                        </div>
+                        <div class="categoria">
+                        <p>'.$linguagem['nivel'].'</p>
+                        </div>
+                        <div class="btn">
+                        <a id="'.$linguagem['id_linguagem'].'" href="sala.php?id_linguagem=' .$linguagem['id_linguagem']. '" class="btn-selecionar">Comerçar</a>
+                        </div>
+                    </div>
+                </div>
+            ';
+        }
+        echo'
+        <div class="curso-container">
+            <h1>Selecione um curso para começar</h1>
+            <div class="card-container">
+                '.$html_linguagens.'
             </div>
         ';
     }
+
+    public function SalaGeralPage($modulos, $aula, $linguagens){
+        // $html_modulos = '';
+        // foreach ($modulos as $modulo) {
+        // echo '<div class="modulo-card">';
+        // echo '<h3>' . $modulo['titulo_modulo'] . '</h3>';
+
+        // echo '<div class="aulas-list">';
+        // foreach ($aula as $itemAula) {
+        //     if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
+        //         echo '<div class="aula-item">' . $itemAula['titulo_aula'] . '</div>';
+        //     }
+        // }
+        // echo '</div>';
+
+        // echo '</div>';
+        // }
+
+        $html_modulos = '';
+        foreach ($modulos as $modulo) {
+        $html_modulos = '
+            <div class="titulo-conteudo">
+                <h2>' . $modulo['titulo_modulo'] . '</h2>
+            </div>
+        ';
+        foreach ($aula as $itemAula) {
+            if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
+                $html_modulos .= '
+                    <div class="aula-item">' . $itemAula['titulo_aula'] . '</div>
+                ';
+            }
+        }
+        echo '</div>';
+
+        echo '</div>';
+        }
 
         if(!isset($_SESSION["login"]) == false) {
 
@@ -473,7 +530,7 @@ class View{
                         <img src="imagens/nomelogo.png" alt="Nome do logo" class="sidebar-logo-img">
                     </div>
                     <nav class="sidebar-nav">
-                        <button type="button" class="menu-item" data-view="aprender">Aprender</button>
+                        <button type="button" class="menu-item" data-view="conteudo">Conteúdo</button>
                         <button type="button" class="menu-item" data-view="perfil">Perfil</button>
                         <div class="dropdown">
                             <button type="button" class="menu-item dropdown-btn" data-view="mais">Mais</button>
@@ -481,40 +538,24 @@ class View{
                                 <button type="button" class="menu-item" data-view="config">Configurações</button>
                                 <button type="button" class="menu-item" data-view="editar">Editar</button>
                                 <a href="sair.php">Sair</a>
+                                <a href="dashboard.php">dash</a>
                             </div>
                         </div>
                     </nav>
                 </div>
 
-                <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="aprender">
+                <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="conteudo">
                     <div class="sala-cabecalho">
-                        <h1 id="sala-titulo">
-                        r</h1>
-                        <p>Bem-vindo à Sala Geral</p>'.(isset($_SESSION["nome_usuario"]) ? $_SESSION["nome_usuario"] : '').'
-                        <div class="sala-mensagem"></div>
+                        <h1 id="sala-titulo"></h1>
                     </div>
                     <div id="sala-formulario"></div>
                 </div>
             </div>
 
-            <template id="template-aprender">
-                <div class="conteudo-aprender">
-                    <h2>Módulos Disponíveis</h2>
-                    '
-                    .$html_modulos.
-                    '
-                    <div class="modulos-lista">
-                        <!-- Lista de módulos será carregada aqui -->
-                        <p>Carregando módulos...</p>
-                    </div>
-                    <h2>Exercícios Disponíveis</h2>
-                    <div class="exercicios-lista">
-                        <!-- Lista de exercícios será carregada aqui -->
-                        <p>Carregando exercícios...</p>
-                    </div>
+            <template id="template-conteudo">
+                <div class="conteudo-container">
+                    '.$html_modulos.'
                 </div>
-                
-                
             </template>
 
             <template id="template-perfil">

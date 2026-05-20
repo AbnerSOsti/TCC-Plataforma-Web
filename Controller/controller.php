@@ -71,7 +71,7 @@ class Controller {
             $message = trim((string) $_GET["message"]);
         }
 
-        $modulos = $model->listar_modulos();
+        $modulos = $model->listar_modulo();
         $aulas = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
         $abaAtiva = $model->obter_aba_dashboard_ativa();
@@ -79,17 +79,28 @@ class Controller {
     }
 
 
-    public function SalaGeral(){
+    public function SalaGeral($linguagem_id = null){
         $model = new Model();
         $visao = new View();
 
+        $modulos = $linguagem_id 
+        ? $model->listar_modulo_por_linguagem($linguagem_id) 
+        : $model->listar_modulo();
+        
 
-        //$visao->header("");
-       // $listar = $model->listar_exercicios();
         $modulos = $model->listar_modulo();
+
         $aula = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
-        $visao->SalaGeralPage($modulos, $aula, $linguagens);
+        $visao->SalaGeralPage($modulos, $aula, $linguagens, $linguagem_id);
+    }
+    public function Selecionar_Curso(){
+        $model = new Model();
+        $visao = new View();
+
+        $visao->header("");
+        $linguagens = $model->listar_linguagens();
+        $visao->Selecionarcurso_Page($linguagens);
     }
 
 
