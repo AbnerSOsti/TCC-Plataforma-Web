@@ -103,5 +103,17 @@ class Controller {
         $visao->Selecionarcurso_Page($linguagens);
     }
 
+    public function Atividade($id_aula = null){
+        $model = new Model();
+        $visao = new View();
+
+        $aulas = $id_aula
+        ? $model->listar_atividade_por_aula($id_aula) 
+        : $model->listar_exercicios();
+        
+        $aula = $model->listar_aulas();
+        $atividade = $aulas; // Renomear para $atividade para refletir o conteúdo real
+        $visao->AtividadePage($aula, $atividade, $id_aula);
+    }
 
 }

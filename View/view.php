@@ -486,22 +486,6 @@ class View{
     }
 
     public function SalaGeralPage($modulos, $aula, $linguagens){
-        // $html_modulos = '';
-        // foreach ($modulos as $modulo) {
-        // echo '<div class="modulo-card">';
-        // echo '<h3>' . $modulo['titulo_modulo'] . '</h3>';
-
-        // echo '<div class="aulas-list">';
-        // foreach ($aula as $itemAula) {
-        //     if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
-        //         echo '<div class="aula-item">' . $itemAula['titulo_aula'] . '</div>';
-        //     }
-        // }
-        // echo '</div>';
-
-        // echo '</div>';
-        // }
-
         $html_modulos = '';
         foreach ($modulos as $modulo) {
         $html_modulos = '
@@ -512,7 +496,7 @@ class View{
         foreach ($aula as $itemAula) {
             if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
                 $html_modulos .= '
-                    <div class="aula-item">' . $itemAula['titulo_aula'] . '</div>
+                    <a id="'.$itemAula['id_aula'].'" href="atividade.php?id_aula=' .$itemAula['id_aula']. '" class="btn-selecionar">Comerçar</a>
                 ';
             }
         }
@@ -630,6 +614,11 @@ class View{
         }
     }
             
+    public function AtividadePage($aula, $exercicios){
+        echo '
+            AOPA
+                    ';
+    }
 
     public function footer($string){
         

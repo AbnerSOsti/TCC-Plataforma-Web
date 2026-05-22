@@ -997,6 +997,17 @@ class Model {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function listar_atividade_por_aula($id_aula){
+        if (!$this->conn || !$id_aula) return [];
+        $query = "SELECT id_exercicio, tipo_exercicio, pergunta FROM exercicios
+                  WHERE id_aula = :id_aula ORDER BY id_exercicio ASC";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_aula', $id_aula, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+    }
     
     public function listar_aulas_por_linguagem($id_linguagem){
         if (!$this->conn || !$id_linguagem) return [];
