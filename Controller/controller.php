@@ -92,7 +92,7 @@ class Controller {
 
         $aula = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
-        $visao->SalaGeralPage($modulos, $aula, $linguagens, $linguagem_id);
+        $visao->SalaGeralPage($modulos, $aula, $linguagens);
     }
     public function Selecionar_Curso(){
         $model = new Model();
@@ -104,15 +104,31 @@ class Controller {
     }
 
     public function Atividade($id_aula = null){
+        if(session_status() == PHP_SESSION_NONE){
+            session_start();
+        }
+
+        if(!isset($_SESSION["login"]) || !isset($_SESSION["id_usuario"])) {
+            header("Location: login.php");
+            exit();
+        }
+
         $model = new Model();
         $visao = new View();
+        $id_usuario = $_SESSION["id_usuario"];
 
-        $aulas = $id_aula
-        ? $model->listar_atividade_por_aula($id_aula) 
-        : $model->listar_exercicios();
+        if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "salvar_progresso") {
+            $total_exercicios = (int) ($_POST["total_exercicios"] ?? 0);
+            $exercicios_corretos = (int) ($_POST["exercicios_corretos"] ?? 0);
+
+            $model->salvar_progresso_aula($id_usuario, $id_aula, $total_exercicios, $exercicios_corretos);
+
+            header("Location: sala.php");
+            exit;
+        }
         
         $aula = $model->listar_aulas();
-        $atividade = $aulas; // Renomear para $atividade para refletir o conteúdo real
+        $atividade = $id_aula ? $model->listar_atividade_por_aula($id_aula) : [];
         $visao->AtividadePage($aula, $atividade, $id_aula);
     }
 

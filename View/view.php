@@ -487,22 +487,23 @@ class View{
 
     public function SalaGeralPage($modulos, $aula, $linguagens){
         $html_modulos = '';
+        $level_counter = 0;
+        
         foreach ($modulos as $modulo) {
-        $html_modulos = '
-            <div class="titulo-conteudo">
-                <h2>' . $modulo['titulo_modulo'] . '</h2>
-            </div>
-        ';
-        foreach ($aula as $itemAula) {
-            if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
-                $html_modulos .= '
-                    <a id="'.$itemAula['id_aula'].'" href="atividade.php?id_aula=' .$itemAula['id_aula']. '" class="btn-selecionar">Comerçar</a>
-                ';
+            $html_modulos .= '
+                <div class="titulo-conteudo">
+                    <h2>' . $modulo['titulo_modulo'] . '</h2>
+                </div>
+            ';
+            
+            foreach ($aula as $itemAula) {
+                if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
+                    $level_counter++;
+                    $html_modulos .= '
+                        <a id="'.$itemAula['id_aula'].'" href="atividade.php?id_aula=' .$itemAula['id_aula']. '" class="btn-selecionar" title="'.$itemAula['titulo_aula'].'">Level ' . $level_counter . '</a>
+                    ';
+                }
             }
-        }
-        echo '</div>';
-
-        echo '</div>';
         }
 
         if(!isset($_SESSION["login"]) == false) {
@@ -538,7 +539,150 @@ class View{
 
             <template id="template-conteudo">
                 <div class="conteudo-container">
-                    '.$html_modulos.'
+                    <div class="conteudo-atividade">
+                            <div class="conteudo-aulas">
+                                '.$html_modulos.'
+                            </div>
+                        <button type="button" class="btn-ranking-mobile" data-action="toggle-ranking">Ranking</button>
+                    </div>
+                    <div class="ranking-container" id="ranking-container">
+                        <div class="ranking-geral">
+                            <div class="titulo-ranking">
+                                <h3>Ranking Geral</h3>
+                            </div>
+                            <div class="ranking-lista">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Usuário</th>
+                                            <th>Aulas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Usuário A</td>
+                                            <td>15</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Usuário B</td>
+                                            <td>12</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Usuário C</td>
+                                            <td>9</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Usuário D</td>
+                                            <td>8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Usuário E</td>
+                                            <td>7</td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td>Usuário F</td>
+                                            <td>6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>Usuário G</td>
+                                            <td>5</td>
+                                        </tr>
+                                        <tr>
+                                            <td>8</td>
+                                            <td>Usuário H</td>
+                                            <td>4</td>
+                                        </tr>
+                                        <tr>
+                                            <td>9</td>
+                                            <td>Usuário I</td>
+                                            <td>3</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10</td>
+                                            <td>Usuário J</td>
+                                            <td>2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="ranking-linguagem">
+                            <div class="titulo-ranking">
+                                <h3>Ranking por Linguagem</h3>
+                            </div>
+                            <div class="ranking-lista">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Usuário</th>
+                                            <th>Aulas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1</td>
+                                            <td>Usuário X</td>
+                                            <td>8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>2</td>
+                                            <td>Usuário Y</td>
+                                            <td>6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3</td>
+                                            <td>Usuário Z</td>
+                                            <td>4</td>
+                                        </tr>
+                                        <tr>
+                                            <td>4</td>
+                                            <td>Usuário W</td>
+                                            <td>8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5</td>
+                                            <td>Usuário V</td>
+                                            <td>6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>6</td>
+                                            <td>Usuário U</td>
+                                            <td>4</td>
+                                        </tr>
+                                        <tr>
+                                            <td>7</td>
+                                            <td>Usuário T</td>
+                                            <td>8</td>
+                                        </tr>
+                                        <tr>
+                                            <td>8</td>
+                                            <td>Usuário S</td>
+                                            <td>6</td>
+                                        </tr>
+                                        <tr>
+                                            <td>9</td>
+                                            <td>Usuário R</td>
+                                            <td>4</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10</td>
+                                            <td>Usuário Q</td>
+                                            <td>2</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </template>
 
@@ -614,10 +758,54 @@ class View{
         }
     }
             
-    public function AtividadePage($aula, $exercicios){
+    
+    public function AtividadePage($aula, $exercicios, $id_aula) {
+        $jsonExercicios = json_encode($exercicios, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);
+        $total = count($exercicios);
+
         echo '
-            AOPA
-                    ';
+            <link rel="stylesheet" href="css/atividade.css">
+            <div class="atividade-page">
+                <div class="atividade-header">
+                    <a href="sala.php" class="btn-cancelar">Cancelar</a>
+                    <div class="atividade-progresso">
+                        <div class="barra-progresso">
+                            <div class="barra-progresso-fill" id="barra-progresso-fill"></div>
+                        </div>
+                        <div class="progresso-info">
+                            <span id="porcentagem">0%</span>
+                            <span id="texto-progresso">0 de ' . $total . ' corretos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="atividade-conteudo">
+                    <div id="container-exercicio" class="exercicio-card">
+                        <h2 id="pergunta-texto"></h2>
+                        <div id="respostas"></div>
+                        <button id="btn-responder" class="btn-responder">Responder</button>
+                        <div id="feedback" class="feedback"></div>
+                    </div>
+                </div>
+
+                <div class="atividade-footer">
+                    <div id="tempo-final" class="tempo-final" style="display:none;"></div>
+                    <form id="form-progresso" method="post">
+                        <input type="hidden" name="acao" value="salvar_progresso">
+                        <input type="hidden" name="id_aula" value="' . htmlspecialchars($id_aula, ENT_QUOTES, 'UTF-8') . '">
+                        <input type="hidden" name="total_exercicios" id="total_exercicios" value="' . $total . '">
+                        <input type="hidden" name="exercicios_corretos" id="exercicios_corretos" value="0">
+                        <input type="hidden" name="tempo_segundos" id="tempo_segundos" value="0">
+                        <button type="submit" id="btn-continuar" class="btn-continuar" style="display:none;">Continuar</button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                const atividadeData = ' . $jsonExercicios . ';
+            </script>
+            <script src="js/atividade.js" defer></script>
+        ';
     }
 
     public function footer($string){

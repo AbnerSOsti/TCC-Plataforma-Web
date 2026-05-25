@@ -142,16 +142,18 @@ INSERT INTO `modulos` (`id_modulo`, `titulo_modulo`, `descricao_modulo`, `ordem_
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `progresso_usuario`
+-- Estrutura para tabela `progresso_aula`
 --
 
-CREATE TABLE `progresso_usuario` (
-  `id_progresso` int(11) NOT NULL,
+CREATE TABLE `progresso_aula` (
+  `id_progresso_aula` int(11) NOT NULL,
   `id_usuario` int(11) NOT NULL,
-  `id_exercicio` int(11) NOT NULL,
-  `resposta_usuario` text DEFAULT NULL,
-  `correto` tinyint(1) DEFAULT NULL,
-  `data_resposta` datetime DEFAULT current_timestamp()
+  `id_aula` int(11) NOT NULL,
+  `status` enum('em_andamento','concluida') NOT NULL DEFAULT 'em_andamento',
+  `data_inicio` datetime NOT NULL DEFAULT current_timestamp(),
+  `data_conclusao` datetime DEFAULT NULL,
+  `total_exercicios` int(11) DEFAULT NULL,
+  `exercicios_corretos` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -207,12 +209,13 @@ ALTER TABLE `modulos`
   ADD PRIMARY KEY (`id_modulo`);
 
 --
--- Índices de tabela `progresso_usuario`
+-- Índices de tabela `progresso_aula`
 --
-ALTER TABLE `progresso_usuario`
-  ADD PRIMARY KEY (`id_progresso`),
+ALTER TABLE `progresso_aula`
+  ADD PRIMARY KEY (`id_progresso_aula`),
+  ADD UNIQUE KEY `usuario_aula` (`id_usuario`, `id_aula`),
   ADD KEY `id_usuario` (`id_usuario`),
-  ADD KEY `id_exercicio` (`id_exercicio`);
+  ADD KEY `id_aula` (`id_aula`);
 
 --
 -- AUTO_INCREMENT para tabelas despejadas
@@ -261,10 +264,10 @@ ALTER TABLE `modulos`
   MODIFY `id_modulo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de tabela `progresso_usuario`
+-- AUTO_INCREMENT de tabela `progresso_aula`
 --
-ALTER TABLE `progresso_usuario`
-  MODIFY `id_progresso` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `progresso_aula`
+  MODIFY `id_progresso_aula` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Restrições para tabelas despejadas
@@ -301,11 +304,11 @@ ALTER TABLE `exercicio_opcoes`
   ADD CONSTRAINT `exercicio_opcoes_ibfk_1` FOREIGN KEY (`id_exercicio`) REFERENCES `exercicios` (`id_exercicio`);
 
 --
--- Restrições para tabelas `progresso_usuario`
+-- Restrições para tabelas `progresso_aula`
 --
-ALTER TABLE `progresso_usuario`
-  ADD CONSTRAINT `progresso_usuario_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `cadastro_usuario` (`id_usuario`),
-  ADD CONSTRAINT `progresso_usuario_ibfk_2` FOREIGN KEY (`id_exercicio`) REFERENCES `exercicios` (`id_exercicio`);
+ALTER TABLE `progresso_aula`
+  ADD CONSTRAINT `progresso_aula_ibfk_1` FOREIGN KEY (`id_usuario`) REFERENCES `cadastro_usuario` (`id_usuario`),
+  ADD CONSTRAINT `progresso_aula_ibfk_2` FOREIGN KEY (`id_aula`) REFERENCES `aulas` (`id_aula`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

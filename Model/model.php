@@ -146,6 +146,7 @@ class Model {
                     if (password_verify($senha_usuario, $user['senha_usuario'])) {
                         session_start();
                         $_SESSION["login"] = true;
+                        $_SESSION["id_usuario"] = $user['id_usuario'];
                         $_SESSION["nome_usuario"] = $user['nome_usuario'];
                         header("Location: selecionar_linguagem.php");
                         exit();
@@ -998,6 +999,7 @@ class Model {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     public function listar_atividade_por_aula($id_aula){
         if (!$this->conn || !$id_aula) return [];
         $query = "SELECT id_exercicio, tipo_exercicio, pergunta FROM exercicios
@@ -1006,9 +1008,63 @@ class Model {
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id_aula', $id_aula, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+
+        $atividades = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $row['tipo_exercicio'] = trim($row['tipo_exercicio']);
+
+            if ($row['tipo_exercicio'] === 'alternativa') {
+                $row['opcoes'] = $this->listar_opcoes_por_exercicio($row['id_exercicio']);
+            } elseif ($row['tipo_exercicio'] === 'completar') {
+                $row['resposta_correta'] = $this->obter_resposta_completar($row['id_exercicio']);
+            } elseif ($row['tipo_exercicio'] === 'ordenar' || $row['tipo_exercicio'] === 'ordenacao') {
+                $row['blocos'] = $this->listar_blocos_por_exercicio($row['id_exercicio']);
+            } else {
+                $row['opcoes'] = [];
+            }
+
+            $atividades[] = $row;
+        }
+
+        return $atividades;
     }
     
+    public function listar_opcoes_por_exercicio($id_exercicio) {
+        if (!$this->conn || !$id_exercicio) return [];
+        $query = "SELECT id_opcao, texto_opcao, correta FROM exercicio_opcoes
+                  WHERE id_exercicio = :id_exercicio 
+                  ORDER BY id_opcao ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_exercicio', $id_exercicio, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function listar_blocos_por_exercicio($id_exercicio) {
+        if (!$this->conn || !$id_exercicio) return [];
+        $query = "SELECT id_bloco, texto_bloco, ordem_correta FROM exercicio_blocos
+                  WHERE id_exercicio = :id_exercicio 
+                  ORDER BY id_bloco ASC";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_exercicio', $id_exercicio, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obter_resposta_completar($id_exercicio) {
+        if (!$this->conn || !$id_exercicio) return null;
+        $query = "SELECT resposta_correta FROM exercicio_completar
+                  WHERE id_exercicio = :id_exercicio 
+                  LIMIT 1";
+        
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_exercicio', $id_exercicio, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
+
     public function listar_aulas_por_linguagem($id_linguagem){
         if (!$this->conn || !$id_linguagem) return [];
         $query = "
@@ -1021,6 +1077,27 @@ class Model {
         $stmt->bindParam(':id', $id_linguagem, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function salvar_progresso_aula($id_usuario, $id_aula, $total_exercicios, $exercicios_corretos) {
+        if (!$this->conn || !$id_usuario || !$id_aula) {
+            return false;
+        }
+
+        $query = "INSERT INTO progresso_aula 
+        (id_usuario, id_aula, status, data_inicio, data_conclusao, total_exercicios, exercicios_corretos)
+                  VALUES (:id_usuario, :id_aula, 'concluida', NOW(), NOW(), :total_exercicios, :exercicios_corretos)
+                  ON DUPLICATE KEY UPDATE 
+                    status = 'concluida',
+                    data_conclusao = NOW(),
+                    total_exercicios = VALUES(total_exercicios),
+                    exercicios_corretos = VALUES(exercicios_corretos)";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+        $stmt->bindParam(':id_aula', $id_aula, PDO::PARAM_INT);
+        $stmt->bindParam(':total_exercicios', $total_exercicios, PDO::PARAM_INT);
+        $stmt->bindParam(':exercicios_corretos', $exercicios_corretos, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 
     public function SalaGeral_model(){

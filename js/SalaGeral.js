@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         container.innerHTML = "";
         container.appendChild(template.content.cloneNode(true));
+        
+        // Adicionar event listener para botão de ranking após renderizar
+        adicionarEventListenerRanking();
     };
 
     const marcarMenuAtivo = function (view) {
@@ -41,6 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // Fechar dropdown se estiver aberto
         if (dropdownContent) {
             dropdownContent.style.display = "none";
+        }
+    };
+
+    const adicionarEventListenerRanking = function() {
+        const btnRankingMobile = document.querySelector(".btn-ranking-mobile");
+        const rankingContainer = document.getElementById("ranking-container");
+        
+        if (btnRankingMobile && rankingContainer) {
+            btnRankingMobile.addEventListener("click", function() {
+                rankingContainer.classList.toggle("visible");
+                btnRankingMobile.textContent = rankingContainer.classList.contains("visible") ? "Esconder Ranking" : "Ranking";
+            });
         }
     };
 
