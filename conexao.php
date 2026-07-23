@@ -1,8 +1,8 @@
 <?php
 class Database {
     private $host = 'localhost';
-    private $db_name = 'codexia';
-    private $username = 'CODEXIA';
+    private $db_name = 'devplace';
+    private $username = 'DEVPLACE';
     private $password = '190405';
     private $conn;
 

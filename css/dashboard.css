@@ -1,7 +1,13 @@
+html,
+body{
+    height:100%;
+    overflow:hidden;
+}
 .dashboard-container{
     display: flex;
     min-height: 100dvh;
     background: #f3f7fb;
+    /* overflow: hidden; */
 }
 
 .dashboard-menu{
@@ -13,16 +19,15 @@
     background: linear-gradient(180deg, #0f2742 0%, #133c64 100%);
     padding: 28px 20px;
     border-right: 1px solid #163f66;
+    flex-shrink: 0;
+    /* overflow: hidden; */
 }
 
-.dashboard-menu h2{
-    width: 100%;
-    height: 50px;
-    background-color:yellowgreen;
-    color: #ffffff;
-    margin: 0 0 12px;
-    font-size: 1.4rem;
-    letter-spacing: 0.3px;
+
+.menu-dropdown{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .menu-item{
@@ -31,26 +36,46 @@
     color: #ffffff;
     border-radius: 10px;
     padding: 12px 14px;
-    text-align: left;
     cursor: pointer;
     font-size: 0.95rem;
-    transition: all 0.2s ease;
+    list-style: none;
 }
 
-.menu-item:hover{
-    background: #20639d;
-}
-
-.menu-item.active{
+.menu-dropdown[open] .menu-item{
     background: #ffffff;
     color: #103253;
     border-color: #ffffff;
     font-weight: 600;
 }
 
+.menu-dropdown-content{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 6px;
+}
+
+.dropdown-link{
+    display: block;
+    padding: 10px 12px;
+    background: #194b77;
+    color: #ffffff;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.dropdown-link:hover{
+    background: #20639d;
+}
+
 .dashboard-conteudo{
+    /* background-color: violet; */
     flex: 1;
     padding: 32px;
+    overflow-y: auto;
+    min-height: 0;
+    height: 100vh;
 }
 
 .dashboard-cabecalho h1{
@@ -58,6 +83,59 @@
     color: #0f2a45;
     font-size: 1.8rem;
 }
+
+.dashboard-cabecalho{
+    margin-bottom: 8px;
+}
+
+.dashboard-card-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.dashboard-action-btn{
+    display: block;
+    padding: 18px 16px;
+    background: linear-gradient(135deg, #0f5a97 0%, #1f76b6 100%);
+    color: #ffffff;
+    text-decoration: none;
+    border-radius: 14px;
+    text-align: center;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(12, 32, 54, 0.16);
+}
+
+.dashboard-action-btn:hover{
+    transform: translateY(-2px);
+}
+.form-panel-inline{
+    display: none;
+    margin-top: 8px;
+    width: 100%;
+
+    &:target{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    & .form-panel-header{
+        width: 100%;
+        height: 50px;
+    }
+    & h3{
+        margin: 0 0 12px;
+        color: #15344f;
+        text-align: center;
+        font-size: 24px;
+    }
+    & .form-painel{
+    width: min(100%, 760px);
+    margin: 0 auto;
+    }
+}
+
 
 .dashboard-cabecalho p{
     margin: 8px 0 22px;
@@ -146,55 +224,145 @@
     color: #15344f;
 }
 
+.dashboard-mensagem {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+    min-height: 0;
+    width: min(360px, calc(100vw - 32px));
+}
+
+.dashboard-toast {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(13, 32, 54, 0.16);
+    margin-bottom: 10px;
+    animation: toast-in 220ms ease-out;
+    transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.dashboard-toast.is-hidden {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.dashboard-toast.toast-success {
+    background: #eaf8ee;
+    color: #166534;
+    border: 1px solid #a7e3b8;
+}
+
+.dashboard-toast.toast-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.dashboard-toast.toast-info {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.toast-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.toast-content strong {
+    font-size: 0.95rem;
+}
+
+.toast-content span {
+    font-size: 0.92rem;
+    line-height: 1.35;
+}
+
+.toast-close {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-size: 1.15rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (max-width: 1024px){
     .dashboard-container{
         display: block;
     }
 
     .dashboard-menu{
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 50;
         width: 100%;
         min-height: auto;
         flex-direction: row;
-        align-items: stretch;
+        align-items: center;
         gap: 8px;
-        padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        padding: 12px 14px;
         border-right: none;
-        border-top: 1px solid #163f66;
-        background: linear-gradient(180deg, #0f2742 0%, #133c64 100%);
+        border-bottom: 1px solid #163f66;
     }
 
     .dashboard-menu h2{
         display: none;
     }
 
-    .menu-item{
+    .menu-dropdown{
         flex: 1;
-        margin: 0;
-        border-radius: 12px;
-        padding: 10px 8px;
-        font-size: 0.84rem;
-        text-align: center;
-        line-height: 1.2;
     }
 
     .dashboard-conteudo{
-        width: 100%;
-        padding: 22px 16px 110px;
+        padding: 24px 20px 40px;
     }
 }
 
 @media (max-width: 760px){
+    .dashboard-container{
+        display: block;
+    }
+
+    .dashboard-conteudo{
+        padding: 20px 14px 80px;
+    }
+
     .dashboard-cabecalho h1{
         font-size: 1.5rem;
     }
 
     .dashboard-cabecalho p{
         font-size: 0.95rem;
+    }
+
+    .dashboard-card-grid{
+        grid-template-columns: 1fr;
+    }
+
+    .panel-form{
+        padding: 12px 12px 96px;
+        align-items: flex-start;
+    }
+
+    .panel-form .form-painel{
+        width: 100%;
+        max-height: none;
     }
 
     .form-painel{
@@ -206,16 +374,4 @@
         grid-template-columns: 1fr;
         gap: 0;
     }
-
-    .menu-item{
-        font-size: 0.78rem;
-        padding: 10px 6px;
-    }
 }
-/*
-CREATE TABLE modulos (
-  id_modulo INT AUTO_INCREMENT PRIMARY KEY,
-  titulo_modulo VARCHAR(150),
-  descricao_modulo TEXT,
-  ordem_modulo INT
-);*/

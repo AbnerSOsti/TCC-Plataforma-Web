@@ -1,0 +1,35 @@
+*** Begin Patch
+*** Update File: c:\laragon\www\TCC\View\view.php
+@@
+-    // Selecionarcurso_Page removed; merged into SalaGeralPage
+-
+-    public function SalaGeralPage($modulos, $aula, $linguagens){
++    // Selecionarcurso_Page removed; merged into SalaGeralPage
++
++    public function SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem = null){
+@@
+-                <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="cursos">
++                <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="' . $dataViewInicial . '">
+@@
+-            <template id="template-conteudo">
+-                <div class="conteudo-container">
+-                    <div class="conteudo-atividade">
+-                            <div class="conteudo-aulas">
+-                                '.$html_modulos.'
+-                            </div>
+-                    </div>
+-                    
+-                </div>
+-            </template>
++            <template id="template-conteudo">
++                <div class="conteudo-container">
++                    ' . $selectedHtml . '
++                    <div class="conteudo-atividade">
++                            <div class="conteudo-aulas">
++                                ' . $html_modulos . '
++                            </div>
++                    </div>
++                    
++                </div>
++            </template>
+*** End Patch

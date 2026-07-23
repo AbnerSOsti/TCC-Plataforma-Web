@@ -12,8 +12,9 @@ html {
     --color-red: #be0000;
     --color-black: #333;
     --font-main: 'Poppins', sans-serif;
-    --color-text: #333;
+    --color-text: #696868;
     --color-white: #fff;
+    --color-purple: #d176ed;
 }
 body {
     font-family: var(--font-main);

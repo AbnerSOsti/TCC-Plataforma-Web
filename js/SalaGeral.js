@@ -10,12 +10,13 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // const titulos = {
-    //     conteudo: "Conteúdo",
-    //     perfil: "Perfil",
-    //     config: "Configurações",
-    //     editar: "Editar Perfil"
-    // };
+    const titulos = {
+        conteudo: "Conteúdo",
+        cursos: "Escolha um Curso",
+        perfil: "Perfil",
+        config: "Configurações",
+        editar: "Editar Perfil"
+    };
 
     const renderTemplate = function (templateId, container) {
         const template = document.getElementById(templateId);
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const carregarTela = function (view) {
         renderTemplate("template-" + view, formulario);
-        // titulo.textContent = titulos[view] || "Sala Geral";
+        titulo.textContent = titulos[view] || "Sala Geral";
         marcarMenuAtivo(view);
 
         // Fechar dropdown se estiver aberto

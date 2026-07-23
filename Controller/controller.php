@@ -19,7 +19,7 @@ class Controller {
         $model = new Model();
         $visao = new View();
 
-        $string = $model->cadsatro_model();
+        $string = $model->cadastro_model();
         $visao->Cadastropage($string);
     }
 
@@ -47,19 +47,29 @@ class Controller {
         $visao->NovaSenhaPage($string);
     }
 
+    public function Admin(){
+        $model = new Model();
+        $visao = new View();
+
+        $string = $model->Login_Admin_model();
+        $visao->Login_admin_page($string);
+    }
+
     public function Dashboard(){
         $model = new Model();
         $visao = new View();
 
         $result = $model->Dashboard_model();
         $message = "";
+        $status = "info";
 
         if (is_array($result)) {
             $message = $result["message"] ?? "";
+            $status = (($result["status"] ?? "") === "success") ? "success" : "error";
 
             if (($result["status"] ?? "") === "success") {
                 $view = $result["view"] ?? "modulo";
-                $location = "dashboard.php?view=" . urlencode($view) . "&message=" . urlencode($message);
+                $location = "dashboard.php?view=" . urlencode($view) . "&message=" . urlencode($message) . "&status=" . urlencode($status);
                 header("Location: " . $location);
                 exit;
             }
@@ -71,37 +81,55 @@ class Controller {
             $message = trim((string) $_GET["message"]);
         }
 
+        if (isset($_GET["status"])) {
+            $statusParam = strtolower(trim((string) $_GET["status"]));
+            if (in_array($statusParam, ["success", "error", "info"], true)) {
+                $status = $statusParam;
+            }
+        }
+
         $modulos = $model->listar_modulo();
         $aulas = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
         $abaAtiva = $model->obter_aba_dashboard_ativa();
-        $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens);
+        $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens, $status);
     }
 
-
     public function SalaGeral($linguagem_id = null){
+        if(session_status() === PHP_SESSION_NONE){
+            session_start();
+        }
+
         $model = new Model();
         $visao = new View();
 
-        $modulos = $linguagem_id 
-        ? $model->listar_modulo_por_linguagem($linguagem_id) 
-        : $model->listar_modulo();
-        
+        $selectedLinguagem = null;
 
-        $modulos = $model->listar_modulo();
+        // If explicit linguagem_id provided via GET, use it and store in session
+        if ($linguagem_id && $linguagem_id > 0) {
+            $modulos = $model->listar_modulo_por_linguagem($linguagem_id);
+            $selectedLinguagem = $model->obter_linguagem_por_id($linguagem_id);
+            // store last selected for user session
+            if (isset($_SESSION["id_usuario"])) {
+                $_SESSION['last_linguagem'] = $linguagem_id;
+            }
+        } else {
+            // if no GET param, try session last_linguagem (if user previously selected)
+            $last = $_SESSION['last_linguagem'] ?? null;
+            if ($last) {
+                $modulos = $model->listar_modulo_por_linguagem($last);
+                $selectedLinguagem = $model->obter_linguagem_por_id($last);
+            } else {
+                $modulos = $model->listar_modulo();
+            }
+        }
 
         $aula = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
-        $visao->SalaGeralPage($modulos, $aula, $linguagens);
+        $visao->SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem);
     }
-    public function Selecionar_Curso(){
-        $model = new Model();
-        $visao = new View();
 
-        $visao->header("");
-        $linguagens = $model->listar_linguagens();
-        $visao->Selecionarcurso_Page($linguagens);
-    }
+    // Selecionar_Curso removed; functionality merged into SalaGeral
 
     public function Atividade($id_aula = null){
         if(session_status() == PHP_SESSION_NONE){

@@ -46,6 +46,7 @@ CREATE TABLE `cadastro_usuario` (
   `nome_usuario` varchar(150) DEFAULT NULL,
   `email_usuario` varchar(250) DEFAULT NULL,
   `senha_usuario` varchar(255) DEFAULT NULL,
+  `tipo_usuario` varchar(255) DEFAULT NULL,
   `datacadastro_usuario` date DEFAULT NULL,
   `token_recuperacao` varchar(350) DEFAULT NULL,
   `token_expira` date DEFAULT NULL
@@ -55,8 +56,10 @@ CREATE TABLE `cadastro_usuario` (
 -- Despejando dados para a tabela `cadastro_usuario`
 --
 
-INSERT INTO `cadastro_usuario` (`id_usuario`, `nome_usuario`, `email_usuario`, `senha_usuario`, `datacadastro_usuario`, `token_recuperacao`, `token_expira`) VALUES
-(2, 'Abner Osti', '9123@fai.com.br', '$2y$10$4bWTOW16EwKaLJ9LRU1Nb.ZY5xrs4W0/AqZZxTj.Qvuk/6i2vFCDy', '2026-03-10', '3d1e9b7a2f49560937f8fce75e623112.1773251226', '2026-03-11');
+INSERT INTO `cadastro_usuario` (`id_usuario`, `nome_usuario`, `email_usuario`, `senha_usuario`, `tipo_usuario`, `datacadastro_usuario`, `token_recuperacao`, `token_expira`) VALUES
+(2, 'Abner Osti', '9123@fai.com.br', '$2y$10$4bWTOW16EwKaLJ9LRU1Nb.ZY5xrs4W0/AqZZxTj.Qvuk/6i2vFCDy', 'Aluno', '2026-03-10', '3d1e9b7a2f49560937f8fce75e623112.1773251226', '2026-03-11');
+
+-- --------------------------------------------------------
 
 -- --------------------------------------------------------
 
@@ -68,7 +71,8 @@ CREATE TABLE `exercicios` (
   `id_exercicio` int(11) NOT NULL,
   `id_aula` int(11) DEFAULT NULL,
   `tipo_exercicio` varchar(50) DEFAULT NULL,
-  `pergunta` text DEFAULT NULL
+  `pergunta` text DEFAULT NULL,
+  `feedback_erro` varchar(350) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -119,7 +123,8 @@ CREATE TABLE `modulos` (
   `id_modulo` int(11) NOT NULL,
   `titulo_modulo` varchar(150) DEFAULT NULL,
   `descricao_modulo` text DEFAULT NULL,
-  `ordem_modulo` int(11) DEFAULT NULL
+  `ordem_modulo` int(11) DEFAULT NULL,
+  `id_linguagem` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `linguagens` (
@@ -127,6 +132,7 @@ CREATE TABLE `linguagens` (
   `nome_linguagem` varchar(100) NOT NULL,
   `descricao` text DEFAULT NULL,
   `nivel` varchar(50) DEFAULT NULL,
+  `img` varchar(500) DEFAULT NULL,
   `data_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_linguagem`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -135,9 +141,9 @@ CREATE TABLE `linguagens` (
 -- Despejando dados para a tabela `modulos`
 --
 
-INSERT INTO `modulos` (`id_modulo`, `titulo_modulo`, `descricao_modulo`, `ordem_modulo`) VALUES
-(1, 'teste', 'teste', 1),
-(2, 'teste2', 'teste', 2);
+INSERT INTO `modulos` (`id_modulo`, `titulo_modulo`, `descricao_modulo`, `ordem_modulo`, `id_linguagem`) VALUES
+(1, 'teste', 'teste', 1, 1),
+(2, 'teste2', 'teste', 2, 1);
 
 -- --------------------------------------------------------
 

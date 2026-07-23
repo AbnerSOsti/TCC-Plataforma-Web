@@ -127,24 +127,28 @@ function finalizarAula() {
 }
 
 function marcarRespostaCorreta(correta) {
+    const exercicioAtual = fila[0];
+
     if (correta) {
         corretos += 1;
         fila.shift();
         feedback.textContent = 'Resposta correta!';
+        feedback.classList.remove('feedback-erro');
         feedback.classList.add('feedback-sucesso');
-    } else {
-        const errado = fila.shift();
-        fila.push(errado);
-        feedback.textContent = 'Resposta errada. Ele voltará ao fim dos exercícios.';
-        feedback.classList.add('feedback-erro');
+
+        atualizarProgresso();
+        if (fila.length === 0) {
+            finalizarAula();
+        } else {
+            setTimeout(renderExercicio, 800);
+        }
+        return;
     }
 
-    atualizarProgresso();
-    if (fila.length === 0) {
-        finalizarAula();
-    } else {
-        setTimeout(renderExercicio, 800);
-    }
+    const feedbackErro = exercicioAtual?.feedback_erro?.trim() || 'Resposta incorreta. Tente novamente.';
+    feedback.textContent = feedbackErro;
+    feedback.classList.remove('feedback-sucesso');
+    feedback.classList.add('feedback-erro');
 }
 
 btnResponder.addEventListener('click', () => {

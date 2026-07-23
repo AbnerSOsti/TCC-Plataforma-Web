@@ -75,13 +75,14 @@ class Model {
         return $expiration < $this->getUtcNow();
     }
     
-     public function cadsatro_model(){
+     public function cadastro_model(){
         
          if(isset($_POST["btnCadastrar"]) || isset($_POST["btnCadastro"])){
 
             $nome_usuario     = $_POST["nome_usuario"];
             $email_usuario    = $_POST["email_usuario"];
             $senha_usuario    = password_hash($_POST["senha_usuario"], PASSWORD_DEFAULT);
+            $tipo_usuario     =  "ALUNO"; // Definindo o tipo de usuário como "Aluno"
             $datacadastro_usuario     = date('Y-m-d H:i:s');
 
         require_once('conexao.php');
@@ -102,9 +103,9 @@ class Model {
                 }
 
                 $query = "INSERT INTO cadastro_usuario (
-                            nome_usuario, email_usuario, senha_usuario, datacadastro_usuario
+                            nome_usuario, email_usuario, senha_usuario, tipo_usuario, datacadastro_usuario
                         ) VALUES (
-                            :nome, :email, :senha, :data
+                            :nome, :email, :senha, :tipo, :data
                         )";
 
                 $stmt = $conn->prepare($query);
@@ -112,6 +113,7 @@ class Model {
                 $stmt->bindParam(":nome", $nome_usuario);
                 $stmt->bindParam(":email", $email_usuario);
                 $stmt->bindParam(":senha", $senha_usuario);
+                $stmt->bindParam(":tipo", $tipo_usuario);
                 $stmt->bindParam(":data", $datacadastro_usuario);
 
                 $stmt->execute();
@@ -143,12 +145,58 @@ class Model {
 
                 if ($stmt->rowCount() > 0) {
                     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if (password_verify($senha_usuario, $user['senha_usuario'])) {
+                    if (password_verify($senha_usuario, $user['senha_usuario']) && $user['tipo_usuario'] === 'ALUNO') {
                         session_start();
                         $_SESSION["login"] = true;
                         $_SESSION["id_usuario"] = $user['id_usuario'];
                         $_SESSION["nome_usuario"] = $user['nome_usuario'];
-                        header("Location: selecionar_linguagem.php");
+                        $_SESSION["tipo_usuario"] = $user['tipo_usuario'];
+                        
+                        header("Location: sala.php");
+                        exit();
+                    } else {
+                        $string = "Senha incorreta.";
+                        return $string;
+                    }
+                } else {
+                    $string = "Email não encontrado.";
+                    return $string;
+                }
+
+            } catch (PDOException $e) {
+                echo "Erro na leitura: " . $e->getMessage();
+            }
+        }
+        }
+    }
+
+    public function Login_Admin_model(){
+        if(isset($_POST["btnLoginAdmin"])){
+
+            $email_usuario    = $_POST["email_usuario"];
+            $senha_usuario    = $_POST["senha_usuario"];
+
+        require_once('conexao.php');
+        $db = new Database();
+        $conn = $db->connect();
+
+        if ($conn) {
+            try {
+
+                $query = "SELECT * FROM cadastro_usuario WHERE email_usuario = :email";
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(":email", $email_usuario);
+                $stmt->execute();
+
+                if ($stmt->rowCount() > 0) {
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (password_verify($senha_usuario, $user['senha_usuario']) && $user['tipo_usuario'] === 'ADMIN') {
+                        session_start();
+                        $_SESSION["login"] = true;
+                        $_SESSION["id_usuario"] = $user['id_usuario'];
+                        $_SESSION["nome_usuario"] = $user['nome_usuario'];
+                        $_SESSION["tipo_usuario"] = $user['tipo_usuario'];
+                        header("Location: dashboard.php");
                         exit();
                     } else {
                         $string = "Senha incorreta.";
@@ -546,13 +594,14 @@ class Model {
         ];
     }
 
-    private function inserirExercicioBase($idAula, $tipoExercicio, $pergunta) {
-        $query = "INSERT INTO exercicios (id_aula, tipo_exercicio, pergunta)
-                  VALUES (:id_aula, :tipo_exercicio, :pergunta)";
+    private function inserirExercicioBase($idAula, $tipoExercicio, $pergunta, $feedbackErro) {
+        $query = "INSERT INTO exercicios (id_aula, tipo_exercicio, pergunta, feedback_erro)
+                  VALUES (:id_aula, :tipo_exercicio, :pergunta, :feedback_erro)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_aula", $idAula, PDO::PARAM_INT);
         $stmt->bindParam(":tipo_exercicio", $tipoExercicio);
         $stmt->bindParam(":pergunta", $pergunta);
+        $stmt->bindParam(":feedback_erro", $feedbackErro);
         $stmt->execute();
 
         return (int) $this->conn->lastInsertId();
@@ -703,6 +752,7 @@ class Model {
         $idAula = $this->normalizarInteiroPositivo($_POST["id_aula_exercicio"] ?? null);
         $tipoExercicio = trim($_POST["tipo_exercicio"] ?? "");
         $pergunta = trim($_POST["pergunta_exercicio"] ?? "");
+        $feedbackErro = trim($_POST["feedback_erro"] ?? "");
         $tiposPermitidos = ["alternativa", "completar", "ordenar"];
 
         if ($idAula === null) {
@@ -736,7 +786,7 @@ class Model {
         try {
             $this->conn->beginTransaction();
 
-            $idExercicio = $this->inserirExercicioBase($idAula, $tipoExercicio, $pergunta);
+            $idExercicio = $this->inserirExercicioBase($idAula, $tipoExercicio, $pergunta, $feedbackErro);
 
             if ($tipoExercicio === "alternativa") {
                 $this->salvarExercicioAlternativa($idExercicio);
@@ -881,6 +931,8 @@ class Model {
             $nome_linguagem = trim($_POST["nome_linguagem"] ?? "");
             $descricao = trim($_POST["descricao_linguagem"] ?? "");
             $nivel = trim($_POST["nivel_linguagem"] ?? "");
+            $img_path = null;
+            
 
             if ($nome_linguagem === "") {
                 return [
@@ -888,6 +940,46 @@ class Model {
                     "message" => "Preencha o nome da linguagem.",
                     "view" => "linguagem"
                 ];
+            }
+
+            $arquivo = $_FILES["img"] ?? null;
+
+            if($arquivo && isset($arquivo["tmp_name"]) && $arquivo["tmp_name"] !== ""){
+                if($arquivo["error"] !== UPLOAD_ERR_OK){
+                    return[
+                        "status" => "error",
+                        "message" => "Erro ao enviar a imagem",
+                        "view" => "linguagem"
+                    ];
+                }
+
+                $extensao = strtolower(pathinfo($arquivo["name"], PATHINFO_EXTENSION));
+                $extensoesPermitidas = ["jpg", "jpeg", "png", "gif", "webp"];
+
+                if(!in_array($extensao, $extensoesPermitidas, true)){
+                    return[
+                        "status" => "error",
+                        "message" => "Formato da imagem invalido. Use JPG, JPEG, PNG, GIF ou WEBP",
+                        "view" => "linguagem"
+                    ];
+                }
+                $pastaUploads = dirname(__DIR__) . "/uploads";
+                
+                if(!is_dir($pastaUploads)){
+                    mkdir($pastaUploads, 0777, true);
+                }
+                $nomeArquivo = bin2hex(random_bytes(16)) . ($extensao ? "." . $extensao : "");
+                $destino = $pastaUploads . "/" . $nomeArquivo;
+
+                if (!move_uploaded_file($arquivo["tmp_name"], $destino)) {
+                    return [
+                        "status" => "error",
+                        "message" => "Não foi possível salvar a imagem na pasta uploads.",
+                        "view" => "linguagem"
+                    ];
+                }
+
+                $img_path = "uploads/" . $nomeArquivo;
             }
 
             try {
@@ -905,15 +997,16 @@ class Model {
                 }
 
                 $query = "INSERT INTO linguagens (
-                            nome_linguagem, descricao, nivel
+                            nome_linguagem, descricao, nivel, img
                         ) VALUES (
-                            :nome, :descricao, :nivel
+                            :nome, :descricao, :nivel, :img
                         )";
 
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(":nome", $nome_linguagem);
                 $stmt->bindParam(":descricao", $descricao);
                 $stmt->bindParam(":nivel", $nivel);
+                $stmt->bindParam(":img", $img_path);
                 $stmt->execute();
 
                 return [
@@ -978,11 +1071,26 @@ class Model {
         }
 
         try {
-            $query = "SELECT id_linguagem, nome_linguagem, nivel FROM linguagens ORDER BY nome_linguagem ASC";
+            $query = "SELECT id_linguagem, nome_linguagem, descricao, nivel, img, data_criacao FROM linguagens ORDER BY id_linguagem ASC";
             $stmt = $this->conn->query($query);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             return [];
+        }
+    }
+
+    public function obter_linguagem_por_id($id){
+        if (!$this->conn || !$id) return null;
+
+        try{
+            $query = "SELECT id_linguagem, nome_linguagem, descricao, nivel, img, data_criacao FROM linguagens WHERE id_linguagem = :id LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $row ? $row : null;
+        } catch(PDOException $e){
+            return null;
         }
     }
 
@@ -1002,7 +1110,7 @@ class Model {
 
     public function listar_atividade_por_aula($id_aula){
         if (!$this->conn || !$id_aula) return [];
-        $query = "SELECT id_exercicio, tipo_exercicio, pergunta FROM exercicios
+        $query = "SELECT id_exercicio, tipo_exercicio, pergunta, feedback_erro FROM exercicios
                   WHERE id_aula = :id_aula ORDER BY id_exercicio ASC";
 
         $stmt = $this->conn->prepare($query);

@@ -9,10 +9,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>linguagens</title>
+    <title>Login</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/selecionar.css">
-    <script src="js/SalaGeral.js" defer></script>
+    <link rel="stylesheet" href="css/login_usuario.css">
    
 </head>
 <body>
@@ -20,7 +19,7 @@
         include "./Controller/controller.php";
 
         $controller = new Controller();
-        $controller->Selecionar_Curso();
+        $controller->Admin();
     ?>
 
 </body>

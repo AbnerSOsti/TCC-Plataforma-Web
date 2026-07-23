@@ -1,4 +1,20 @@
-<?php ob_start(); ?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['login']) || $_SESSION['login'] !== true) {
+    header('Location: admin.php');
+    exit();
+}
+
+$tipo = isset($_SESSION['tipo_usuario']) ? strtoupper((string) $_SESSION['tipo_usuario']) : '';
+
+    if ($tipo !== 'ADMIN') {
+    header('Location: sala.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,4 +36,5 @@
         ?>
     </div>
 </body>
+<script src="https://fontawesome.com" crossorigin="anonymous"></script>
 </html>
