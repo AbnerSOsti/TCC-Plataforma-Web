@@ -477,7 +477,7 @@ class Model {
     }
 
     private function getDashboardViewFromRequest() {
-        $viewsPermitidas = ["modulo", "linguagem", "aula", "exercicio"];
+        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio", "editar-curso"];
         $view = trim((string) ($_POST["dashboard_view"] ?? $_GET["view"] ?? ""));
 
         if (in_array($view, $viewsPermitidas, true)) {
@@ -1089,6 +1089,32 @@ class Model {
         }
     }
 
+    public function buscar_linguagem_por_id($id_linguagem){
+        if (!$this->conn) {
+            return null;
+        }
+
+        $idLinguagem = $this->normalizarInteiroPositivo($id_linguagem);
+        if ($idLinguagem === null) {
+            return null;
+        }
+
+        try {
+            $query = "SELECT id_linguagem, nome_linguagem, descricao, nivel, img, data_criacao
+                      FROM linguagens
+                      WHERE id_linguagem = :id_linguagem
+                      LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":id_linguagem", $idLinguagem, PDO::PARAM_INT);
+            $stmt->execute();
+
+            $linguagem = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $linguagem ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
     public function listar_linguagens_inscritas_por_usuario($id_usuario){
         if (!$this->conn || !$id_usuario) {
             return [];
@@ -1280,7 +1306,7 @@ class Model {
         if (!$this->conn) return [];
         
         $query ="
-        SELECT id_modulo, titulo_modulo, descricao_modulo FROM modulos
+        SELECT id_modulo, titulo_modulo, descricao_modulo, ordem_modulo FROM modulos
         WHERE id_linguagem = :id_linguagem ORDER BY ordem_modulo ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_linguagem", $linguagem_id, PDO::PARAM_INT);

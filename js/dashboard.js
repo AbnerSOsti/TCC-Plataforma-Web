@@ -126,6 +126,41 @@ document.addEventListener("DOMContentLoaded", function () {
             });
             renderTipoExercicio(novoSeletor.value);
         }
+
+        const botoesMenuModulo = container.querySelectorAll('[data-action="toggle-menu-modulo"]');
+        botoesMenuModulo.forEach(function (botaoMenu) {
+            botaoMenu.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const dropdownAtual = botaoMenu.closest(".dropdown-acoes-modulo");
+                const estavaAberto = dropdownAtual.classList.contains("is-aberto");
+
+                container.querySelectorAll(".dropdown-acoes-modulo.is-aberto").forEach(function (dropdown) {
+                    dropdown.classList.remove("is-aberto");
+                    const menu = dropdown.querySelector(".menu-acoes-modulo");
+                    const botao = dropdown.querySelector('[data-action="toggle-menu-modulo"]');
+
+                    if (menu) {
+                        menu.style.display = "none";
+                    }
+
+                    if (botao) {
+                        botao.setAttribute("aria-expanded", "false");
+                    }
+                });
+
+                if (!estavaAberto) {
+                    dropdownAtual.classList.add("is-aberto");
+                    const menuAtual = dropdownAtual.querySelector(".menu-acoes-modulo");
+
+                    if (menuAtual) {
+                        menuAtual.style.display = "flex";
+                    }
+
+                    botaoMenu.setAttribute("aria-expanded", "true");
+                }
+            });
+        });
     };
 
     const marcarMenuAtivo = function (view) {

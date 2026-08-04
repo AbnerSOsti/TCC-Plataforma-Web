@@ -359,10 +359,10 @@ class View{
                 </div>';
     }
 
-    public function DashboardPage($string, $modulos = [], $aulas = [], $abaAtiva = 'modulo', $linguagens = [], $status = 'info'){
+    public function DashboardPage($string, $modulos = [], $aulas = [], $abaAtiva = 'modulo', $linguagens = [], $status = 'info', $linguagemSelecionada = null, $modulosCurso = []){
         $opcoes_modulo = '<option value="">Selecione um modulo</option>';
         $opcoes_aula = '<option value="">Selecione uma aula</option>';
-        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio"];
+        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio", "editar-curso"];
 
         $html_gerenciar = '';
 
@@ -395,9 +395,11 @@ class View{
                                         ' . htmlspecialchars($linguagem['nivel'] ?? '', ENT_QUOTES, 'UTF-8') . '
                                     </span>
 
-                                    <button class="btn-editar" type="button">
-                                        Editar Curso →
-                                    </button>
+                                    <form class="form-editar-curso" action="dashboard.php" method="get">
+                                        <input type="hidden" name="view" value="editar-curso">
+                                        <input type="hidden" name="linguagem" value="' . htmlspecialchars((string) ($linguagem['id_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                                        <button class="btn-editar" type="submit">Editar Curso →</button>
+                                    </form>
 
                                 </div>
 
@@ -408,6 +410,48 @@ class View{
 
         if (!in_array($abaAtiva, $viewsPermitidas, true)) {
             $abaAtiva = 'gerenciar';
+        }
+
+        $cursoEdicao = is_array($linguagemSelecionada) ? $linguagemSelecionada : [];
+        $imagemCursoEdicao = trim((string) ($cursoEdicao['img'] ?? ''));
+        if ($imagemCursoEdicao === '') {
+            $imagemCursoEdicao = 'imagens/img_curso.png';
+        }
+
+        $htmlModulosCurso = '';
+        if (is_array($modulosCurso) && count($modulosCurso) > 0) {
+            foreach ($modulosCurso as $moduloCurso) {
+                $htmlModulosCurso .= '
+                    <tr>
+                        <td>' . htmlspecialchars((string) ($moduloCurso['titulo_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="descricao-modulo">' . htmlspecialchars((string) ($moduloCurso['descricao_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="coluna-ordem">' . htmlspecialchars((string) ($moduloCurso['ordem_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="coluna-acoes">
+                            <div class="dropdown-acoes-modulo">
+                                <button type="button" class="btn-menu-modulo" data-action="toggle-menu-modulo" aria-label="Abrir ações do módulo" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis">
+                                        <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+                                    </svg>
+                                </button>
+                                <div class="menu-acoes-modulo">
+                                    <button type="button">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                        Editar
+                                    </button>
+                                    <button type="button" class="acao-deletar-modulo">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                                        Deletar
+                                    </button>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>';
+            }
+        } else {
+            $htmlModulosCurso = '
+                <tr>
+                    <td colspan="4" class="tabela-sem-registros">Nenhum módulo cadastrado para este curso.</td>
+                </tr>';
         }
 
         if (is_array($modulos)) {
@@ -537,6 +581,79 @@ class View{
                         ' .$html_gerenciar. '
                     </div>
                 </div>
+            </template>
+
+            <template id="template-editar-curso">
+                <section class="form-panel-inline editar-curso-panel" aria-labelledby="titulo-editar-curso">
+                    <div class="form-panel-header">
+                        <h3 id="titulo-editar-curso">Editar Curso</h3>
+                    </div>
+                    <div class="editar-curso-acoes">
+                        <button type="button" class="btn-deletar-curso">Deletar Curso</button>
+                    </div>
+                    <form class="form-painel editar-curso-form" action="dashboard.php" method="post" enctype="multipart/form-data" autocomplete="off">
+                        <input type="hidden" id="editar-curso-id" name="id_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['id_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+
+                        <div class="campo-formulario">
+                            <label for="editar-curso-nome">Nome da Linguagem</label>
+                            <input type="text" id="editar-curso-nome" name="nome_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['nome_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="editar-curso-descricao">Descrição</label>
+                            <textarea id="editar-curso-descricao" name="descricao_linguagem" rows="5">' . htmlspecialchars((string) ($cursoEdicao['descricao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</textarea>
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label for="editar-curso-nivel">Nível</label>
+                            <input type="text" id="editar-curso-nivel" name="nivel_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['nivel'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        </div>
+
+                        <div class="campo-formulario">
+                            <label>Imagem atual</label>
+                            <div class="editar-curso-imagem-atual">
+                                <img src="' . htmlspecialchars($imagemCursoEdicao, ENT_QUOTES, 'UTF-8') . '" alt="Imagem atual do curso">
+                                <span>Imagem cadastrada</span>
+                            </div>
+                        </div>
+
+                        <div class="campo-img">
+                            <label for="editar-curso-imagem">Substituir imagem</label>
+                            <input type="file" id="editar-curso-imagem" name="img" accept="image/*">
+                        </div>
+
+                        <button type="button" class="btn-salvar">Atualizar Curso</button>
+                    </form>
+
+                    <hr class="editar-curso-divisor">
+
+                    <section class="editar-curso-modulos" aria-labelledby="titulo-modulos-curso">
+                        <div class="editar-curso-modulos-cabecalho">
+                            <div>
+                                <h4 id="titulo-modulos-curso">Módulos do Curso</h4>
+                                <p>Gerencie os módulos vinculados a esta linguagem.</p>
+                            </div>
+                        </div>
+
+                        <div class="editar-curso-tabela-wrapper">
+                            <table class="tabela-modulos">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Título</th>
+                                        <th scope="col">Descrição</th>
+                                        <th scope="col" class="coluna-ordem">Ordem</th>
+                                        <th scope="col" class="coluna-acoes"><span class="visualmente-oculto">Ações</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ' . $htmlModulosCurso . '
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <hr class="editar-curso-divisor">
+                </section>
             </template>
 
             <template id="template-linguagem">

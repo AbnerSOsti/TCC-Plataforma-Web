@@ -92,7 +92,22 @@ class Controller {
         $aulas = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
         $abaAtiva = $model->obter_aba_dashboard_ativa();
-        $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens, $status);
+        $linguagemSelecionada = null;
+        $modulosCurso = [];
+
+        if ($abaAtiva === "editar-curso") {
+            $linguagemSelecionada = $model->buscar_linguagem_por_id($_GET["linguagem"] ?? null);
+
+            if ($linguagemSelecionada === null) {
+                $abaAtiva = "gerenciar";
+                $message = "Curso não encontrado.";
+                $status = "error";
+            } else {
+                $modulosCurso = $model->listar_modulo_por_linguagem($linguagemSelecionada["id_linguagem"]);
+            }
+        }
+
+        $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens, $status, $linguagemSelecionada, $modulosCurso);
     }
 
     public function SalaGeral($linguagem_id = null){
