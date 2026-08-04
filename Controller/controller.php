@@ -104,29 +104,62 @@ class Controller {
         $visao = new View();
 
         $selectedLinguagem = null;
+        $messageInicio = '';
+        $enrolledLinguagens = [];
+        $userId = $_SESSION['id_usuario'] ?? null;
 
-        // If explicit linguagem_id provided via GET, use it and store in session
+        if ($userId) {
+            $enrolledLinguagens = $model->listar_linguagens_inscritas_por_usuario($userId);
+        }
+
+        if ($userId) {
+            $model->garantir_configuracao_usuario($userId);
+        }
+
         if ($linguagem_id && $linguagem_id > 0) {
             $modulos = $model->listar_modulo_por_linguagem($linguagem_id);
             $selectedLinguagem = $model->obter_linguagem_por_id($linguagem_id);
-            // store last selected for user session
-            if (isset($_SESSION["id_usuario"])) {
+            $moduloAtual = !empty($modulos[0]['id_modulo']) ? (int) $modulos[0]['id_modulo'] : null;
+
+            if ($userId) {
+                $model->marcar_linguagem_acessada($userId, $linguagem_id);
+                $model->atualizar_configuracao_usuario($userId, [
+                    'id_linguagem_atual' => $linguagem_id,
+                    'id_modulo_atual' => $moduloAtual,
+                    'id_aula_atual' => null,
+                    'ultima_linguagem_acessada' => $linguagem_id,
+                    'atualizar_ultimo_acesso' => true,
+                ]);
+                $model->inscrever_usuario_em_linguagem($userId, $linguagem_id);
                 $_SESSION['last_linguagem'] = $linguagem_id;
             }
         } else {
-            // if no GET param, try session last_linguagem (if user previously selected)
             $last = $_SESSION['last_linguagem'] ?? null;
+            if (!$last && $userId) {
+                $last = $model->obter_ultimo_curso_acessado_do_usuario($userId);
+                if ($last) {
+                    $_SESSION['last_linguagem'] = $last;
+                }
+            }
+
+            if ($userId) {
+                $model->atualizar_configuracao_usuario($userId, [
+                    'atualizar_ultimo_acesso' => true,
+                ]);
+            }
+
             if ($last) {
                 $modulos = $model->listar_modulo_por_linguagem($last);
                 $selectedLinguagem = $model->obter_linguagem_por_id($last);
             } else {
-                $modulos = $model->listar_modulo();
+                $modulos = [];
+                $messageInicio = 'Selecione um curso para acessar os módulos.';
             }
         }
 
         $aula = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
-        $visao->SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem);
+        $visao->SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem, $messageInicio, $enrolledLinguagens);
     }
 
     // Selecionar_Curso removed; functionality merged into SalaGeral
@@ -144,6 +177,19 @@ class Controller {
         $model = new Model();
         $visao = new View();
         $id_usuario = $_SESSION["id_usuario"];
+
+        if ($id_aula && $id_usuario) {
+            $aulaDetalhe = $model->obter_aula_por_id($id_aula);
+            if ($aulaDetalhe) {
+                $model->atualizar_configuracao_usuario($id_usuario, [
+                    'id_linguagem_atual' => $aulaDetalhe['id_linguagem'] ?? null,
+                    'id_modulo_atual' => $aulaDetalhe['id_modulo'] ?? null,
+                    'id_aula_atual' => $id_aula,
+                    'ultima_linguagem_acessada' => $aulaDetalhe['id_linguagem'] ?? null,
+                    'atualizar_ultimo_acesso' => true,
+                ]);
+            }
+        }
 
         if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "salvar_progresso") {
             $total_exercicios = (int) ($_POST["total_exercicios"] ?? 0);

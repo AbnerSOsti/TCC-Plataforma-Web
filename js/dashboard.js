@@ -1,35 +1,36 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const containerToast = document.getElementById("dashboard-mensagem");
+    const menuItems = document.querySelectorAll(".dashboard-nav .menu-item");
+    const container = document.getElementById("dashboard-container-conteudo");
+    const dashboardConteudo = document.getElementById("dashboard-conteudo");
+    const mensagemContainer = document.getElementById("dashboard-mensagem");
 
-    if (containerToast) {
-        const toasts = containerToast.querySelectorAll(".dashboard-toast");
+    if (!menuItems.length || !container || !dashboardConteudo) {
+        return;
+    }
 
+    // Toast functionality
+    if (mensagemContainer) {
+        const toasts = mensagemContainer.querySelectorAll(".dashboard-toast");
         toasts.forEach(function (toast) {
             const fechar = toast.querySelector(".toast-close");
-
             const esconderToast = function () {
                 toast.classList.add("is-hidden");
                 window.setTimeout(function () {
                     toast.remove();
                 }, 220);
             };
-
             if (fechar) {
                 fechar.addEventListener("click", esconderToast);
             }
-
             window.setTimeout(esconderToast, 4000);
         });
     }
 
-    const seletorTipo = document.getElementById("tipo_exercicio");
-    const areaTipos = document.getElementById("tipos-exercicio-conteudo");
-
-    if (!seletorTipo || !areaTipos) {
-        return;
-    }
-
+    // Renderizar tipo de exercício
     const renderTipoExercicio = function (tipo) {
+        const areaTipos = document.getElementById("tipos-exercicio-conteudo");
+        if (!areaTipos) return;
+        
         areaTipos.innerHTML = "";
 
         if (tipo === "alternativa") {
@@ -107,9 +108,42 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
-    seletorTipo.addEventListener("change", function (event) {
-        renderTipoExercicio(event.target.value);
+    // Template rendering
+    const renderTemplate = function (templateId) {
+        const template = document.getElementById("template-" + templateId);
+        if (!template || !container) {
+            return;
+        }
+
+        container.innerHTML = "";
+        container.appendChild(template.content.cloneNode(true));
+        
+        // Reinicializar o seletor de tipo se existir
+        const novoSeletor = container.querySelector("#tipo_exercicio");
+        if (novoSeletor) {
+            novoSeletor.addEventListener("change", function (event) {
+                renderTipoExercicio(event.target.value);
+            });
+            renderTipoExercicio(novoSeletor.value);
+        }
+    };
+
+    const marcarMenuAtivo = function (view) {
+        menuItems.forEach(function (btn) {
+            btn.classList.toggle("active", btn.dataset.view === view);
+        });
+    };
+
+    const carregarTela = function (view) {
+        renderTemplate(view);
+        marcarMenuAtivo(view);
+    };
+
+    menuItems.forEach(function (item) {
+        item.addEventListener("click", function () {
+            carregarTela(item.dataset.view);
+        });
     });
 
-    renderTipoExercicio(seletorTipo.value);
-}); 
+    carregarTela(dashboardConteudo.dataset.viewInicial || "gerenciar");
+});

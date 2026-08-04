@@ -362,10 +362,52 @@ class View{
     public function DashboardPage($string, $modulos = [], $aulas = [], $abaAtiva = 'modulo', $linguagens = [], $status = 'info'){
         $opcoes_modulo = '<option value="">Selecione um modulo</option>';
         $opcoes_aula = '<option value="">Selecione uma aula</option>';
-        $viewsPermitidas = ["modulo", "linguagem", "aula", "exercicio"];
+        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio"];
+
+        $html_gerenciar = '';
+
+            foreach ($linguagens as $linguagem) {
+            $imgRaw = $linguagem['img'] ?? '';
+            $imgRaw = is_string($imgRaw) ? trim($imgRaw) : '';
+
+            if ($imgRaw === '') {
+                $imgSrc = 'imagens/img_curso.png';
+            } else {
+                $imgSrc = $imgRaw;
+            }
+
+            $html_gerenciar .='
+            <div class="curso-card" data-linguagem-id="' . htmlspecialchars($linguagem['id_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '">
+
+                                <div class="curso-img">
+                                    <img src="' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="">
+                                </div>
+
+                                <div class="curso-info">
+
+                                    <h3>' . htmlspecialchars($linguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '</h3>
+
+                                    <p style="flex: 1;">
+                                        ' . htmlspecialchars($linguagem['descricao'] ?? '', ENT_QUOTES, 'UTF-8') . '
+                                    </p>
+
+                                    <span class="badge iniciante">
+                                        ' . htmlspecialchars($linguagem['nivel'] ?? '', ENT_QUOTES, 'UTF-8') . '
+                                    </span>
+
+                                    <button class="btn-editar" type="button">
+                                        Editar Curso →
+                                    </button>
+
+                                </div>
+
+                            </div>
+            ';
+        }
+
 
         if (!in_array($abaAtiva, $viewsPermitidas, true)) {
-            $abaAtiva = 'linguagem';
+            $abaAtiva = 'gerenciar';
         }
 
         if (is_array($modulos)) {
@@ -405,341 +447,224 @@ class View{
 
         echo '
             <link rel="stylesheet" href="css/dashboard.css">
-            <div class="dashboard-container">
-                <aside class="dashboard-menu">
-                    <a href="index.php" class="btn-voltar">Home</a>
-                    
-                    <details class="menu-dropdown">
-                        <summary class="menu-item">Cadastro</summary>
-                        <div class="menu-dropdown-content">
-                            <a class="dropdown-link" href="#form-linguagem">Linguagem</a>
-                            <a class="dropdown-link" href="#form-modulo">Módulo</a>
-                            <a class="dropdown-link" href="#form-aula">Aula</a>
-                            <a class="dropdown-link" href="#form-exercicio">Exercício</a>
-                        </div>
-                    </details>
-                </aside>
+                <div class="dashboard-container">
+                    <aside class="dashboard-menu">
+                        <a href="index.php" class="btn-voltar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+                            </svg>
+                            Home
+                        </a>
+                        <nav class="dashboard-nav">
+                            <button type="button" class="menu-item active" data-view="gerenciar">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                </svg>
+                                <span>Gerenciar</span>
+                            </button>
+                            <button type="button" class="menu-item" data-view="linguagem">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="m5 8 6 6"/><path d="m19 8-6 6"/>
+                                </svg>
+                                <span>Nova Linguagem</span>
+                            </button>
+                            <button type="button" class="menu-item" data-view="modulo">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+                                    <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+                                </svg>
+                                <span>Novo Módulo</span>
+                            </button>
+                            <button type="button" class="menu-item" data-view="aula">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+                                </svg>
+                                <span>Nova Aula</span>
+                            </button>
+                            <button type="button" class="menu-item" data-view="exercicio">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 3v18"/><path d="M3 12h18"/>
+                                </svg>
+                                <span>Novo Exercício</span>
+                            </button>
+                        </nav>
+                    </aside>
 
-                <div class="dashboard-conteudo" id="dashboard-conteudo">
-                    <div class="dashboard-cabecalho">
-                        <div class="dashboard-mensagem" id="dashboard-mensagem">
-                            '.$this->renderDashboardToast($string, $status).'
+                    <div class="dashboard-conteudo" id="dashboard-conteudo" data-view-inicial="' . htmlspecialchars($abaAtiva, ENT_QUOTES, 'UTF-8') . '">
+                        
+                        <div class="dashboard-cabecalho">
+                            <div class="dashboard-mensagem" id="dashboard-mensagem">
+                                '.$this->renderDashboardToast($string, $status).'
+                            </div>
                         </div>
+
+                        <div id="dashboard-container-conteudo"></div>
                     </div>
-                    
-                    <section id="form-linguagem" class="form-panel-inline">
-                        <div class="form-panel-header">
-                            <h3>Cadastrar Linguagem</h3>
-                        </div>
-                        <form class="form-painel" action="dashboard.php" method="post" enctype="multipart/form-data" autocomplete="off">
-                            <input type="hidden" name="dashboard_view" value="linguagem">
-                            <div class="campo-formulario">
-                                <label for="nome_linguagem">Nome da Linguagem</label>
-                                <input type="text" id="nome_linguagem" name="nome_linguagem" placeholder="Ex: PHP" required>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="descricao_linguagem">Descrição</label>
-                                <textarea id="descricao_linguagem" name="descricao_linguagem" rows="4" placeholder="Descreva a linguagem"></textarea>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="nivel_linguagem">Nível</label>
-                                <input type="text" id="nivel_linguagem" name="nivel_linguagem" placeholder="Ex: Iniciante">
-                            </div>
-                            <div class="campo-img">
-                                <input type="file" id="img" name="img" accept="image/*">
-                            </div>
-                            <button type="submit" name="btnSalvarLinguagem" class="btn-salvar">Salvar Linguagem</button>
-                        </form>
-                    </section>
-
-                    <section id="form-modulo" class="form-panel-inline">
-                        <div class="form-panel-header">
-                            <h3>Cadastrar Módulo</h3>
-                        </div>
-                        <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
-                            <input type="hidden" name="dashboard_view" value="modulo">
-                            <div class="campo-formulario">
-                                <label for="titulo_modulo">Titulo do Modulo</label>
-                                <input type="text" id="titulo_modulo" name="titulo_modulo" placeholder="Ex: Logica de Programacao" required>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="descricao_modulo">Descricao do Modulo</label>
-                                <textarea id="descricao_modulo" name="descricao_modulo" rows="5" placeholder="Descreva o objetivo deste modulo" required></textarea>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="id_linguagem">Linguagem</label>
-                                <select id="id_linguagem" name="id_linguagem" required>
-                                    '.$opcoes_linguagem.'
-                                </select>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="ordem_modulo">Ordem do Modulo (opcional)</label>
-                                <input type="number" id="ordem_modulo" name="ordem_modulo" min="1" placeholder="Ex: 1">
-                            </div>
-                            <button type="submit" name="btnSalvarModulo" class="btn-salvar">Salvar Modulo</button>
-                        </form>
-                    </section>
-
-                    <section id="form-aula" class="form-panel-inline">
-                        <div class="form-panel-header">
-                            <h3>Cadastrar Aula</h3>
-                        </div>
-                        <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
-                            <input type="hidden" name="dashboard_view" value="aula">
-                            <div class="linha-formulario">
-                                <div class="campo-formulario">
-                                    <label for="id_modulo_aula">Modulo</label>
-                                    <select id="id_modulo_aula" name="id_modulo_aula" required>
-                                        '.$opcoes_modulo.'
-                                    </select>
-                                </div>
-                                <div class="campo-formulario">
-                                    <label for="titulo_aula">Titulo da Aula</label>
-                                    <input type="text" id="titulo_aula" name="titulo_aula" placeholder="Ex: Estruturas condicionais" required>
-                                </div>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="conteudo_aula">Conteudo da Aula</label>
-                                <textarea id="conteudo_aula" name="conteudo_aula" rows="8" placeholder="Escreva o conteudo da aula" required></textarea>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="ordem_aula">Ordem da Aula (opcional)</label>
-                                <input type="number" id="ordem_aula" name="ordem_aula" min="1" placeholder="Ex: 1">
-                            </div>
-                            <button type="submit" name="btnSalvarAula" class="btn-salvar">Salvar Aula</button>
-                        </form>
-                    </section>
-
-                    <section id="form-exercicio" class="form-panel-inline">
-                        <div class="form-panel-header">
-                            <h3>Cadastrar Exercício</h3>
-                        </div>
-                        <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
-                            <input type="hidden" name="dashboard_view" value="exercicio">
-                            <div class="linha-formulario">
-                                <div class="campo-formulario">
-                                    <label for="id_aula_exercicio">Aula</label>
-                                    <select id="id_aula_exercicio" name="id_aula_exercicio" required>
-                                        '.$opcoes_aula.'
-                                    </select>
-                                </div>
-                                <div class="campo-formulario">
-                                    <label for="tipo_exercicio">Tipo do Exercicio</label>
-                                    <select id="tipo_exercicio" name="tipo_exercicio" required>
-                                        <option value="">Selecione o tipo</option>
-                                        <option value="alternativa">Multipla escolha</option>
-                                        <option value="completar">Completar lacunas</option>
-                                        <option value="ordenar">Ordenar blocos</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="campo-formulario">
-                                <label for="pergunta_exercicio">Pergunta</label>
-                                <textarea id="pergunta_exercicio" name="pergunta_exercicio" rows="4" placeholder="Digite o enunciado do exercicio" required></textarea>
-                                <label for="feedback_erro">Feedback para resposta incorreta</label>
-                                <textarea id="feedback_erro" 
-                                name="feedback_erro" 
-                                rows="4" 
-                                placeholder="Escreva uma explicação que será exibida quando o aluno responder incorretamente. Explique o erro e, se possível, dê uma dica para chegar à resposta correta." 
-                                required></textarea>
-                            </div>
-                            <div id="tipos-exercicio-conteudo" class="bloco-dinamico"></div>
-                            <button type="submit" name="btnSalvarExercicio" class="btn-salvar">Salvar Exercicio</button>
-                        </form>
-                    </section>
                 </div>
-            </div>
 
-            <template id="template-tipo-alternativa">
-                <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
-                    <input type="hidden" name="dashboard_view" value="modulo">
-                    <div class="campo-formulario">
-                        <label for="titulo_modulo">Titulo do Modulo</label>
-                        <input type="text" id="titulo_modulo" name="titulo_modulo" placeholder="Ex: Logica de Programacao" required>
+            <template id="template-gerenciar">
+                <div class="gerenciar-cursos">
+                    <div class="topo-gerenciar">
+                        <div class="titulo-area">
+                            <h1>Cursos</h1>
+                            <p>Gerencie todos os cursos cadastrados na plataforma.</p>
+                        </div>
+                        <button class="btn-novo" type="button" >
+                            + Novo Curso
+                        </button>
                     </div>
-
-                    <div class="campo-formulario">
-                        <label for="descricao_modulo">Descricao do Modulo</label>
-                        <textarea id="descricao_modulo" name="descricao_modulo" rows="5" placeholder="Descreva o objetivo deste modulo" required></textarea>
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="id_linguagem">Linguagem</label>
-                        <select id="id_linguagem" name="id_linguagem" required>
-                            '.$opcoes_linguagem.'
+                    <div class="barra-filtros">
+                        <input
+                            type="text"
+                            placeholder="Pesquisar curso..."
+                            class="campo-pesquisa">
+                        <select>
+                            <option>Todos os níveis</option>
+                            <option>Iniciante</option>
+                            <option>Intermediário</option>
+                            <option>Avançado</option>
+                        </select>
+                        <select>
+                            <option>Mais recentes</option>
+                            <option>Mais antigos</option>
+                            <option>A-Z</option>
+                            <option>Z-A</option>
                         </select>
                     </div>
-
-                    <div class="campo-formulario">
-                        <label for="ordem_modulo">Ordem do Modulo (opcional)</label>
-                        <input type="number" id="ordem_modulo" name="ordem_modulo" min="1" placeholder="Ex: 1">
+                    <div class="lista-cursos">
+                        ' .$html_gerenciar. '
                     </div>
-
-                    <button type="submit" name="btnSalvarModulo" class="btn-salvar">Salvar Modulo</button>
-                </form>
+                </div>
             </template>
 
             <template id="template-linguagem">
-                <form class="form-painel" action="dashboard.php" method="post" enctype="multipart/form-data" autocomplete="off">
-                    <input type="hidden" name="dashboard_view" value="linguagem">
-
-                    <div class="campo-formulario">
-                        <label for="nome_linguagem">Nome da Linguagem</label>
-                        <input type="text" id="nome_linguagem" name="nome_linguagem" placeholder="Ex: PHP" required>
+                <div class="form-panel-inline">
+                    <div class="form-panel-header">
+                        <h3>Cadastrar Linguagem</h3>
                     </div>
+                    <form class="form-painel" action="dashboard.php" method="post" enctype="multipart/form-data" autocomplete="off">
+                        <input type="hidden" name="dashboard_view" value="linguagem">
+                        <div class="campo-formulario">
+                            <label for="nome_linguagem">Nome da Linguagem</label>
+                            <input type="text" id="nome_linguagem" name="nome_linguagem" placeholder="Ex: PHP" required>
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="descricao_linguagem">Descrição</label>
+                            <textarea id="descricao_linguagem" name="descricao_linguagem" rows="4" placeholder="Descreva a linguagem"></textarea>
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="nivel_linguagem">Nível</label>
+                            <input type="text" id="nivel_linguagem" name="nivel_linguagem" placeholder="Ex: Iniciante">
+                        </div>
+                        <div class="campo-img">
+                            <input type="file" id="img" name="img" accept="image/*">
+                        </div>
+                        <button type="submit" name="btnSalvarLinguagem" class="btn-salvar">Salvar Linguagem</button>
+                    </form>
+                </div>
+            </template>
 
-                    <div class="campo-formulario">
-                        <label for="descricao_linguagem">Descrição</label>
-                        <textarea id="descricao_linguagem" name="descricao_linguagem" rows="4" placeholder="Descreva a linguagem"></textarea>
+            <template id="template-modulo">
+                <div class="form-panel-inline">
+                    <div class="form-panel-header">
+                        <h3>Cadastrar Módulo</h3>
                     </div>
-
-                    <div class="campo-formulario">
-                        <label for="nivel_linguagem">Nível</label>
-                        <input type="text" id="nivel_linguagem" name="nivel_linguagem" placeholder="Ex: Iniciante">
-                    </div>
-
-                    <div class="campo-img">
-                        <input type="file" id="img" name="img" accept="image/*">
-                    </div>
-
-                    <button type="submit" name="btnSalvarLinguagem" class="btn-salvar">Salvar Linguagem</button> 
-                </form>
-
+                    <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
+                        <input type="hidden" name="dashboard_view" value="modulo">
+                        <div class="campo-formulario">
+                            <label for="titulo_modulo">Titulo do Modulo</label>
+                            <input type="text" id="titulo_modulo" name="titulo_modulo" placeholder="Ex: Logica de Programacao" required>
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="descricao_modulo">Descricao do Modulo</label>
+                            <textarea id="descricao_modulo" name="descricao_modulo" rows="5" placeholder="Descreva o objetivo deste modulo" required></textarea>
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="id_linguagem">Linguagem</label>
+                            <select id="id_linguagem" name="id_linguagem" required>
+                                '.$opcoes_linguagem.'
+                            </select>
+                        </div>
+                        <div class="campo-formulario">
+                            <label for="ordem_modulo">Ordem do Modulo (opcional)</label>
+                            <input type="number" id="ordem_modulo" name="ordem_modulo" min="1" placeholder="Ex: 1">
+                        </div>
+                        <button type="submit" name="btnSalvarModulo" class="btn-salvar">Salvar Modulo</button>
+                    </form>
+                </div>
             </template>
 
             <template id="template-aula">
-                <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
-                    <input type="hidden" name="dashboard_view" value="aula">
-                    <div class="linha-formulario">
-                        <div class="campo-formulario">
-                            <label for="id_modulo_aula">Modulo</label>
-                            <select id="id_modulo_aula" name="id_modulo_aula" required>
-                                '.$opcoes_modulo.'
-                            </select>
+                <div class="form-panel-inline">
+                    <div class="form-panel-header">
+                        <h3>Cadastrar Aula</h3>
+                    </div>
+                    <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
+                        <input type="hidden" name="dashboard_view" value="aula">
+                        <div class="linha-formulario">
+                            <div class="campo-formulario">
+                                <label for="id_modulo_aula">Modulo</label>
+                                <select id="id_modulo_aula" name="id_modulo_aula" required>
+                                    '.$opcoes_modulo.'
+                                </select>
+                            </div>
+                            <div class="campo-formulario">
+                                <label for="titulo_aula">Titulo da Aula</label>
+                                <input type="text" id="titulo_aula" name="titulo_aula" placeholder="Ex: Estruturas condicionais" required>
+                            </div>
                         </div>
-
                         <div class="campo-formulario">
-                            <label for="titulo_aula">Titulo da Aula</label>
-                            <input type="text" id="titulo_aula" name="titulo_aula" placeholder="Ex: Estruturas condicionais" required>
+                            <label for="conteudo_aula">Conteudo da Aula</label>
+                            <textarea id="conteudo_aula" name="conteudo_aula" rows="8" placeholder="Escreva o conteudo da aula" required></textarea>
                         </div>
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="conteudo_aula">Conteudo da Aula</label>
-                        <textarea id="conteudo_aula" name="conteudo_aula" rows="8" placeholder="Escreva o conteudo da aula" required></textarea>
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="ordem_aula">Ordem da Aula (opcional)</label>
-                        <input type="number" id="ordem_aula" name="ordem_aula" min="1" placeholder="Ex: 1">
-                    </div>
-
-                    <button type="submit" name="btnSalvarAula" class="btn-salvar">Salvar Aula</button>
-                </form>
+                        <div class="campo-formulario">
+                            <label for="ordem_aula">Ordem da Aula (opcional)</label>
+                            <input type="number" id="ordem_aula" name="ordem_aula" min="1" placeholder="Ex: 1">
+                        </div>
+                        <button type="submit" name="btnSalvarAula" class="btn-salvar">Salvar Aula</button>
+                    </form>
+                </div>
             </template>
 
             <template id="template-exercicio">
-                <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
-                    <input type="hidden" name="dashboard_view" value="exercicio">
-                    <div class="linha-formulario">
-                        <div class="campo-formulario">
-                            <label for="id_aula_exercicio">Aula</label>
-                            <select id="id_aula_exercicio" name="id_aula_exercicio" required>
-                                '.$opcoes_aula.'
-                            </select>
+                <div class="form-panel-inline">
+                    <div class="form-panel-header">
+                        <h3>Cadastrar Exercício</h3>
+                    </div>
+                    <form class="form-painel" action="dashboard.php" method="post" autocomplete="off">
+                        <input type="hidden" name="dashboard_view" value="exercicio">
+                        <div class="linha-formulario">
+                            <div class="campo-formulario">
+                                <label for="id_aula_exercicio">Aula</label>
+                                <select id="id_aula_exercicio" name="id_aula_exercicio" required>
+                                    '.$opcoes_aula.'
+                                </select>
+                            </div>
+                            <div class="campo-formulario">
+                                <label for="tipo_exercicio">Tipo do Exercicio</label>
+                                <select id="tipo_exercicio" name="tipo_exercicio" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="alternativa">Multipla escolha</option>
+                                    <option value="completar">Completar lacunas</option>
+                                    <option value="ordenar">Ordenar blocos</option>
+                                </select>
+                            </div>
                         </div>
-
                         <div class="campo-formulario">
-                            <label for="tipo_exercicio">Tipo do Exercicio</label>
-                            <select id="tipo_exercicio" name="tipo_exercicio" required>
-                                <option value="">Selecione o tipo</option>
-                                <option value="alternativa">Multipla escolha</option>
-                                <option value="completar">Completar lacunas</option>
-                                <option value="ordenar">Ordenar blocos</option>
-                            </select>
+                            <label for="pergunta_exercicio">Pergunta</label>
+                            <textarea id="pergunta_exercicio" name="pergunta_exercicio" rows="4" placeholder="Digite o enunciado do exercicio" required></textarea>
+                            <label for="feedback_erro">Feedback para resposta incorreta</label>
+                            <textarea id="feedback_erro" 
+                            name="feedback_erro" 
+                            rows="4" 
+                            placeholder="Escreva uma explicação que será exibida quando o aluno responder incorretamente. Explique o erro e, se possível, dê uma dica para chegar à resposta correta." 
+                            required></textarea>
                         </div>
-                    </div>
-
-                    <div class="campo-formulario">
-                        <label for="pergunta_exercicio">Pergunta</label>
-                        <textarea id="pergunta_exercicio" name="pergunta_exercicio" rows="4" placeholder="Digite o enunciado do exercicio" required></textarea>
-                    </div>
-
-                    <div id="tipos-exercicio-conteudo" class="bloco-dinamico"></div>
-
-                    <button type="submit" name="btnSalvarExercicio" class="btn-salvar">Salvar Exercicio</button>
-                </form>
-            </template>
-
-            <template id="template-tipo-alternativa">
-                <div class="card-tipo">
-                    <h3>Opcoes da Multipla Escolha</h3>
-                    <div class="campo-formulario">
-                        <label for="opcao_1">Opcao 1</label>
-                        <input type="text" id="opcao_1" name="opcao_1" required>
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="opcao_2">Opcao 2</label>
-                        <input type="text" id="opcao_2" name="opcao_2" required>
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="opcao_3">Opcao 3</label>
-                        <input type="text" id="opcao_3" name="opcao_3">
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="opcao_4">Opcao 4</label>
-                        <input type="text" id="opcao_4" name="opcao_4">
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="opcao_correta">Opcao correta</label>
-                        <select id="opcao_correta" name="opcao_correta" required>
-                            <option value="">Selecione</option>
-                            <option value="1">Opcao 1</option>
-                            <option value="2">Opcao 2</option>
-                            <option value="3">Opcao 3</option>
-                            <option value="4">Opcao 4</option>
-                        </select>
-                    </div>
-                </div>
-            </template>
-
-            <template id="template-tipo-completar">
-                <div class="card-tipo">
-                    <h3>Texto com Lacunas</h3>
-                    <div class="campo-formulario">
-                        <label for="texto_lacunas">Texto base</label>
-                        <textarea id="texto_lacunas" name="texto_lacunas" rows="5" placeholder="Use ___ para marcar lacunas"></textarea>
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="respostas_lacunas">Respostas corretas</label>
-                        <input type="text" id="respostas_lacunas" name="respostas_lacunas" placeholder="Ex: variavel, constante, funcao">
-                    </div>
-                </div>
-            </template>
-
-            <template id="template-tipo-ordenar">
-                <div class="card-tipo">
-                    <h3>Ordenacao de Blocos</h3>
-                    <div class="campo-formulario">
-                        <label for="bloco_1">Bloco 1</label>
-                        <input type="text" id="bloco_1" name="bloco_1" required>
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="bloco_2">Bloco 2</label>
-                        <input type="text" id="bloco_2" name="bloco_2" required>
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="bloco_3">Bloco 3</label>
-                        <input type="text" id="bloco_3" name="bloco_3">
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="bloco_4">Bloco 4</label>
-                        <input type="text" id="bloco_4" name="bloco_4">
-                    </div>
-                    <div class="campo-formulario">
-                        <label for="ordem_correta">Ordem correta</label>
-                        <input type="text" id="ordem_correta" name="ordem_correta" placeholder="Ex: 2,1,3,4" required>
-                    </div>
+                        <div id="tipos-exercicio-conteudo" class="bloco-dinamico"></div>
+                        <button type="submit" name="btnSalvarExercicio" class="btn-salvar">Salvar Exercicio</button>
+                    </form>
                 </div>
             </template>
 
@@ -749,9 +674,10 @@ class View{
 
     // Selecionarcurso_Page removed; merged into SalaGeralPage
 
-    public function SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem = null){
+    public function SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem = null, $messageInicio = '', $enrolledLinguagens = []){
         $html_modulos = '';
         $html_listarcursos = '';
+        $html_inscritos = '';
         $level_counter = 0;
         
         foreach ($linguagens as $linguagem) {
@@ -788,6 +714,7 @@ class View{
         }
         
         foreach ($modulos as $modulo) {
+            
             $html_modulos .= '
                 <div class="titulo-conteudo">
                     <h2>' . $modulo['titulo_modulo'] . '</h2>
@@ -813,6 +740,62 @@ class View{
         //     $selectedHtml = '<div class="selected-course"><div class="selected-header"><img src="' . $selImgSrc . '" alt="' . htmlspecialchars($selectedLinguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '" class="selected-img"><div class="selected-info"><h2>' . htmlspecialchars($selectedLinguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '</h2><p>' . nl2br(htmlspecialchars($selectedLinguagem['descricao'] ?? '', ENT_QUOTES, 'UTF-8')) . '</p><p><strong>Nível:</strong> ' . htmlspecialchars($selectedLinguagem['nivel'] ?? '', ENT_QUOTES, 'UTF-8') . '</p></div></div></div>';
         //     $dataViewInicial = 'conteudo';
         // }
+
+        if (is_array($enrolledLinguagens) && count($enrolledLinguagens) > 0) {
+            foreach ($enrolledLinguagens as $linguagem) {
+                $imgRaw = $linguagem['img'] ?? '';
+                $imgRaw = is_string($imgRaw) ? trim($imgRaw) : '';
+                $imgSrc = $imgRaw === '' ? 'imagens/img_curso.png' : $imgRaw;
+
+                $html_inscritos .= '
+                    <div class="curso-card">
+                        <div class="img-curso">
+                            <img src="' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="Logo">
+                        </div>
+                        <div class="estrutura">
+                            <div class="titulo">
+                                <h3>' . htmlspecialchars($linguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '</h3>
+                            </div>
+                            <div class="descricao">
+                                <p>' . htmlspecialchars($linguagem['descricao'] ?? '', ENT_QUOTES, 'UTF-8') . '</p>
+                            </div>
+                            <div class="nivel">
+                                <p>' . htmlspecialchars($linguagem['nivel'] ?? '', ENT_QUOTES, 'UTF-8') . '</p>
+                            </div>
+                            <div class="btn-selecionarcurso">
+                                <a href="sala.php?linguagem=' . htmlspecialchars($linguagem['id_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '" >Selecionar</a>
+                            </div>
+                        </div>
+                    </div>
+                ';
+            }
+
+            $html_inscritos = '
+                <div class="cursos-inscritos">
+                    <div class="curso-titulo-area">
+                        <h2>Meus Cursos</h2>
+                    </div>
+                    <div class="cursos-lista">
+                        ' . $html_inscritos . '
+                    </div>
+                </div>
+            ';
+        }
+
+        $messageInicio = trim((string) $messageInicio);
+        if ($selectedLinguagem) {
+            $conteudo_principal = '<div class="conteudo-atividade"><div class="conteudo-aulas">' . $html_modulos . '</div></div>';
+        } else {
+            $conteudo_principal = '
+                <div class="conteudo-aviso">
+                    <div class="texto-aviso">
+                        <h2>Selecione um curso</h2>
+                        <p>Para visualizar os módulos, escolha um curso na aba Cursos.</p>
+                        ' . ($messageInicio !== '' ? '<div class="mensagem-aviso">' . htmlspecialchars($messageInicio, ENT_QUOTES, 'UTF-8') . '</div>' : '') . '
+                    </div>
+                </div>
+            ';
+        }
 
         if(!isset($_SESSION["login"]) == false) {
 
@@ -949,17 +932,13 @@ class View{
 
             <template id="template-conteudo">
                 <div class="conteudo-container">
-                    <div class="conteudo-atividade">
-                            <div class="conteudo-aulas">
-                                '.$html_modulos.'
-                            </div>
-                    </div>
-                    
+                    '.$conteudo_principal.'
                 </div>
             </template>
 
             <template id="template-cursos">
             <div class="curso-container">
+                '.$html_inscritos.'
                 <div class="curso-cabecalho">
                     <div class="filtrar-busca">
                         <p>Selecione a linguagem que deseja aprender.</p>
@@ -978,16 +957,6 @@ class View{
                     </div>
                 </div>
             </div>
-            </template>
-
-            <template id="template-perfil">
-                                <a href="sala.php?id_linguagem=' . htmlspecialchars($linguagem['id_linguagem'], ENT_QUOTES, 'UTF-8') . '" class="btn-selecionar">Selecionar</a>
-                            </div>
-                        ';
-                        
-                        echo '
-                    </div>
-                </div>
             </template>
 
             <template id="template-perfil">

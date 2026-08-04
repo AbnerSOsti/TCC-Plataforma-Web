@@ -313,7 +313,8 @@
     min-height: 650px;
     margin-top: 0px;
     & .curso-cabecalho{
-        background-color: rgb(205, 50, 187);
+        background-color: rgb(247, 247, 247);
+        box-shadow: 0 4px 12px rgba(29, 10, 28, 0.277);
         display: flex;
         justify-content: center;
         align-items: center;

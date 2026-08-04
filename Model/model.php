@@ -151,6 +151,15 @@ class Model {
                         $_SESSION["id_usuario"] = $user['id_usuario'];
                         $_SESSION["nome_usuario"] = $user['nome_usuario'];
                         $_SESSION["tipo_usuario"] = $user['tipo_usuario'];
+
+                        $this->garantir_configuracao_usuario($user['id_usuario']);
+                        $this->atualizar_configuracao_usuario($user['id_usuario'], [
+                            'atualizar_ultimo_login' => true,
+                            'atualizar_ultimo_acesso' => true,
+                        ]);
+
+                        $configuracao = $this->obter_configuracao_usuario($user['id_usuario']);
+                        $_SESSION['last_linguagem'] = $configuracao['ultima_linguagem_acessada'] ?? $configuracao['id_linguagem_atual'] ?? null;
                         
                         header("Location: sala.php");
                         exit();
@@ -1008,6 +1017,7 @@ class Model {
                 $stmt->bindParam(":nivel", $nivel);
                 $stmt->bindParam(":img", $img_path);
                 $stmt->execute();
+                
 
                 return [
                     "status" => "success",
@@ -1079,6 +1089,178 @@ class Model {
         }
     }
 
+    public function listar_linguagens_inscritas_por_usuario($id_usuario){
+        if (!$this->conn || !$id_usuario) {
+            return [];
+        }
+
+        try {
+            $query = "SELECT l.id_linguagem, l.nome_linguagem, l.descricao, l.nivel, l.img, ul.data_inscricao, ul.data_ultimo_acesso
+                      FROM usuario_linguagem ul
+                      INNER JOIN linguagens l ON l.id_linguagem = ul.id_linguagem
+                      WHERE ul.id_usuario = :id_usuario
+                      ORDER BY ul.data_ultimo_acesso DESC, ul.data_inscricao DESC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function garantir_configuracao_usuario($id_usuario){
+        if (!$this->conn || !$id_usuario) {
+            return false;
+        }
+
+        try {
+            $query = "INSERT INTO usuario_configuracao (id_usuario, ultimo_login, ultimo_acesso, tema)
+                      VALUES (:id_usuario, NOW(), NOW(), 'claro')
+                      ON DUPLICATE KEY UPDATE id_usuario = id_usuario";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function obter_configuracao_usuario($id_usuario){
+        if (!$this->conn || !$id_usuario) {
+            return [];
+        }
+
+        try {
+            $query = "SELECT id_usuario, id_linguagem_atual, id_modulo_atual, id_aula_atual, ultimo_acesso, ultimo_login, ultima_linguagem_acessada, tema
+                      FROM usuario_configuracao
+                      WHERE id_usuario = :id_usuario
+                      LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function atualizar_configuracao_usuario($id_usuario, array $dados = []){
+        if (!$this->conn || !$id_usuario) {
+            return false;
+        }
+
+        $this->garantir_configuracao_usuario($id_usuario);
+
+        $updates = [];
+        $params = [':id_usuario' => $id_usuario];
+
+        if (array_key_exists('id_linguagem_atual', $dados)) {
+            $updates[] = 'id_linguagem_atual = :id_linguagem_atual';
+            $params[':id_linguagem_atual'] = $dados['id_linguagem_atual'];
+        }
+
+        if (array_key_exists('id_modulo_atual', $dados)) {
+            $updates[] = 'id_modulo_atual = :id_modulo_atual';
+            $params[':id_modulo_atual'] = $dados['id_modulo_atual'];
+        }
+
+        if (array_key_exists('id_aula_atual', $dados)) {
+            $updates[] = 'id_aula_atual = :id_aula_atual';
+            $params[':id_aula_atual'] = $dados['id_aula_atual'];
+        }
+
+        if (array_key_exists('ultima_linguagem_acessada', $dados)) {
+            $updates[] = 'ultima_linguagem_acessada = :ultima_linguagem_acessada';
+            $params[':ultima_linguagem_acessada'] = $dados['ultima_linguagem_acessada'];
+        }
+
+        if (!empty($dados['tema'])) {
+            $updates[] = 'tema = :tema';
+            $params[':tema'] = $dados['tema'];
+        }
+
+        if (!empty($dados['atualizar_ultimo_login'])) {
+            $updates[] = 'ultimo_login = NOW()';
+        }
+
+        if (!empty($dados['atualizar_ultimo_acesso'])) {
+            $updates[] = 'ultimo_acesso = NOW()';
+        }
+
+        if (empty($updates)) {
+            return true;
+        }
+
+        try {
+            $query = 'UPDATE usuario_configuracao SET ' . implode(', ', $updates) . ' WHERE id_usuario = :id_usuario';
+            $stmt = $this->conn->prepare($query);
+
+            foreach ($params as $param => $value) {
+                if ($param === ':id_usuario') {
+                    $stmt->bindValue($param, $value, PDO::PARAM_INT);
+                } else {
+                    $stmt->bindValue($param, $value);
+                }
+            }
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    public function obter_ultimo_curso_acessado_do_usuario($id_usuario){
+        if (!$this->conn || !$id_usuario) {
+            return null;
+        }
+
+        try {
+            $configuracao = $this->obter_configuracao_usuario($id_usuario);
+            if (!empty($configuracao['ultima_linguagem_acessada'])) {
+                return (int) $configuracao['ultima_linguagem_acessada'];
+            }
+
+            if (!empty($configuracao['id_linguagem_atual'])) {
+                return (int) $configuracao['id_linguagem_atual'];
+            }
+
+            return null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+    public function marcar_linguagem_acessada($id_usuario, $id_linguagem){
+        if (!$this->conn || !$id_usuario || !$id_linguagem) {
+            return false;
+        }
+
+        return $this->atualizar_configuracao_usuario($id_usuario, [
+            'ultima_linguagem_acessada' => $id_linguagem,
+            'id_linguagem_atual' => $id_linguagem,
+            'atualizar_ultimo_acesso' => true,
+        ]);
+    }
+
+    public function inscrever_usuario_em_linguagem($id_usuario, $id_linguagem){
+        if (!$this->conn || !$id_usuario || !$id_linguagem) {
+            return false;
+        }
+
+        try {
+            $query = "INSERT INTO usuario_linguagem (id_usuario, id_linguagem, data_inscricao, data_ultimo_acesso)
+                      VALUES (:id_usuario, :id_linguagem, NOW(), NOW())
+                      ON DUPLICATE KEY UPDATE data_ultimo_acesso = NOW()";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->bindParam(':id_linguagem', $id_linguagem, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
     public function obter_linguagem_por_id($id){
         if (!$this->conn || !$id) return null;
 
@@ -1105,6 +1287,26 @@ class Model {
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function obter_aula_por_id($id_aula){
+        if (!$this->conn || !$id_aula) {
+            return null;
+        }
+
+        try {
+            $query = "SELECT a.id_aula, a.id_modulo, m.id_linguagem
+                      FROM aulas a
+                      INNER JOIN modulos m ON m.id_modulo = a.id_modulo
+                      WHERE a.id_aula = :id_aula
+                      LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_aula', $id_aula, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 
 
