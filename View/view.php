@@ -42,24 +42,234 @@ class View{
         header("Location: sala.php");
         } else {
             echo '
-            <nav class="navbar">
-                
-                    <img src="imagens/logo.png" alt="Logo do site" class="logo">
-            </nav>
-            <header class="cabecalho-c">
-            <div class="conteudo-cabecalho-c">
-                <div class="texto-cabecalho-c">
-                    <h1>APRENDA A PROGRAMAR DE FORMA PRÁTICA</h1>
-                    <p>Antes de aprender uma linguagem, aprenda a pensar como um programador. 
-                    Desenvolva sua lógica, pratique com pseudocódigo e evolua naturalmente até
-                     a programação real.</p>
-                    <a href="login.php" class="começar">COMEÇAR AGORA</a>
+            <!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Beginner Dev</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+    <main>
+
+        <!-- =========================
+             HERO / PRIMEIRA SECTION
+        ========================== -->
+        <section class="hero">
+
+            <!-- Elementos decorativos -->
+            <div class="hero__background">
+                <span class="hero__orb hero__orb--one"></span>
+                <span class="hero__orb hero__orb--two"></span>
+                <span class="hero__grid"></span>
+            </div>
+
+
+            <!-- =========================
+                 NAVBAR
+            ========================== -->
+            <header class="navbar">
+
+                <a href="#" class="navbar__logo">
+                    <span class="navbar__logo-icon">&lt;/&gt;</span>
+                    <span>Beginner Dev</span>
+                </a>
+
+
+                <nav class="navbar__links">
+
+                    <a href="#" class="navbar__link navbar__link--active">
+                        Início
+                    </a>
+
+                    <a href="#linguagens" class="navbar__link">
+                        Linguagens
+                    </a>
+
+                    <a href="#roadmap" class="navbar__link">
+                        Roadmap
+                    </a>
+
+                    <a href="#sobre" class="navbar__link">
+                        Sobre
+                    </a>
+
+                    <a href="#depoimentos" class="navbar__link">
+                        Depoimentos
+                    </a>
+
+                </nav>
+
+
+                <div class="navbar__actions">
+
+                    <a href="login.php" class="button button--outline">
+                        Entrar
+                    </a>
+
+                    <a href="cadastro.php" class="button button--primary">
+                        Começar agora
+                    </a>
+
                 </div>
+
+
+                <!-- Menu mobile -->
+                <input
+                    type="checkbox"
+                    id="menu-toggle"
+                    class="navbar__toggle"
+                >
+
+                <label
+                    for="menu-toggle"
+                    class="navbar__menu"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+
+            </header>
+
+
+            <!-- =========================
+                 CONTEÚDO PRINCIPAL
+            ========================== -->
+            <div class="hero__content">
+
+                <!-- Lado esquerdo -->
+                <div class="hero__text">
+
+                    <div class="hero__badge">
+                        <span>✦</span>
+                        APRENDA.
+                        <strong>PRATIQUE.</strong>
+                        EVOLUA.
+                    </div>
+
+
+                    <h1 class="hero__title">
+                        Aprenda programação
+                        <span>de forma prática,</span>
+                        <strong>moderna e divertida.</strong>
+                    </h1>
+
+
+                    <p class="hero__description">
+                        Do zero ao avançado com trilhas interativas,
+                        exercícios práticos e uma experiência feita
+                        para você evoluir <strong>no seu ritmo.</strong>
+                    </p>
+
+
+                    <div class="hero__buttons">
+
+                        <a href="cadastro.php" class="button button--primary button--large">
+                            Começar agora
+                            <span class="button__arrow">→</span>
+                        </a>
+
+
+                        <a href="#sobre" class="hero__play">
+
+                            <span class="hero__play-icon">
+                                ▶
+                            </span>
+
+                            <span>
+                                Ver como funciona
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+                <div class="hero__visual">
+                    <img src="imagens/hero.png">
+                
+                </div>
+
             </div>
-            <div class="imagem-cabecalho-c">
-                <img src="imagens/img1.png" alt="Imagem de programação">
+
+
+            <!-- =========================
+                 ESTATÍSTICAS
+            ========================== -->
+            <div class="hero__stats">
+
+                <div class="hero__stat">
+
+                    <div class="hero__stat-icon">
+                        &lt;/&gt;
+                    </div>
+
+                    <div>
+                        <strong>+20</strong>
+                        <span>Linguagens</span>
+                    </div>
+
+                </div>
+
+
+                <div class="hero__stat">
+
+                    <div class="hero__stat-icon hero__stat-icon--blue">
+                        ⚡
+                    </div>
+
+                    <div>
+                        <strong>+800</strong>
+                        <span>Exercícios</span>
+                    </div>
+
+                </div>
+
+
+                <div class="hero__stat">
+
+                    <div class="hero__stat-icon hero__stat-icon--cyan">
+                        ◉
+                    </div>
+
+                    <div>
+                        <strong>+15k</strong>
+                        <span>Desenvolvedores</span>
+                    </div>
+
+                </div>
+
             </div>
-        </header>
+
+
+            <!-- Indicador de scroll -->
+            <div class="hero__scroll">
+
+                <span class="hero__scroll-icon">
+                    ↓
+                </span>
+
+                <span>
+                    Role para explorar
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- Apenas para demonstrar a próxima section -->
+        <section id="linguagens" class="section-linguagem">
+            <h2>Linguagens</h2>
+        </section>
+
+    </main>
+
             ';
         }
     }
@@ -528,15 +738,26 @@ class View{
             foreach ($itensExercicio as $itemExercicio) {
                 $idItem = $itemExercicio['id_opcao'] ?? $itemExercicio['id_bloco'] ?? $itemExercicio['id'] ?? '';
                 $camposItem = '';
+
                 if ($tipoExercicioEdicao === 'alternativa') {
-                    $camposItem = '<input type="text" name="texto_opcao" value="' . htmlspecialchars((string) ($itemExercicio['texto_opcao'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required><select name="correta"><option value="0">Incorreta</option><option value="1"' . (!empty($itemExercicio['correta']) ? ' selected' : '') . '>Correta</option></select>';
+                    $camposItem = '<div class="linha-formulario"><div class="campo-formulario" style="flex:1"><label>Opção</label><input type="text" name="texto_opcao" value="' . htmlspecialchars((string) ($itemExercicio['texto_opcao'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div><div class="campo-formulario" style="width:180px"><label>Correta</label><select name="correta"><option value="0">Incorreta</option><option value="1"' . (!empty($itemExercicio['correta']) ? ' selected' : '') . '>Correta</option></select></div></div>';
                 } elseif ($tipoExercicioEdicao === 'completar') {
-                    $camposItem = '<input type="text" name="resposta_correta" value="' . htmlspecialchars((string) ($itemExercicio['resposta_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>';
+                    $camposItem = '<div class="campo-formulario"><label>Resposta correta</label><input type="text" name="resposta_correta" value="' . htmlspecialchars((string) ($itemExercicio['resposta_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div>';
                 } else {
-                    $camposItem = '<input type="text" name="texto_bloco" value="' . htmlspecialchars((string) ($itemExercicio['texto_bloco'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required><input type="number" name="ordem_correta" min="1" value="' . htmlspecialchars((string) ($itemExercicio['ordem_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>';
+                    $camposItem = '<div class="linha-formulario"><div class="campo-formulario" style="flex:1"><label>Bloco</label><input type="text" name="texto_bloco" value="' . htmlspecialchars((string) ($itemExercicio['texto_bloco'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div><div class="campo-formulario campo-ordem-selecionado" style="width:140px"><label>Ordem</label><input type="number" name="ordem_correta" min="1" value="' . htmlspecialchars((string) ($itemExercicio['ordem_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div></div>';
                 }
 
-                $htmlItensExercicio .= '<div class="item-exercicio-edicao"><form action="dashboard.php" method="post"><input type="hidden" name="dashboard_view" value="editar-exercicio"><input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '"><input type="hidden" name="id_item_exercicio" value="' . htmlspecialchars((string) $idItem, ENT_QUOTES, 'UTF-8') . '"><div class="campos-item-exercicio">' . $camposItem . '</div><button type="submit" name="btnAtualizarItemExercicio" class="btn-salvar">Atualizar</button></form><form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir somente este item?\');"><input type="hidden" name="dashboard_view" value="editar-exercicio"><input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '"><input type="hidden" name="id_item_exercicio" value="' . htmlspecialchars((string) $idItem, ENT_QUOTES, 'UTF-8') . '"><button type="submit" name="btnExcluirItemExercicio" class="btn-deletar-curso">Deletar</button></form></div>';
+                // formulário de atualização (sempre disponível)
+                $formAtualizar = '<form action="dashboard.php" method="post" class="form-item-atualizar">'
+                    . '<input type="hidden" name="dashboard_view" value="editar-exercicio">'
+                    . '<input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '">'
+                    . '<input type="hidden" name="id_item_exercicio" value="' . htmlspecialchars((string) $idItem, ENT_QUOTES, 'UTF-8') . '">'
+                    . '<div class="campos-item-exercicio">' . $camposItem . '</div>'
+                    . '<button type="submit" name="btnAtualizarItemExercicio" class="btn-salvar">Atualizar</button>'
+                    . '</form>';
+
+                // Remover botão de exclusão por item: manter apenas o botão de deletar no topo (excluir exercício inteiro)
+                $htmlItensExercicio .= '<div class="item-exercicio-edicao">' . $formAtualizar . '</div>';
             }
         } else {
             $htmlItensExercicio = '<p class="tabela-sem-registros">Nenhum item cadastrado para este tipo de exercício.</p>';

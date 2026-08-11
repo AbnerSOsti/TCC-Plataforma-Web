@@ -9,6 +9,7 @@ html {
     /* outline: 1px solid red; */
 }
 :root{
+    /* --color-fundo: #010823; */
     --color-red: #be0000;
     --color-black: #333;
     --font-main: 'Poppins', sans-serif;
@@ -20,7 +21,7 @@ body {
     font-family: var(--font-main);
     line-height: 1.6;
     color: var(--color-text);
-    background-color: var(--color-white);
+    /* background-color: var(--color-white); */
 }
 .navbar {
     display: flex;
