@@ -13,16 +13,11 @@ body{
     width: 240px;
     min-width: 240px;
     height: 100vh;
-
     background: #ffffff;
-
     border-right: 1px solid #ececf3;
-
     padding: 24px 16px;
-
     display: flex;
     flex-direction: column;
-
     box-shadow: 0 0 30px rgba(15,23,42,.04);
 }
 
@@ -177,10 +172,16 @@ body{
     min-height: calc(100vh - 48px);
     margin: 0;
 
-    & .editar-curso-acoes{
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 16px;
+        & .editar-curso-acoes{
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+
+            & form{
+                margin: 0;
+            }
 
         & .btn-deletar-curso{
             border: none;
@@ -379,6 +380,244 @@ body{
                 flex-direction: column;
             }
         }
+    }
+    .editar-curso-aulas{
+        & .visualmente-oculto{
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+        }
+
+        & .editar-curso-aulas-cabecalho{
+            margin-bottom: 16px;
+
+            & h4{
+                margin: 0;
+                color: #15344f;
+                font-size: 1.1rem;
+            }
+
+            & p{
+                margin: 6px 0 0;
+                color: #5b6d7f;
+            }
+        }
+        & .tabela-aulas{
+            width: 100%;
+            min-width: 720px;
+            border-collapse: collapse;
+            background: #ffffff;
+
+            & th,
+            & td{
+                padding: 14px 16px;
+                border-bottom: 1px solid #e5edf4;
+                text-align: left;
+                vertical-align: middle;
+            }
+
+            & th{
+                color: #15344f;
+                font-size: 0.84rem;
+                font-weight: 700;
+                background: #f8fbfe;
+            }
+
+            & tbody tr:last-child td{
+                border-bottom: none;
+            }
+
+            & tbody tr:hover{
+                background: #fbfdff;
+            }
+
+            & .descricao-aula{
+                max-width: 420px;
+                color: #5b6d7f;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            & .coluna-ordem{
+                width: 90px;
+                text-align: center;
+            }
+
+            & .coluna-acoes{
+                width: 72px;
+                text-align: center;
+            }
+
+            & .tabela-sem-registros{
+                padding: 24px;
+                text-align: center;
+                color: #5b6d7f;
+            }
+        }
+        & .dropdown-acoes-aula{
+            position: relative;
+            display: inline-flex;
+            justify-content: center;
+
+            & .btn-menu-aula{
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 36px;
+                height: 36px;
+                border: none;
+                border-radius: 8px;
+                background: transparent;
+                color: #5b6d7f;
+                cursor: pointer;
+
+                &:hover{
+                    background: #f1f5f9;
+                    color: #15344f;
+                }
+            }
+
+            & .menu-acoes-aula{
+                position: absolute;
+                top: calc(100% + 6px);
+                right: 0;
+                z-index: 20;
+                display: none;
+                min-width: 140px;
+                padding: 6px;
+                border: 1px solid #d4e0ea;
+                border-radius: 10px;
+                background: #ffffff;
+                box-shadow: 0 10px 24px rgba(12, 32, 54, 0.12);
+
+                & button{
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                    gap: 8px;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 9px 10px;
+                    background: transparent;
+                    color: #15344f;
+                    cursor: pointer;
+                    text-align: left;
+
+                    &:hover{
+                        background: #f1f5f9;
+                    }
+
+                    &.acao-deletar-aula{
+                        color: #dc2626;
+
+                        &:hover{
+                            background: #fef2f2;
+                        }
+                    }
+                }
+            }
+
+            &.is-aberto .menu-acoes-aula{
+                display: flex;
+                flex-direction: column;
+            }
+        }
+    }
+}
+
+.editar-curso-panel .btn-voltar-painel{
+    display: inline-flex;
+    align-items: center;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #e7f0f7;
+    color: #15344f;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.editar-curso-panel .btn-voltar-painel:hover{
+    background: #d4e4f0;
+}
+
+.editar-curso-panel .dados-selecionados input[readonly],
+.editar-curso-panel .dados-selecionados textarea[readonly]{
+    background: #f8fbfe;
+    color: #425466;
+    cursor: default;
+}
+
+.editar-curso-panel .campo-ordem-selecionado{
+    max-width: 160px;
+}
+
+.editar-curso-panel .menu-acoes-modulo .menu-link{
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    border-radius: 6px;
+    padding: 9px 10px;
+    color: #15344f;
+    cursor: pointer;
+    text-align: left;
+    text-decoration: none;
+}
+
+.editar-curso-panel .menu-acoes-modulo .menu-link:hover{
+    background: #f1f5f9;
+}
+
+.editar-curso-panel .menu-acoes-modulo form{
+    width: 100%;
+    margin: 0;
+}
+
+.itens-exercicio-lista{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-exercicio-edicao{
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid #d4e0ea;
+    border-radius: 10px;
+    background: #f8fbfe;
+}
+
+.item-exercicio-edicao form:first-child{
+    display: flex;
+    flex: 1;
+    align-items: end;
+    gap: 10px;
+}
+
+.campos-item-exercicio{
+    display: flex;
+    flex: 1;
+    gap: 10px;
+}
+
+.campos-item-exercicio input,
+.campos-item-exercicio select{
+    min-width: 0;
+    flex: 1;
+}
+
+@media (max-width: 720px){
+    .item-exercicio-edicao,
+    .item-exercicio-edicao form:first-child,
+    .campos-item-exercicio{
+        align-items: stretch;
+        flex-direction: column;
     }
 }
 

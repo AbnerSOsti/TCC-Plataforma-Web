@@ -70,6 +70,14 @@ class Controller {
             if (($result["status"] ?? "") === "success") {
                 $view = $result["view"] ?? "modulo";
                 $location = "dashboard.php?view=" . urlencode($view) . "&message=" . urlencode($message) . "&status=" . urlencode($status);
+                $params = $result["params"] ?? [];
+                if (is_array($params)) {
+                    foreach ($params as $nome => $valor) {
+                        if (is_scalar($valor) && $valor !== '') {
+                            $location .= "&" . urlencode((string) $nome) . "=" . urlencode((string) $valor);
+                        }
+                    }
+                }
                 header("Location: " . $location);
                 exit;
             }
@@ -94,9 +102,15 @@ class Controller {
         $abaAtiva = $model->obter_aba_dashboard_ativa();
         $linguagemSelecionada = null;
         $modulosCurso = [];
+        $moduloSelecionado = null;
+        $aulasModulo = [];
+        $aulaSelecionada = null;
+        $exerciciosAula = [];
+        $exercicioSelecionado = null;
+        $itensExercicio = [];
 
         if ($abaAtiva === "editar-curso") {
-            $linguagemSelecionada = $model->buscar_linguagem_por_id($_GET["linguagem"] ?? null);
+            $linguagemSelecionada = $model->buscar_linguagem_por_id($_GET["linguagem"] ?? $_POST["id_linguagem"] ?? null);
 
             if ($linguagemSelecionada === null) {
                 $abaAtiva = "gerenciar";
@@ -105,9 +119,39 @@ class Controller {
             } else {
                 $modulosCurso = $model->listar_modulo_por_linguagem($linguagemSelecionada["id_linguagem"]);
             }
+        } elseif ($abaAtiva === "editar-modulo") {
+            $moduloSelecionado = $model->buscar_modulo_por_id($_GET["modulo"] ?? $_POST["id_modulo"] ?? null);
+
+            if ($moduloSelecionado === null) {
+                $abaAtiva = "gerenciar";
+                $message = "Módulo não encontrado.";
+                $status = "error";
+            } else {
+                $aulasModulo = $model->listar_aulas_por_modulo($moduloSelecionado["id_modulo"]);
+            }
+        } elseif ($abaAtiva === "editar-aula") {
+            $aulaSelecionada = $model->buscar_aula_dashboard_por_id($_GET["aula"] ?? $_POST["id_aula"] ?? null);
+
+            if ($aulaSelecionada === null) {
+                $abaAtiva = "gerenciar";
+                $message = "Aula não encontrada.";
+                $status = "error";
+            } else {
+                $exerciciosAula = $model->listar_exercicios_por_aula($aulaSelecionada["id_aula"]);
+            }
+        } elseif ($abaAtiva === "editar-exercicio") {
+            $exercicioSelecionado = $model->buscar_exercicio_dashboard_por_id($_GET["exercicio"] ?? $_POST["id_exercicio"] ?? null);
+
+            if ($exercicioSelecionado === null) {
+                $abaAtiva = "gerenciar";
+                $message = "Exercício não encontrado.";
+                $status = "error";
+            } else {
+                $itensExercicio = $model->listar_itens_por_exercicio($exercicioSelecionado);
+            }
         }
 
-        $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens, $status, $linguagemSelecionada, $modulosCurso);
+        $visao->DashboardPage($message, $modulos, $aulas, $abaAtiva, $linguagens, $status, $linguagemSelecionada, $modulosCurso, $moduloSelecionado, $aulasModulo, $aulaSelecionada, $exerciciosAula, $exercicioSelecionado, $itensExercicio);
     }
 
     public function SalaGeral($linguagem_id = null){

@@ -477,7 +477,7 @@ class Model {
     }
 
     private function getDashboardViewFromRequest() {
-        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio", "editar-curso"];
+        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio", "editar-curso", "editar-modulo", "editar-aula", "editar-exercicio"];
         $view = trim((string) ($_POST["dashboard_view"] ?? $_GET["view"] ?? ""));
 
         if (in_array($view, $viewsPermitidas, true)) {
@@ -831,10 +831,415 @@ class Model {
         }
     }
 
+    private function atualizarModuloDashboard() {
+        $idModulo = $this->normalizarInteiroPositivo($_POST['id_modulo'] ?? null);
+        $titulo = trim($_POST['titulo_modulo'] ?? '');
+        $descricao = trim($_POST['descricao_modulo'] ?? '');
+        $ordem = $this->normalizarInteiroPositivo($_POST['ordem_modulo'] ?? null);
+
+        if ($idModulo === null || !$this->moduloExiste($idModulo)) {
+            return ['status' => 'error', 'message' => 'O módulo selecionado não existe mais.', 'view' => 'editar-modulo'];
+        }
+        if ($titulo === '' || $descricao === '' || $ordem === null) {
+            return ['status' => 'error', 'message' => 'Preencha título, descrição e uma ordem válida para o módulo.', 'view' => 'editar-modulo'];
+        }
+
+        try {
+            $queryDuplicado = 'SELECT 1 FROM modulos WHERE titulo_modulo = :titulo AND id_modulo <> :id_modulo LIMIT 1';
+            $stmtDuplicado = $this->conn->prepare($queryDuplicado);
+            $stmtDuplicado->bindParam(':titulo', $titulo);
+            $stmtDuplicado->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
+            $stmtDuplicado->execute();
+            if ($stmtDuplicado->fetchColumn()) {
+                return ['status' => 'error', 'message' => 'Já existe outro módulo com este título.', 'view' => 'editar-modulo'];
+            }
+
+            $query = 'UPDATE modulos SET titulo_modulo = :titulo, descricao_modulo = :descricao, ordem_modulo = :ordem WHERE id_modulo = :id_modulo';
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':titulo', $titulo);
+            $stmt->bindParam(':descricao', $descricao);
+            $stmt->bindParam(':ordem', $ordem, PDO::PARAM_INT);
+            $stmt->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return ['status' => 'success', 'message' => 'Módulo atualizado com sucesso.', 'view' => 'editar-modulo', 'params' => ['modulo' => $idModulo]];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'message' => 'Não foi possível atualizar o módulo.', 'view' => 'editar-modulo'];
+        }
+    }
+
+    private function atualizarAulaDashboard() {
+        $idAula = $this->normalizarInteiroPositivo($_POST['id_aula'] ?? null);
+        $titulo = trim($_POST['titulo_aula'] ?? '');
+        $conteudo = trim($_POST['conteudo_aula'] ?? '');
+        $ordem = $this->normalizarInteiroPositivo($_POST['ordem_aula'] ?? null);
+
+        if ($idAula === null || !$this->aulaExiste($idAula)) {
+            return ['status' => 'error', 'message' => 'A aula selecionada não existe mais.', 'view' => 'editar-aula'];
+        }
+        if ($titulo === '' || $conteudo === '' || $ordem === null) {
+            return ['status' => 'error', 'message' => 'Preencha título, conteúdo e uma ordem válida para a aula.', 'view' => 'editar-aula'];
+        }
+
+        try {
+            $queryDuplicado = 'SELECT 1 FROM aulas a
+                                INNER JOIN aulas atual ON atual.id_modulo = a.id_modulo
+                                WHERE atual.id_aula = :id_atual AND a.titulo_aula = :titulo AND a.id_aula <> :id_aula
+                                LIMIT 1';
+            $stmtDuplicado = $this->conn->prepare($queryDuplicado);
+            $stmtDuplicado->bindParam(':id_atual', $idAula, PDO::PARAM_INT);
+            $stmtDuplicado->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
+            $stmtDuplicado->bindParam(':titulo', $titulo);
+            $stmtDuplicado->execute();
+            if ($stmtDuplicado->fetchColumn()) {
+                return ['status' => 'error', 'message' => 'Já existe outra aula com este título neste módulo.', 'view' => 'editar-aula'];
+            }
+
+            $query = 'UPDATE aulas SET titulo_aula = :titulo, conteudo_aula = :conteudo, ordem_aula = :ordem WHERE id_aula = :id_aula';
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':titulo', $titulo);
+            $stmt->bindParam(':conteudo', $conteudo);
+            $stmt->bindParam(':ordem', $ordem, PDO::PARAM_INT);
+            $stmt->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return ['status' => 'success', 'message' => 'Aula atualizada com sucesso.', 'view' => 'editar-aula', 'params' => ['aula' => $idAula]];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'message' => 'Não foi possível atualizar a aula.', 'view' => 'editar-aula'];
+        }
+    }
+
+    private function excluirAulaComDependencias($idAula) {
+        $queries = [
+            'UPDATE usuario_configuracao SET id_aula_atual = NULL WHERE id_aula_atual = :id_aula',
+            'DELETE eo FROM exercicio_opcoes eo INNER JOIN exercicios e ON e.id_exercicio = eo.id_exercicio WHERE e.id_aula = :id_aula',
+            'DELETE ec FROM exercicio_completar ec INNER JOIN exercicios e ON e.id_exercicio = ec.id_exercicio WHERE e.id_aula = :id_aula',
+            'DELETE eb FROM exercicio_blocos eb INNER JOIN exercicios e ON e.id_exercicio = eb.id_exercicio WHERE e.id_aula = :id_aula',
+            'DELETE FROM progresso_aula WHERE id_aula = :id_aula',
+            'DELETE FROM exercicios WHERE id_aula = :id_aula',
+            'DELETE FROM aulas WHERE id_aula = :id_aula',
+        ];
+
+        foreach ($queries as $query) {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
+            $stmt->execute();
+        }
+    }
+
+    private function excluirAulaDashboard() {
+        $aula = $this->buscar_aula_dashboard_por_id($_POST['id_aula'] ?? null);
+        if ($aula === null) {
+            return ['status' => 'error', 'message' => 'A aula selecionada não existe mais.', 'view' => 'editar-aula'];
+        }
+
+        try {
+            $this->conn->beginTransaction();
+            $this->excluirAulaComDependencias((int) $aula['id_aula']);
+            $this->conn->commit();
+            return ['status' => 'success', 'message' => 'Aula excluída com sucesso.', 'view' => 'editar-modulo', 'params' => ['modulo' => $aula['id_modulo']]];
+        } catch (Throwable $e) {
+            if ($this->conn->inTransaction()) $this->conn->rollBack();
+            return ['status' => 'error', 'message' => 'Não foi possível excluir a aula.', 'view' => 'editar-aula'];
+        }
+    }
+
+    private function excluirModuloDashboard() {
+        $modulo = $this->buscar_modulo_por_id($_POST['id_modulo'] ?? null);
+        if ($modulo === null) {
+            return ['status' => 'error', 'message' => 'O módulo selecionado não existe mais.', 'view' => 'editar-modulo'];
+        }
+
+        try {
+            $this->conn->beginTransaction();
+            $idModulo = (int) $modulo['id_modulo'];
+            $this->excluirModuloComDependencias($idModulo);
+            $this->conn->commit();
+            return ['status' => 'success', 'message' => 'Módulo excluído com sucesso.', 'view' => 'editar-curso', 'params' => ['linguagem' => $modulo['id_linguagem']]];
+        } catch (Throwable $e) {
+            if ($this->conn->inTransaction()) $this->conn->rollBack();
+            return ['status' => 'error', 'message' => 'Não foi possível excluir o módulo.', 'view' => 'editar-modulo'];
+        }
+    }
+
+    private function excluirModuloComDependencias($idModulo) {
+        $stmtAulas = $this->conn->prepare('SELECT id_aula FROM aulas WHERE id_modulo = :id_modulo');
+        $stmtAulas->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
+        $stmtAulas->execute();
+        foreach ($stmtAulas->fetchAll(PDO::FETCH_COLUMN) as $idAula) {
+            $this->excluirAulaComDependencias((int) $idAula);
+        }
+
+        $stmtConfiguracao = $this->conn->prepare('UPDATE usuario_configuracao SET id_modulo_atual = NULL WHERE id_modulo_atual = :id_modulo');
+        $stmtConfiguracao->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
+        $stmtConfiguracao->execute();
+
+        $stmtModulo = $this->conn->prepare('DELETE FROM modulos WHERE id_modulo = :id_modulo');
+        $stmtModulo->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
+        $stmtModulo->execute();
+    }
+
+    private function atualizarLinguagemDashboard() {
+        $idLinguagem = $this->normalizarInteiroPositivo($_POST['id_linguagem'] ?? null);
+        $nome = trim($_POST['nome_linguagem'] ?? '');
+        $descricao = trim($_POST['descricao_linguagem'] ?? '');
+        $nivel = trim($_POST['nivel_linguagem'] ?? '');
+        $linguagem = $this->buscar_linguagem_por_id($idLinguagem);
+
+        if ($linguagem === null) {
+            return ['status' => 'error', 'message' => 'A linguagem selecionada não existe mais.', 'view' => 'editar-curso'];
+        }
+        if ($nome === '') {
+            return ['status' => 'error', 'message' => 'Informe o nome da linguagem.', 'view' => 'editar-curso'];
+        }
+
+        $imagem = $linguagem['img'];
+        $arquivo = $_FILES['img'] ?? null;
+        if ($arquivo && ($arquivo['tmp_name'] ?? '') !== '') {
+            if (($arquivo['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                return ['status' => 'error', 'message' => 'Não foi possível enviar a imagem.', 'view' => 'editar-curso'];
+            }
+
+            $extensao = strtolower(pathinfo((string) ($arquivo['name'] ?? ''), PATHINFO_EXTENSION));
+            if (!in_array($extensao, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
+                return ['status' => 'error', 'message' => 'Formato de imagem inválido.', 'view' => 'editar-curso'];
+            }
+
+            $pastaUploads = dirname(__DIR__) . '/uploads';
+            if (!is_dir($pastaUploads)) {
+                mkdir($pastaUploads, 0777, true);
+            }
+            $nomeArquivo = bin2hex(random_bytes(16)) . '.' . $extensao;
+            if (!move_uploaded_file($arquivo['tmp_name'], $pastaUploads . '/' . $nomeArquivo)) {
+                return ['status' => 'error', 'message' => 'Não foi possível salvar a imagem.', 'view' => 'editar-curso'];
+            }
+            $imagem = 'uploads/' . $nomeArquivo;
+        }
+
+        try {
+            $queryDuplicado = 'SELECT 1 FROM linguagens WHERE nome_linguagem = :nome AND id_linguagem <> :id_linguagem LIMIT 1';
+            $stmtDuplicado = $this->conn->prepare($queryDuplicado);
+            $stmtDuplicado->bindParam(':nome', $nome);
+            $stmtDuplicado->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
+            $stmtDuplicado->execute();
+            if ($stmtDuplicado->fetchColumn()) {
+                return ['status' => 'error', 'message' => 'Já existe outra linguagem com este nome.', 'view' => 'editar-curso'];
+            }
+
+            $query = 'UPDATE linguagens SET nome_linguagem = :nome, descricao = :descricao, nivel = :nivel, img = :img WHERE id_linguagem = :id_linguagem';
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':nome', $nome);
+            $stmt->bindParam(':descricao', $descricao);
+            $stmt->bindParam(':nivel', $nivel);
+            $stmt->bindParam(':img', $imagem);
+            $stmt->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return ['status' => 'success', 'message' => 'Linguagem atualizada com sucesso.', 'view' => 'editar-curso', 'params' => ['linguagem' => $idLinguagem]];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'message' => 'Não foi possível atualizar a linguagem.', 'view' => 'editar-curso'];
+        }
+    }
+
+    private function excluirLinguagemDashboard() {
+        $linguagem = $this->buscar_linguagem_por_id($_POST['id_linguagem'] ?? null);
+        if ($linguagem === null) {
+            return ['status' => 'error', 'message' => 'A linguagem selecionada não existe mais.', 'view' => 'editar-curso'];
+        }
+
+        try {
+            $this->conn->beginTransaction();
+            $idLinguagem = (int) $linguagem['id_linguagem'];
+            $stmtModulos = $this->conn->prepare('SELECT id_modulo FROM modulos WHERE id_linguagem = :id_linguagem');
+            $stmtModulos->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
+            $stmtModulos->execute();
+            foreach ($stmtModulos->fetchAll(PDO::FETCH_COLUMN) as $idModulo) {
+                $this->excluirModuloComDependencias((int) $idModulo);
+            }
+
+            $stmtConfiguracao = $this->conn->prepare('UPDATE usuario_configuracao SET id_linguagem_atual = NULL, ultima_linguagem_acessada = NULL WHERE id_linguagem_atual = :id_linguagem OR ultima_linguagem_acessada = :id_linguagem_acessada');
+            $stmtConfiguracao->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
+            $stmtConfiguracao->bindParam(':id_linguagem_acessada', $idLinguagem, PDO::PARAM_INT);
+            $stmtConfiguracao->execute();
+
+            $stmtUsuarios = $this->conn->prepare('DELETE FROM usuario_linguagem WHERE id_linguagem = :id_linguagem');
+            $stmtUsuarios->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
+            $stmtUsuarios->execute();
+
+            $stmtLinguagem = $this->conn->prepare('DELETE FROM linguagens WHERE id_linguagem = :id_linguagem');
+            $stmtLinguagem->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
+            $stmtLinguagem->execute();
+            $this->conn->commit();
+
+            return ['status' => 'success', 'message' => 'Linguagem excluída com sucesso.', 'view' => 'gerenciar'];
+        } catch (Throwable $e) {
+            if ($this->conn->inTransaction()) $this->conn->rollBack();
+            return ['status' => 'error', 'message' => 'Não foi possível excluir a linguagem.', 'view' => 'editar-curso'];
+        }
+    }
+
+    private function excluirExercicioComDependencias($idExercicio) {
+        $queries = [
+            'DELETE FROM exercicio_opcoes WHERE id_exercicio = :id_exercicio',
+            'DELETE FROM exercicio_completar WHERE id_exercicio = :id_exercicio',
+            'DELETE FROM exercicio_blocos WHERE id_exercicio = :id_exercicio',
+            'DELETE FROM exercicios WHERE id_exercicio = :id_exercicio',
+        ];
+        foreach ($queries as $query) {
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_exercicio', $idExercicio, PDO::PARAM_INT);
+            $stmt->execute();
+        }
+    }
+
+    private function atualizarExercicioDashboard() {
+        $exercicio = $this->buscar_exercicio_dashboard_por_id($_POST['id_exercicio'] ?? null);
+        $pergunta = trim($_POST['pergunta_exercicio'] ?? '');
+        $feedbackErro = trim($_POST['feedback_erro'] ?? '');
+        if ($exercicio === null) {
+            return ['status' => 'error', 'message' => 'O exercício selecionado não existe mais.', 'view' => 'editar-exercicio'];
+        }
+        if ($pergunta === '') {
+            return ['status' => 'error', 'message' => 'Preencha a pergunta do exercício.', 'view' => 'editar-exercicio'];
+        }
+
+        try {
+            $stmt = $this->conn->prepare('UPDATE exercicios SET pergunta = :pergunta, feedback_erro = :feedback_erro WHERE id_exercicio = :id_exercicio');
+            $stmt->bindParam(':pergunta', $pergunta);
+            $stmt->bindParam(':feedback_erro', $feedbackErro);
+            $stmt->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
+            $stmt->execute();
+            return ['status' => 'success', 'message' => 'Exercício atualizado com sucesso.', 'view' => 'editar-exercicio', 'params' => ['exercicio' => $exercicio['id_exercicio']]];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'message' => 'Não foi possível atualizar o exercício.', 'view' => 'editar-exercicio'];
+        }
+    }
+
+    private function excluirExercicioDashboard() {
+        $exercicio = $this->buscar_exercicio_dashboard_por_id($_POST['id_exercicio'] ?? null);
+        if ($exercicio === null) {
+            return ['status' => 'error', 'message' => 'O exercício selecionado não existe mais.', 'view' => 'editar-exercicio'];
+        }
+        try {
+            $this->conn->beginTransaction();
+            $this->excluirExercicioComDependencias((int) $exercicio['id_exercicio']);
+            $this->conn->commit();
+            return ['status' => 'success', 'message' => 'Exercício excluído com sucesso.', 'view' => 'editar-aula', 'params' => ['aula' => $exercicio['id_aula']]];
+        } catch (Throwable $e) {
+            if ($this->conn->inTransaction()) $this->conn->rollBack();
+            return ['status' => 'error', 'message' => 'Não foi possível excluir o exercício.', 'view' => 'editar-exercicio'];
+        }
+    }
+
+    private function atualizarItemExercicioDashboard() {
+        $exercicio = $this->buscar_exercicio_dashboard_por_id($_POST['id_exercicio'] ?? null);
+        $idItem = $this->normalizarInteiroPositivo($_POST['id_item_exercicio'] ?? null);
+        if ($exercicio === null || $idItem === null) {
+            return ['status' => 'error', 'message' => 'Item do exercício não encontrado.', 'view' => 'editar-exercicio'];
+        }
+
+        try {
+            $tipo = trim((string) $exercicio['tipo_exercicio']);
+            if ($tipo === 'alternativa') {
+                $texto = trim($_POST['texto_opcao'] ?? '');
+                $correta = ($_POST['correta'] ?? '0') === '1' ? 1 : 0;
+                if ($texto === '') throw new RuntimeException('Preencha o texto da opção.');
+                if ($correta === 1) {
+                    $stmtLimpar = $this->conn->prepare('UPDATE exercicio_opcoes SET correta = 0 WHERE id_exercicio = :id_exercicio');
+                    $stmtLimpar->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
+                    $stmtLimpar->execute();
+                }
+                $query = 'UPDATE exercicio_opcoes eo INNER JOIN exercicios e ON e.id_exercicio = eo.id_exercicio SET eo.texto_opcao = :texto, eo.correta = :correta WHERE eo.id_opcao = :id_item AND e.id_exercicio = :id_exercicio';
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':texto', $texto);
+                $stmt->bindParam(':correta', $correta, PDO::PARAM_INT);
+            } elseif ($tipo === 'completar') {
+                $texto = trim($_POST['resposta_correta'] ?? '');
+                if ($texto === '') throw new RuntimeException('Preencha a resposta correta.');
+                $query = 'UPDATE exercicio_completar ec INNER JOIN exercicios e ON e.id_exercicio = ec.id_exercicio SET ec.resposta_correta = :texto WHERE ec.id = :id_item AND e.id_exercicio = :id_exercicio';
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':texto', $texto);
+            } elseif ($tipo === 'ordenar' || $tipo === 'ordenacao') {
+                $texto = trim($_POST['texto_bloco'] ?? '');
+                $ordem = $this->normalizarInteiroPositivo($_POST['ordem_correta'] ?? null);
+                if ($texto === '' || $ordem === null) throw new RuntimeException('Preencha o bloco e sua ordem válida.');
+                $query = 'UPDATE exercicio_blocos eb INNER JOIN exercicios e ON e.id_exercicio = eb.id_exercicio SET eb.texto_bloco = :texto, eb.ordem_correta = :ordem WHERE eb.id_bloco = :id_item AND e.id_exercicio = :id_exercicio';
+                $stmt = $this->conn->prepare($query);
+                $stmt->bindParam(':texto', $texto);
+                $stmt->bindParam(':ordem', $ordem, PDO::PARAM_INT);
+            } else {
+                throw new RuntimeException('Tipo de exercício inválido.');
+            }
+
+            $stmt->bindParam(':id_item', $idItem, PDO::PARAM_INT);
+            $stmt->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
+            $stmt->execute();
+            return ['status' => 'success', 'message' => 'Item atualizado com sucesso.', 'view' => 'editar-exercicio', 'params' => ['exercicio' => $exercicio['id_exercicio']]];
+        } catch (Throwable $e) {
+            return ['status' => 'error', 'message' => $e instanceof RuntimeException ? $e->getMessage() : 'Não foi possível atualizar o item.', 'view' => 'editar-exercicio'];
+        }
+    }
+
+    private function excluirItemExercicioDashboard() {
+        $exercicio = $this->buscar_exercicio_dashboard_por_id($_POST['id_exercicio'] ?? null);
+        $idItem = $this->normalizarInteiroPositivo($_POST['id_item_exercicio'] ?? null);
+        if ($exercicio === null || $idItem === null) {
+            return ['status' => 'error', 'message' => 'Item do exercício não encontrado.', 'view' => 'editar-exercicio'];
+        }
+
+        $mapa = ['alternativa' => ['exercicio_opcoes', 'id_opcao'], 'completar' => ['exercicio_completar', 'id'], 'ordenar' => ['exercicio_blocos', 'id_bloco'], 'ordenacao' => ['exercicio_blocos', 'id_bloco']];
+        $tipo = trim((string) $exercicio['tipo_exercicio']);
+        if (!isset($mapa[$tipo])) {
+            return ['status' => 'error', 'message' => 'Tipo de exercício inválido.', 'view' => 'editar-exercicio'];
+        }
+
+        try {
+            [$tabela, $coluna] = $mapa[$tipo];
+            $query = "DELETE FROM {$tabela} WHERE {$coluna} = :id_item AND id_exercicio = :id_exercicio";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_item', $idItem, PDO::PARAM_INT);
+            $stmt->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
+            $stmt->execute();
+            return ['status' => 'success', 'message' => 'Item excluído com sucesso.', 'view' => 'editar-exercicio', 'params' => ['exercicio' => $exercicio['id_exercicio']]];
+        } catch (PDOException $e) {
+            return ['status' => 'error', 'message' => 'Não foi possível excluir o item.', 'view' => 'editar-exercicio'];
+        }
+    }
+
     public function dashboard_model(){
         // Cadastro de modulo, linguagem, aula e exercicio a partir do dashboard
         if (!$this->conn) {
             return "Erro ao conectar ao banco!";
+        }
+        if (isset($_POST['btnAtualizarLinguagem'])) {
+            return $this->atualizarLinguagemDashboard();
+        }
+        if (isset($_POST['btnExcluirLinguagem'])) {
+            return $this->excluirLinguagemDashboard();
+        }
+        if (isset($_POST['btnAtualizarModulo'])) {
+            return $this->atualizarModuloDashboard();
+        }
+        if (isset($_POST['btnExcluirModulo'])) {
+            return $this->excluirModuloDashboard();
+        }
+        if (isset($_POST['btnAtualizarAula'])) {
+            return $this->atualizarAulaDashboard();
+        }
+        if (isset($_POST['btnExcluirAula'])) {
+            return $this->excluirAulaDashboard();
+        }
+        if (isset($_POST['btnAtualizarExercicio'])) {
+            return $this->atualizarExercicioDashboard();
+        }
+        if (isset($_POST['btnExcluirExercicio'])) {
+            return $this->excluirExercicioDashboard();
+        }
+        if (isset($_POST['btnAtualizarItemExercicio'])) {
+            return $this->atualizarItemExercicioDashboard();
+        }
+        if (isset($_POST['btnExcluirItemExercicio'])) {
+            return $this->excluirItemExercicioDashboard();
         }
         // Cadastro Modulo
         if(isset($_POST["btnSalvarModulo"])){
@@ -1313,6 +1718,121 @@ class Model {
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function buscar_modulo_por_id($id_modulo){
+        $idModulo = $this->normalizarInteiroPositivo($id_modulo);
+        if (!$this->conn || $idModulo === null) {
+            return null;
+        }
+
+        try {
+            $query = "SELECT id_modulo, id_linguagem, titulo_modulo, descricao_modulo, ordem_modulo
+                      FROM modulos
+                      WHERE id_modulo = :id_modulo
+                      LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+    public function listar_aulas_por_modulo($id_modulo){
+        if (!$this->conn || !$id_modulo) return [];
+        $query = "SELECT id_aula, titulo_aula, conteudo_aula, ordem_aula FROM aulas
+                  WHERE id_modulo = :id_modulo ORDER BY ordem_aula ASC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_modulo', $id_modulo, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function buscar_aula_dashboard_por_id($id_aula){
+        $idAula = $this->normalizarInteiroPositivo($id_aula);
+        if (!$this->conn || $idAula === null) {
+            return null;
+        }
+
+        try {
+            $query = "SELECT id_aula, id_modulo, titulo_aula, conteudo_aula, ordem_aula
+                      FROM aulas
+                      WHERE id_aula = :id_aula
+                      LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+    public function listar_exercicios_por_aula($id_aula){
+        $idAula = $this->normalizarInteiroPositivo($id_aula);
+        if (!$this->conn || $idAula === null) {
+            return [];
+        }
+
+        try {
+            $query = "SELECT id_exercicio, tipo_exercicio, pergunta, feedback_erro
+                      FROM exercicios
+                      WHERE id_aula = :id_aula
+                      ORDER BY id_exercicio ASC";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function buscar_exercicio_dashboard_por_id($id_exercicio){
+        $idExercicio = $this->normalizarInteiroPositivo($id_exercicio);
+        if (!$this->conn || $idExercicio === null) {
+            return null;
+        }
+
+        try {
+            $query = 'SELECT id_exercicio, id_aula, tipo_exercicio, pergunta, feedback_erro
+                      FROM exercicios WHERE id_exercicio = :id_exercicio LIMIT 1';
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_exercicio', $idExercicio, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+
+    public function listar_itens_por_exercicio(array $exercicio){
+        $idExercicio = (int) ($exercicio['id_exercicio'] ?? 0);
+        $tipo = trim((string) ($exercicio['tipo_exercicio'] ?? ''));
+        if ($idExercicio <= 0) {
+            return [];
+        }
+
+        if ($tipo === 'alternativa') {
+            return $this->listar_opcoes_por_exercicio($idExercicio);
+        }
+        if ($tipo === 'ordenar' || $tipo === 'ordenacao') {
+            return $this->listar_blocos_por_exercicio($idExercicio);
+        }
+        if ($tipo === 'completar') {
+            try {
+                $stmt = $this->conn->prepare('SELECT id, resposta_correta FROM exercicio_completar WHERE id_exercicio = :id_exercicio ORDER BY id ASC');
+                $stmt->bindParam(':id_exercicio', $idExercicio, PDO::PARAM_INT);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            } catch (PDOException $e) {
+                return [];
+            }
+        }
+
+        return [];
     }
 
     public function obter_aula_por_id($id_aula){

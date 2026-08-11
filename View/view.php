@@ -359,10 +359,10 @@ class View{
                 </div>';
     }
 
-    public function DashboardPage($string, $modulos = [], $aulas = [], $abaAtiva = 'modulo', $linguagens = [], $status = 'info', $linguagemSelecionada = null, $modulosCurso = []){
+    public function DashboardPage($string, $modulos = [], $aulas = [], $abaAtiva = 'modulo', $linguagens = [], $status = 'info', $linguagemSelecionada = null, $modulosCurso = [], $moduloSelecionado = null, $aulasModulo = [], $aulaSelecionada = null, $exerciciosAula = [], $exercicioSelecionado = null, $itensExercicio = []){
         $opcoes_modulo = '<option value="">Selecione um modulo</option>';
         $opcoes_aula = '<option value="">Selecione uma aula</option>';
-        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio", "editar-curso"];
+        $viewsPermitidas = ["gerenciar", "modulo", "linguagem", "aula", "exercicio", "editar-curso", "editar-modulo", "editar-aula", "editar-exercicio"];
 
         $html_gerenciar = '';
 
@@ -417,6 +417,9 @@ class View{
         if ($imagemCursoEdicao === '') {
             $imagemCursoEdicao = 'imagens/img_curso.png';
         }
+        $moduloEdicao = is_array($moduloSelecionado) ? $moduloSelecionado : [];
+        $aulaEdicao = is_array($aulaSelecionada) ? $aulaSelecionada : [];
+        $exercicioEdicao = is_array($exercicioSelecionado) ? $exercicioSelecionado : [];
 
         $htmlModulosCurso = '';
         if (is_array($modulosCurso) && count($modulosCurso) > 0) {
@@ -434,14 +437,15 @@ class View{
                                     </svg>
                                 </button>
                                 <div class="menu-acoes-modulo">
-                                    <button type="button">
+                                    <a class="menu-link" href="dashboard.php?view=editar-modulo&amp;modulo=' . urlencode((string) ($moduloCurso['id_modulo'] ?? '')) . '">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pencil"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
                                         Editar
-                                    </button>
-                                    <button type="button" class="acao-deletar-modulo">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
-                                        Deletar
-                                    </button>
+                                    </a>
+                                    <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir este módulo e todas as aulas vinculadas?\');">
+                                        <input type="hidden" name="dashboard_view" value="editar-modulo">
+                                        <input type="hidden" name="id_modulo" value="' . htmlspecialchars((string) ($moduloCurso['id_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                                        <button type="submit" name="btnExcluirModulo" class="acao-deletar-modulo">Deletar</button>
+                                    </form>
                                 </div>
                             </div>
                         </td>
@@ -452,6 +456,90 @@ class View{
                 <tr>
                     <td colspan="4" class="tabela-sem-registros">Nenhum módulo cadastrado para este curso.</td>
                 </tr>';
+        }
+
+        $htmlAulasModulo = '';
+        if (is_array($aulasModulo) && count($aulasModulo) > 0)
+            {
+                foreach ($aulasModulo as $aulaCurso)
+                {
+                     $htmlAulasModulo .= '
+                       <tr>
+                         <td>' . htmlspecialchars((string) ($aulaCurso['titulo_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="descricao-modulo">' . htmlspecialchars((string) ($aulaCurso['conteudo_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="coluna-ordem">' . htmlspecialchars((string) ($aulaCurso['ordem_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="coluna-acoes">
+                            <div class="dropdown-acoes-modulo">
+                                <button type="button" class="btn-menu-modulo" data-action="toggle-menu-modulo" aria-label="Abrir ações do módulo" aria-expanded="false">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ellipsis">
+                                        <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+                                    </svg>
+                                </button>
+                                <div class="menu-acoes-modulo">
+                                    <a class="menu-link" href="dashboard.php?view=editar-aula&amp;aula=' . urlencode((string) ($aulaCurso['id_aula'] ?? '')) . '">Editar</a>
+                                    <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir esta aula e todos os exercícios vinculados?\');">
+                                        <input type="hidden" name="dashboard_view" value="editar-aula">
+                                        <input type="hidden" name="id_aula" value="' . htmlspecialchars((string) ($aulaCurso['id_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                                        <button type="submit" name="btnExcluirAula" class="acao-deletar-modulo">Deletar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>';
+
+                }
+            } else {
+                $htmlAulasModulo = '
+                    <tr>
+                        <td colspan="4" class="tabela-sem-registros">Nenhuma aula cadastrada para este módulo.</td>
+                    </tr>';
+            }
+
+        $htmlExerciciosAula = '';
+        if (is_array($exerciciosAula) && count($exerciciosAula) > 0) {
+            foreach ($exerciciosAula as $exercicioAula) {
+                $htmlExerciciosAula .= '
+                    <tr>
+                        <td>' . htmlspecialchars((string) ($exercicioAula['tipo_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="descricao-modulo">' . htmlspecialchars((string) ($exercicioAula['pergunta'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td>' . htmlspecialchars((string) ($exercicioAula['feedback_erro'] ?? ''), ENT_QUOTES, 'UTF-8') . '</td>
+                        <td class="coluna-acoes">
+                            <div class="dropdown-acoes-modulo">
+                                <button type="button" class="btn-menu-modulo" data-action="toggle-menu-modulo" aria-label="Abrir ações do exercício" aria-expanded="false">•••</button>
+                                <div class="menu-acoes-modulo">
+                                    <a class="menu-link" href="dashboard.php?view=editar-exercicio&amp;exercicio=' . urlencode((string) ($exercicioAula['id_exercicio'] ?? '')) . '">Editar</a>
+                                    <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir este exercício e seus itens vinculados?\');">
+                                        <input type="hidden" name="dashboard_view" value="editar-exercicio">
+                                        <input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioAula['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                                        <button type="submit" name="btnExcluirExercicio" class="acao-deletar-modulo">Deletar</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>';
+            }
+        } else {
+            $htmlExerciciosAula = '<tr><td colspan="4" class="tabela-sem-registros">Nenhum exercício cadastrado para esta aula.</td></tr>';
+        }
+
+        $htmlItensExercicio = '';
+        $tipoExercicioEdicao = trim((string) ($exercicioEdicao['tipo_exercicio'] ?? ''));
+        if (is_array($itensExercicio) && count($itensExercicio) > 0) {
+            foreach ($itensExercicio as $itemExercicio) {
+                $idItem = $itemExercicio['id_opcao'] ?? $itemExercicio['id_bloco'] ?? $itemExercicio['id'] ?? '';
+                $camposItem = '';
+                if ($tipoExercicioEdicao === 'alternativa') {
+                    $camposItem = '<input type="text" name="texto_opcao" value="' . htmlspecialchars((string) ($itemExercicio['texto_opcao'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required><select name="correta"><option value="0">Incorreta</option><option value="1"' . (!empty($itemExercicio['correta']) ? ' selected' : '') . '>Correta</option></select>';
+                } elseif ($tipoExercicioEdicao === 'completar') {
+                    $camposItem = '<input type="text" name="resposta_correta" value="' . htmlspecialchars((string) ($itemExercicio['resposta_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>';
+                } else {
+                    $camposItem = '<input type="text" name="texto_bloco" value="' . htmlspecialchars((string) ($itemExercicio['texto_bloco'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required><input type="number" name="ordem_correta" min="1" value="' . htmlspecialchars((string) ($itemExercicio['ordem_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>';
+                }
+
+                $htmlItensExercicio .= '<div class="item-exercicio-edicao"><form action="dashboard.php" method="post"><input type="hidden" name="dashboard_view" value="editar-exercicio"><input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '"><input type="hidden" name="id_item_exercicio" value="' . htmlspecialchars((string) $idItem, ENT_QUOTES, 'UTF-8') . '"><div class="campos-item-exercicio">' . $camposItem . '</div><button type="submit" name="btnAtualizarItemExercicio" class="btn-salvar">Atualizar</button></form><form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir somente este item?\');"><input type="hidden" name="dashboard_view" value="editar-exercicio"><input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '"><input type="hidden" name="id_item_exercicio" value="' . htmlspecialchars((string) $idItem, ENT_QUOTES, 'UTF-8') . '"><button type="submit" name="btnExcluirItemExercicio" class="btn-deletar-curso">Deletar</button></form></div>';
+            }
+        } else {
+            $htmlItensExercicio = '<p class="tabela-sem-registros">Nenhum item cadastrado para este tipo de exercício.</p>';
         }
 
         if (is_array($modulos)) {
@@ -589,9 +677,14 @@ class View{
                         <h3 id="titulo-editar-curso">Editar Curso</h3>
                     </div>
                     <div class="editar-curso-acoes">
-                        <button type="button" class="btn-deletar-curso">Deletar Curso</button>
+                        <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir esta linguagem, seus módulos, aulas e exercícios?\');">
+                            <input type="hidden" name="dashboard_view" value="editar-curso">
+                            <input type="hidden" name="id_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['id_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                            <button type="submit" name="btnExcluirLinguagem" class="btn-deletar-curso">Deletar Curso</button>
+                        </form>
                     </div>
                     <form class="form-painel editar-curso-form" action="dashboard.php" method="post" enctype="multipart/form-data" autocomplete="off">
+                        <input type="hidden" name="dashboard_view" value="editar-curso">
                         <input type="hidden" id="editar-curso-id" name="id_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['id_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
 
                         <div class="campo-formulario">
@@ -622,7 +715,7 @@ class View{
                             <input type="file" id="editar-curso-imagem" name="img" accept="image/*">
                         </div>
 
-                        <button type="button" class="btn-salvar">Atualizar Curso</button>
+                        <button type="submit" name="btnAtualizarLinguagem" class="btn-salvar">Atualizar Curso</button>
                     </form>
 
                     <hr class="editar-curso-divisor">
@@ -653,6 +746,129 @@ class View{
                     </section>
 
                     <hr class="editar-curso-divisor">
+                </section>
+            </template>
+
+            <template id="template-editar-modulo">
+                <section class="form-panel-inline editar-curso-panel" aria-labelledby="titulo-editar-modulo">
+                    <div class="form-panel-header">
+                        <h3 id="titulo-editar-modulo">Módulo</h3>
+                    </div>
+                    <div class="editar-curso-acoes">
+                        <a class="btn-voltar-painel" href="dashboard.php?view=editar-curso&amp;linguagem=' . urlencode((string) ($moduloEdicao['id_linguagem'] ?? '')) . '">Voltar ao curso</a>
+                        <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir este módulo e todas as aulas vinculadas?\');">
+                            <input type="hidden" name="dashboard_view" value="editar-modulo">
+                            <input type="hidden" name="id_modulo" value="' . htmlspecialchars((string) ($moduloEdicao['id_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                            <button type="submit" name="btnExcluirModulo" class="btn-deletar-curso">Deletar Módulo</button>
+                        </form>
+                    </div>
+                    <form class="form-painel dados-selecionados" action="dashboard.php" method="post">
+                        <input type="hidden" name="dashboard_view" value="editar-modulo">
+                        <input type="hidden" name="id_modulo" value="' . htmlspecialchars((string) ($moduloEdicao['id_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        <div class="campo-formulario">
+                            <label>Título do módulo</label>
+                            <input type="text" name="titulo_modulo" value="' . htmlspecialchars((string) ($moduloEdicao['titulo_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
+                        </div>
+                        <div class="campo-formulario">
+                            <label>Descrição</label>
+                            <textarea name="descricao_modulo" rows="5" required>' . htmlspecialchars((string) ($moduloEdicao['descricao_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '</textarea>
+                        </div>
+                        <div class="campo-formulario campo-ordem-selecionado">
+                            <label>Ordem</label>
+                            <input type="number" name="ordem_modulo" min="1" value="' . htmlspecialchars((string) ($moduloEdicao['ordem_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
+                        </div>
+                        <button type="submit" name="btnAtualizarModulo" class="btn-salvar">Atualizar Módulo</button>
+                    </form>
+                    <hr class="editar-curso-divisor">
+                    <section class="editar-curso-modulos" aria-labelledby="titulo-aulas-modulo">
+                        <div class="editar-curso-modulos-cabecalho">
+                            <div>
+                                <h4 id="titulo-aulas-modulo">Aulas do Módulo</h4>
+                                <p>Gerencie as aulas vinculadas a este módulo.</p>
+                            </div>
+                        </div>
+                        <div class="editar-curso-tabela-wrapper">
+                            <table class="tabela-modulos">
+                                <thead><tr><th scope="col">Título</th><th scope="col">Conteúdo</th><th scope="col" class="coluna-ordem">Ordem</th><th scope="col" class="coluna-acoes"><span class="visualmente-oculto">Ações</span></th></tr></thead>
+                                <tbody>' . $htmlAulasModulo . '</tbody>
+                            </table>
+                        </div>
+                    </section>
+                </section>
+            </template>
+
+            <template id="template-editar-aula">
+                <section class="form-panel-inline editar-curso-panel" aria-labelledby="titulo-editar-aula">
+                    <div class="form-panel-header">
+                        <h3 id="titulo-editar-aula">Aula</h3>
+                    </div>
+                    <div class="editar-curso-acoes">
+                        <a class="btn-voltar-painel" href="dashboard.php?view=editar-modulo&amp;modulo=' . urlencode((string) ($aulaEdicao['id_modulo'] ?? '')) . '">Voltar ao módulo</a>
+                        <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir esta aula e todos os exercícios vinculados?\');">
+                            <input type="hidden" name="dashboard_view" value="editar-aula">
+                            <input type="hidden" name="id_aula" value="' . htmlspecialchars((string) ($aulaEdicao['id_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                            <button type="submit" name="btnExcluirAula" class="btn-deletar-curso">Deletar Aula</button>
+                        </form>
+                    </div>
+                    <form class="form-painel dados-selecionados" action="dashboard.php" method="post">
+                        <input type="hidden" name="dashboard_view" value="editar-aula">
+                        <input type="hidden" name="id_aula" value="' . htmlspecialchars((string) ($aulaEdicao['id_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        <div class="campo-formulario">
+                            <label>Título da aula</label>
+                            <input type="text" name="titulo_aula" value="' . htmlspecialchars((string) ($aulaEdicao['titulo_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
+                        </div>
+                        <div class="campo-formulario">
+                            <label>Conteúdo</label>
+                            <textarea name="conteudo_aula" rows="5" required>' . htmlspecialchars((string) ($aulaEdicao['conteudo_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '</textarea>
+                        </div>
+                        <div class="campo-formulario campo-ordem-selecionado">
+                            <label>Ordem</label>
+                            <input type="number" name="ordem_aula" min="1" value="' . htmlspecialchars((string) ($aulaEdicao['ordem_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
+                        </div>
+                        <button type="submit" name="btnAtualizarAula" class="btn-salvar">Atualizar Aula</button>
+                    </form>
+                    <hr class="editar-curso-divisor">
+                    <section class="editar-curso-modulos" aria-labelledby="titulo-exercicios-aula">
+                        <div class="editar-curso-modulos-cabecalho">
+                            <div>
+                                <h4 id="titulo-exercicios-aula">Exercícios da Aula</h4>
+                                <p>Exercícios vinculados a esta aula.</p>
+                            </div>
+                        </div>
+                        <div class="editar-curso-tabela-wrapper">
+                            <table class="tabela-modulos">
+                                <thead><tr><th scope="col">Tipo</th><th scope="col">Pergunta</th><th scope="col">Feedback de erro</th><th scope="col" class="coluna-acoes"><span class="visualmente-oculto">Ações</span></th></tr></thead>
+                                <tbody>' . $htmlExerciciosAula . '</tbody>
+                            </table>
+                        </div>
+                    </section>
+                </section>
+            </template>
+
+            <template id="template-editar-exercicio">
+                <section class="form-panel-inline editar-curso-panel" aria-labelledby="titulo-editar-exercicio">
+                    <div class="form-panel-header"><h3 id="titulo-editar-exercicio">Exercício</h3></div>
+                    <div class="editar-curso-acoes">
+                        <a class="btn-voltar-painel" href="dashboard.php?view=editar-aula&amp;aula=' . urlencode((string) ($exercicioEdicao['id_aula'] ?? '')) . '">Voltar à aula</a>
+                        <form action="dashboard.php" method="post" onsubmit="return confirm(\'Excluir este exercício e todos os itens vinculados?\');">
+                            <input type="hidden" name="dashboard_view" value="editar-exercicio">
+                            <input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                            <button type="submit" name="btnExcluirExercicio" class="btn-deletar-curso">Deletar Exercício</button>
+                        </form>
+                    </div>
+                    <form class="form-painel dados-selecionados" action="dashboard.php" method="post">
+                        <input type="hidden" name="dashboard_view" value="editar-exercicio">
+                        <input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        <div class="campo-formulario"><label>Tipo do exercício</label><input type="text" value="' . htmlspecialchars((string) ($exercicioEdicao['tipo_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '" readonly></div>
+                        <div class="campo-formulario"><label>Pergunta</label><textarea name="pergunta_exercicio" rows="5" required>' . htmlspecialchars((string) ($exercicioEdicao['pergunta'] ?? ''), ENT_QUOTES, 'UTF-8') . '</textarea></div>
+                        <div class="campo-formulario"><label>Feedback de erro</label><input type="text" name="feedback_erro" value="' . htmlspecialchars((string) ($exercicioEdicao['feedback_erro'] ?? ''), ENT_QUOTES, 'UTF-8') . '"></div>
+                        <button type="submit" name="btnAtualizarExercicio" class="btn-salvar">Atualizar Exercício</button>
+                    </form>
+                    <hr class="editar-curso-divisor">
+                    <section class="editar-curso-modulos" aria-labelledby="titulo-itens-exercicio">
+                        <div class="editar-curso-modulos-cabecalho"><div><h4 id="titulo-itens-exercicio">Itens do tipo ' . htmlspecialchars($tipoExercicioEdicao, ENT_QUOTES, 'UTF-8') . '</h4><p>Edite ou exclua somente os itens vinculados a este exercício.</p></div></div>
+                        <div class="itens-exercicio-lista">' . $htmlItensExercicio . '</div>
+                    </section>
                 </section>
             </template>
 
