@@ -517,6 +517,24 @@ class Model {
         return $valor > 0 ? $valor : null;
     }
 
+    private function obterIdAdminLogado() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $idAdmin = $_SESSION['id_usuario'] ?? null;
+
+        if ($idAdmin === null || $idAdmin === '' || filter_var($idAdmin, FILTER_VALIDATE_INT) === false) {
+            return null;
+        }
+
+        return (int) $idAdmin;
+    }
+
+    private function obterDataHoraAtual() {
+        return (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+    }
+
     private function moduloExiste($idModulo) {
         $query = "SELECT 1 FROM modulos WHERE id_modulo = :id_modulo LIMIT 1";
         $stmt = $this->conn->prepare($query);
@@ -588,13 +606,18 @@ class Model {
             ];
         }
 
-        $query = "INSERT INTO aulas (id_modulo, titulo_aula, conteudo_aula, ordem_aula)
-                  VALUES (:id_modulo, :titulo_aula, :conteudo_aula, :ordem_aula)";
+        $idAdminCriador = $this->obterIdAdminLogado();
+        $dataCriacao = $this->obterDataHoraAtual();
+
+        $query = "INSERT INTO aulas (id_modulo, titulo_aula, conteudo_aula, ordem_aula, id_admin_criador, data_criacao)
+                  VALUES (:id_modulo, :titulo_aula, :conteudo_aula, :ordem_aula, :id_admin_criador, :data_criacao)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_modulo", $idModulo, PDO::PARAM_INT);
         $stmt->bindParam(":titulo_aula", $tituloAula);
         $stmt->bindParam(":conteudo_aula", $conteudoAula);
         $stmt->bindParam(":ordem_aula", $ordemAula, PDO::PARAM_INT);
+        $stmt->bindParam(":id_admin_criador", $idAdminCriador, PDO::PARAM_INT);
+        $stmt->bindParam(":data_criacao", $dataCriacao);
         $stmt->execute();
 
         return [
@@ -604,13 +627,18 @@ class Model {
     }
 
     private function inserirExercicioBase($idAula, $tipoExercicio, $pergunta, $feedbackErro) {
-        $query = "INSERT INTO exercicios (id_aula, tipo_exercicio, pergunta, feedback_erro)
-                  VALUES (:id_aula, :tipo_exercicio, :pergunta, :feedback_erro)";
+        $idAdminCriador = $this->obterIdAdminLogado();
+        $dataCriacao = $this->obterDataHoraAtual();
+
+        $query = "INSERT INTO exercicios (id_aula, tipo_exercicio, pergunta, feedback_erro, id_admin_criador, data_criacao)
+                  VALUES (:id_aula, :tipo_exercicio, :pergunta, :feedback_erro, :id_admin_criador, :data_criacao)";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_aula", $idAula, PDO::PARAM_INT);
         $stmt->bindParam(":tipo_exercicio", $tipoExercicio);
         $stmt->bindParam(":pergunta", $pergunta);
         $stmt->bindParam(":feedback_erro", $feedbackErro);
+        $stmt->bindParam(":id_admin_criador", $idAdminCriador, PDO::PARAM_INT);
+        $stmt->bindParam(":data_criacao", $dataCriacao);
         $stmt->execute();
 
         return (int) $this->conn->lastInsertId();
@@ -854,11 +882,16 @@ class Model {
                 return ['status' => 'error', 'message' => 'Já existe outro módulo com este título.', 'view' => 'editar-modulo'];
             }
 
-            $query = 'UPDATE modulos SET titulo_modulo = :titulo, descricao_modulo = :descricao, ordem_modulo = :ordem WHERE id_modulo = :id_modulo';
+            $idAdminEditor = $this->obterIdAdminLogado();
+            $dataAtualizacao = $this->obterDataHoraAtual();
+
+            $query = 'UPDATE modulos SET titulo_modulo = :titulo, descricao_modulo = :descricao, ordem_modulo = :ordem, id_admin_editor = :id_admin_editor, data_atualizacao = :data_atualizacao WHERE id_modulo = :id_modulo';
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':titulo', $titulo);
             $stmt->bindParam(':descricao', $descricao);
             $stmt->bindParam(':ordem', $ordem, PDO::PARAM_INT);
+            $stmt->bindParam(':id_admin_editor', $idAdminEditor, PDO::PARAM_INT);
+            $stmt->bindParam(':data_atualizacao', $dataAtualizacao);
             $stmt->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -895,11 +928,16 @@ class Model {
                 return ['status' => 'error', 'message' => 'Já existe outra aula com este título neste módulo.', 'view' => 'editar-aula'];
             }
 
-            $query = 'UPDATE aulas SET titulo_aula = :titulo, conteudo_aula = :conteudo, ordem_aula = :ordem WHERE id_aula = :id_aula';
+            $idAdminEditor = $this->obterIdAdminLogado();
+            $dataAtualizacao = $this->obterDataHoraAtual();
+
+            $query = 'UPDATE aulas SET titulo_aula = :titulo, conteudo_aula = :conteudo, ordem_aula = :ordem, id_admin_editor = :id_admin_editor, data_atualizacao = :data_atualizacao WHERE id_aula = :id_aula';
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':titulo', $titulo);
             $stmt->bindParam(':conteudo', $conteudo);
             $stmt->bindParam(':ordem', $ordem, PDO::PARAM_INT);
+            $stmt->bindParam(':id_admin_editor', $idAdminEditor, PDO::PARAM_INT);
+            $stmt->bindParam(':data_atualizacao', $dataAtualizacao);
             $stmt->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -985,6 +1023,8 @@ class Model {
         $descricao = trim($_POST['descricao_linguagem'] ?? '');
         $nivel = trim($_POST['nivel_linguagem'] ?? '');
         $linguagem = $this->buscar_linguagem_por_id($idLinguagem);
+        $criador = $linguagem['id_admin_criador'] ?? null;
+        $editor = $linguagem['id_admin_editor'] ?? null;
 
         if ($linguagem === null) {
             return ['status' => 'error', 'message' => 'A linguagem selecionada não existe mais.', 'view' => 'editar-curso'];
@@ -1026,12 +1066,17 @@ class Model {
                 return ['status' => 'error', 'message' => 'Já existe outra linguagem com este nome.', 'view' => 'editar-curso'];
             }
 
-            $query = 'UPDATE linguagens SET nome_linguagem = :nome, descricao = :descricao, nivel = :nivel, img = :img WHERE id_linguagem = :id_linguagem';
+            $idAdminEditor = $this->obterIdAdminLogado();
+            $dataAtualizacao = $this->obterDataHoraAtual();
+
+            $query = 'UPDATE linguagens SET nome_linguagem = :nome, descricao = :descricao, nivel = :nivel, img = :img, id_admin_editor = :id_admin_editor, data_atualizacao = :data_atualizacao WHERE id_linguagem = :id_linguagem';
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':nome', $nome);
             $stmt->bindParam(':descricao', $descricao);
             $stmt->bindParam(':nivel', $nivel);
             $stmt->bindParam(':img', $imagem);
+            $stmt->bindParam(':id_admin_editor', $idAdminEditor, PDO::PARAM_INT);
+            $stmt->bindParam(':data_atualizacao', $dataAtualizacao);
             $stmt->bindParam(':id_linguagem', $idLinguagem, PDO::PARAM_INT);
             $stmt->execute();
 
@@ -1104,9 +1149,14 @@ class Model {
         }
 
         try {
-            $stmt = $this->conn->prepare('UPDATE exercicios SET pergunta = :pergunta, feedback_erro = :feedback_erro WHERE id_exercicio = :id_exercicio');
+            $idAdminEditor = $this->obterIdAdminLogado();
+            $dataAtualizacao = $this->obterDataHoraAtual();
+
+            $stmt = $this->conn->prepare('UPDATE exercicios SET pergunta = :pergunta, feedback_erro = :feedback_erro, id_admin_editor = :id_admin_editor, data_atualizacao = :data_atualizacao WHERE id_exercicio = :id_exercicio');
             $stmt->bindParam(':pergunta', $pergunta);
             $stmt->bindParam(':feedback_erro', $feedbackErro);
+            $stmt->bindParam(':id_admin_editor', $idAdminEditor, PDO::PARAM_INT);
+            $stmt->bindParam(':data_atualizacao', $dataAtualizacao);
             $stmt->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
             $stmt->execute();
             return ['status' => 'success', 'message' => 'Exercício atualizado com sucesso.', 'view' => 'editar-exercicio', 'params' => ['exercicio' => $exercicio['id_exercicio']]];
@@ -1174,6 +1224,15 @@ class Model {
             $stmt->bindParam(':id_item', $idItem, PDO::PARAM_INT);
             $stmt->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
             $stmt->execute();
+
+            $idAdminEditor = $this->obterIdAdminLogado();
+            $dataAtualizacao = $this->obterDataHoraAtual();
+            $stmtUpdateExercicio = $this->conn->prepare('UPDATE exercicios SET id_admin_editor = :id_admin_editor, data_atualizacao = :data_atualizacao WHERE id_exercicio = :id_exercicio');
+            $stmtUpdateExercicio->bindParam(':id_admin_editor', $idAdminEditor, PDO::PARAM_INT);
+            $stmtUpdateExercicio->bindParam(':data_atualizacao', $dataAtualizacao);
+            $stmtUpdateExercicio->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
+            $stmtUpdateExercicio->execute();
+
             return ['status' => 'success', 'message' => 'Item atualizado com sucesso.', 'view' => 'editar-exercicio', 'params' => ['exercicio' => $exercicio['id_exercicio']]];
         } catch (Throwable $e) {
             return ['status' => 'error', 'message' => $e instanceof RuntimeException ? $e->getMessage() : 'Não foi possível atualizar o item.', 'view' => 'editar-exercicio'];
@@ -1200,6 +1259,15 @@ class Model {
             $stmt->bindParam(':id_item', $idItem, PDO::PARAM_INT);
             $stmt->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
             $stmt->execute();
+
+            $idAdminEditor = $this->obterIdAdminLogado();
+            $dataAtualizacao = $this->obterDataHoraAtual();
+            $stmtUpdateExercicio = $this->conn->prepare('UPDATE exercicios SET id_admin_editor = :id_admin_editor, data_atualizacao = :data_atualizacao WHERE id_exercicio = :id_exercicio');
+            $stmtUpdateExercicio->bindParam(':id_admin_editor', $idAdminEditor, PDO::PARAM_INT);
+            $stmtUpdateExercicio->bindParam(':data_atualizacao', $dataAtualizacao);
+            $stmtUpdateExercicio->bindParam(':id_exercicio', $exercicio['id_exercicio'], PDO::PARAM_INT);
+            $stmtUpdateExercicio->execute();
+
             return ['status' => 'success', 'message' => 'Item excluído com sucesso.', 'view' => 'editar-exercicio', 'params' => ['exercicio' => $exercicio['id_exercicio']]];
         } catch (PDOException $e) {
             return ['status' => 'error', 'message' => 'Não foi possível excluir o item.', 'view' => 'editar-exercicio'];
@@ -1311,10 +1379,13 @@ class Model {
                     $ordem_modulo = (int) $stmt_ordem->fetchColumn();
                 }
 
+                $id_admin_criador = $this->obterIdAdminLogado();
+                $data_criacao = $this->obterDataHoraAtual();
+
                 $query = "INSERT INTO modulos (
-                            titulo_modulo, descricao_modulo, ordem_modulo, id_linguagem
+                            titulo_modulo, descricao_modulo, ordem_modulo, id_linguagem, id_admin_criador, data_criacao
                         ) VALUES (
-                            :titulo, :descricao, :ordem, :id_linguagem
+                            :titulo, :descricao, :ordem, :id_linguagem, :id_admin_criador, :data_criacao
                         )";
 
                 $stmt = $this->conn->prepare($query);
@@ -1323,6 +1394,8 @@ class Model {
                 $stmt->bindParam(":descricao", $descricao_modulo);
                 $stmt->bindParam(":ordem", $ordem_modulo);
                 $stmt->bindParam(":id_linguagem", $id_linguagem, PDO::PARAM_INT);
+                $stmt->bindParam(":id_admin_criador", $id_admin_criador, PDO::PARAM_INT);
+                $stmt->bindParam(":data_criacao", $data_criacao);
 
                 $stmt->execute();
 
@@ -1410,10 +1483,13 @@ class Model {
                     ];
                 }
 
+                $id_admin_criador = $this->obterIdAdminLogado();
+                $data_criacao = $this->obterDataHoraAtual();
+
                 $query = "INSERT INTO linguagens (
-                            nome_linguagem, descricao, nivel, img
+                            nome_linguagem, descricao, nivel, img, id_admin_criador, data_criacao
                         ) VALUES (
-                            :nome, :descricao, :nivel, :img
+                            :nome, :descricao, :nivel, :img, :id_admin_criador, :data_criacao
                         )";
 
                 $stmt = $this->conn->prepare($query);
@@ -1421,6 +1497,8 @@ class Model {
                 $stmt->bindParam(":descricao", $descricao);
                 $stmt->bindParam(":nivel", $nivel);
                 $stmt->bindParam(":img", $img_path);
+                $stmt->bindParam(":id_admin_criador", $id_admin_criador, PDO::PARAM_INT);
+                $stmt->bindParam(":data_criacao", $data_criacao);
                 $stmt->execute();
                 
 
@@ -1505,9 +1583,14 @@ class Model {
         }
 
         try {
-            $query = "SELECT id_linguagem, nome_linguagem, descricao, nivel, img, data_criacao
-                      FROM linguagens
-                      WHERE id_linguagem = :id_linguagem
+            $query = "SELECT l.id_linguagem, l.nome_linguagem, l.descricao, l.nivel, l.img,
+                             l.id_admin_criador, l.data_criacao, l.id_admin_editor, l.data_atualizacao,
+                             cu_criador.nome_usuario AS nome_admin_criador,
+                             cu_editor.nome_usuario AS nome_admin_editor
+                      FROM linguagens l
+                      LEFT JOIN cadastro_usuario cu_criador ON cu_criador.id_usuario = l.id_admin_criador
+                      LEFT JOIN cadastro_usuario cu_editor ON cu_editor.id_usuario = l.id_admin_editor
+                      WHERE l.id_linguagem = :id_linguagem
                       LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(":id_linguagem", $idLinguagem, PDO::PARAM_INT);
@@ -1727,9 +1810,14 @@ class Model {
         }
 
         try {
-            $query = "SELECT id_modulo, id_linguagem, titulo_modulo, descricao_modulo, ordem_modulo
-                      FROM modulos
-                      WHERE id_modulo = :id_modulo
+            $query = "SELECT m.id_modulo, m.id_linguagem, m.titulo_modulo, m.descricao_modulo, m.ordem_modulo,
+                             m.id_admin_criador, m.data_criacao, m.id_admin_editor, m.data_atualizacao,
+                             cu_criador.nome_usuario AS nome_admin_criador,
+                             cu_editor.nome_usuario AS nome_admin_editor
+                      FROM modulos m
+                      LEFT JOIN cadastro_usuario cu_criador ON cu_criador.id_usuario = m.id_admin_criador
+                      LEFT JOIN cadastro_usuario cu_editor ON cu_editor.id_usuario = m.id_admin_editor
+                      WHERE m.id_modulo = :id_modulo
                       LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_modulo', $idModulo, PDO::PARAM_INT);
@@ -1757,9 +1845,14 @@ class Model {
         }
 
         try {
-            $query = "SELECT id_aula, id_modulo, titulo_aula, conteudo_aula, ordem_aula
-                      FROM aulas
-                      WHERE id_aula = :id_aula
+            $query = "SELECT a.id_aula, a.id_modulo, a.titulo_aula, a.conteudo_aula, a.ordem_aula,
+                             a.id_admin_criador, a.data_criacao, a.id_admin_editor, a.data_atualizacao,
+                             cu_criador.nome_usuario AS nome_admin_criador,
+                             cu_editor.nome_usuario AS nome_admin_editor
+                      FROM aulas a
+                      LEFT JOIN cadastro_usuario cu_criador ON cu_criador.id_usuario = a.id_admin_criador
+                      LEFT JOIN cadastro_usuario cu_editor ON cu_editor.id_usuario = a.id_admin_editor
+                      WHERE a.id_aula = :id_aula
                       LIMIT 1";
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_aula', $idAula, PDO::PARAM_INT);
@@ -1797,8 +1890,14 @@ class Model {
         }
 
         try {
-            $query = 'SELECT id_exercicio, id_aula, tipo_exercicio, pergunta, feedback_erro
-                      FROM exercicios WHERE id_exercicio = :id_exercicio LIMIT 1';
+            $query = 'SELECT e.id_exercicio, e.id_aula, e.tipo_exercicio, e.pergunta, e.feedback_erro,
+                             e.id_admin_criador, e.data_criacao, e.id_admin_editor, e.data_atualizacao,
+                             cu_criador.nome_usuario AS nome_admin_criador,
+                             cu_editor.nome_usuario AS nome_admin_editor
+                      FROM exercicios e
+                      LEFT JOIN cadastro_usuario cu_criador ON cu_criador.id_usuario = e.id_admin_criador
+                      LEFT JOIN cadastro_usuario cu_editor ON cu_editor.id_usuario = e.id_admin_editor
+                      WHERE e.id_exercicio = :id_exercicio LIMIT 1';
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':id_exercicio', $idExercicio, PDO::PARAM_INT);
             $stmt->execute();

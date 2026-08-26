@@ -19,12 +19,20 @@ CREATE TABLE IF NOT EXISTS `aulas` (
   `id_aula` int NOT NULL AUTO_INCREMENT,
   `id_modulo` int DEFAULT NULL,
   `titulo_aula` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `conteudo_aula` text COLLATE utf8mb4_unicode_ci,
+  `conteudo_aula` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `ordem_aula` int DEFAULT NULL,
+  `id_admin_criador` int DEFAULT NULL,
+  `data_criacao` datetime DEFAULT NULL,
+  `id_admin_editor` int DEFAULT NULL,
+  `data_atualizacao` datetime DEFAULT NULL,
   PRIMARY KEY (`id_aula`),
   KEY `id_modulo` (`id_modulo`),
-  CONSTRAINT `aulas_ibfk_1` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `id_usuario_criador` (`id_admin_criador`) USING BTREE,
+  KEY `id_usuario_editor` (`id_admin_editor`) USING BTREE,
+  CONSTRAINT `aulas_ibfk_1` FOREIGN KEY (`id_modulo`) REFERENCES `modulos` (`id_modulo`),
+  CONSTRAINT `FK_aulas_criador` FOREIGN KEY (`id_admin_criador`) REFERENCES `cadastro_usuario` (`id_usuario`),
+  CONSTRAINT `FK_aulas_editor` FOREIGN KEY (`id_admin_editor`) REFERENCES `cadastro_usuario` (`id_usuario`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -40,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `cadastro_usuario` (
   `token_expira` date DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `email_usuario` (`email_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -51,10 +59,18 @@ CREATE TABLE IF NOT EXISTS `exercicios` (
   `tipo_exercicio` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pergunta` text COLLATE utf8mb4_unicode_ci,
   `feedback_erro` varchar(350) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `id_admin_criador` int DEFAULT NULL,
+  `data_criacao` datetime DEFAULT NULL,
+  `id_admin_editor` int DEFAULT NULL,
+  `data_atualizacao` datetime DEFAULT NULL,
   PRIMARY KEY (`id_exercicio`),
   KEY `id_aula` (`id_aula`),
-  CONSTRAINT `exercicios_ibfk_1` FOREIGN KEY (`id_aula`) REFERENCES `aulas` (`id_aula`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `id_admin_criador` (`id_admin_criador`),
+  KEY `id_admin_editor` (`id_admin_editor`),
+  CONSTRAINT `FK_exercicios_aulas` FOREIGN KEY (`id_aula`) REFERENCES `aulas` (`id_aula`),
+  CONSTRAINT `FK_exercicios_cadastro_usuario` FOREIGN KEY (`id_admin_criador`) REFERENCES `cadastro_usuario` (`id_usuario`),
+  CONSTRAINT `FK_exercicios_cadastro_usuario_2` FOREIGN KEY (`id_admin_editor`) REFERENCES `cadastro_usuario` (`id_usuario`)
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -67,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `exercicio_blocos` (
   PRIMARY KEY (`id_bloco`),
   KEY `id_exercicio` (`id_exercicio`),
   CONSTRAINT `exercicio_blocos_ibfk_1` FOREIGN KEY (`id_exercicio`) REFERENCES `exercicios` (`id_exercicio`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -79,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `exercicio_completar` (
   PRIMARY KEY (`id`),
   KEY `id_exercicio` (`id_exercicio`),
   CONSTRAINT `exercicio_completar_ibfk_1` FOREIGN KEY (`id_exercicio`) REFERENCES `exercicios` (`id_exercicio`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -92,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `exercicio_opcoes` (
   PRIMARY KEY (`id_opcao`),
   KEY `id_exercicio` (`id_exercicio`),
   CONSTRAINT `exercicio_opcoes_ibfk_1` FOREIGN KEY (`id_exercicio`) REFERENCES `exercicios` (`id_exercicio`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -103,21 +119,38 @@ CREATE TABLE IF NOT EXISTS `linguagens` (
   `descricao` text COLLATE utf8mb4_unicode_ci,
   `nivel` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `img` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `data_criacao` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_linguagem`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id_admin_criador` int DEFAULT NULL,
+  `data_criacao` datetime DEFAULT NULL,
+  `id_admin_editor` int DEFAULT NULL,
+  `data_atualizacao` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_linguagem`),
+  KEY `id_admin_editor` (`id_admin_editor`),
+  KEY `id_admin_criador` (`id_admin_criador`),
+  CONSTRAINT `FK_linguagens_cadastro_usuario` FOREIGN KEY (`id_admin_criador`) REFERENCES `cadastro_usuario` (`id_usuario`),
+  CONSTRAINT `FK_linguagens_cadastro_usuario_2` FOREIGN KEY (`id_admin_editor`) REFERENCES `cadastro_usuario` (`id_usuario`)
+) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 
 -- Copiando estrutura para tabela devplace.modulos
 CREATE TABLE IF NOT EXISTS `modulos` (
   `id_modulo` int NOT NULL AUTO_INCREMENT,
+  `id_linguagem` int DEFAULT NULL,
   `titulo_modulo` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `descricao_modulo` text COLLATE utf8mb4_unicode_ci,
   `ordem_modulo` int DEFAULT NULL,
-  `id_linguagem` int DEFAULT NULL,
-  PRIMARY KEY (`id_modulo`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `id_admin_criador` int DEFAULT NULL,
+  `data_criacao` datetime DEFAULT NULL,
+  `id_admin_editor` int DEFAULT NULL,
+  `data_atualizacao` datetime DEFAULT NULL,
+  PRIMARY KEY (`id_modulo`),
+  KEY `id_admin_criador` (`id_admin_criador`),
+  KEY `id_admin_editor` (`id_admin_editor`),
+  KEY `id_linguagem` (`id_linguagem`),
+  CONSTRAINT `FK_modulos_cadastro_usuario` FOREIGN KEY (`id_admin_criador`) REFERENCES `cadastro_usuario` (`id_usuario`),
+  CONSTRAINT `FK_modulos_cadastro_usuario_2` FOREIGN KEY (`id_admin_editor`) REFERENCES `cadastro_usuario` (`id_usuario`),
+  CONSTRAINT `FK_modulos_linguagens` FOREIGN KEY (`id_linguagem`) REFERENCES `linguagens` (`id_linguagem`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Exportação de dados foi desmarcado.
 

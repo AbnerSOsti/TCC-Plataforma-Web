@@ -25,3 +25,14 @@
 
 </body>
 </html>
+<script>
+    window.addEventListener('scroll', function() {
+    const navbar = document.querySelector('.navbar');
+    // Se a página rolar mais de 20px para baixo, adiciona a classe, senão remove
+    if (window.scrollY > 20) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });
+</script>

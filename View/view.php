@@ -42,17 +42,6 @@ class View{
         header("Location: sala.php");
         } else {
             echo '
-            <!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Beginner Dev</title>
-
-    <link rel="stylesheet" href="style.css">
-</head>
     <main>
 
         <!-- =========================
@@ -194,10 +183,7 @@ class View{
                     <img src="imagens/hero.png">
                 
                 </div>
-
             </div>
-
-
             <!-- =========================
                  ESTATÍSTICAS
             ========================== -->
@@ -246,7 +232,6 @@ class View{
 
             </div>
 
-
             <!-- Indicador de scroll -->
             <div class="hero__scroll">
 
@@ -259,14 +244,186 @@ class View{
                 </span>
 
             </div>
-
         </section>
 
-
-        <!-- Apenas para demonstrar a próxima section -->
+        <!-- =========================================
+            SECTION - JORNADA DE APRENDIZAGEM
+        ========================================= -->
         <section id="linguagens" class="section-linguagem">
-            <h2>Linguagens</h2>
+            <div class="linguagem__content">
+                <div class="linguagem__text">
+
+                    <div class="linguagem__badge">
+                        <span>✦</span>
+                        SEU
+                        <strong>CAMINHO DE</strong>
+                        APRENDIZADO.
+                    </div>
+
+                    <h1 class="linguagem__title">
+                        Comece pelo essencial:
+                        <strong>Lógica e pensamento computacional.</strong>
+                    </h1>
+
+
+                    <p class="linguagem__description">
+                        Antes de aprender qualquer linguagem de programação, 
+                        construa uma base sólida que vai te acompanhar por toda sua jornada.
+                    </p>
+                    <div class="linguagem__ideia">
+                        <div class="lampada">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb-icon lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        </div>
+                        <div class="ideia__descricao">
+                            <strong>Por que começar por aqui?</strong>
+                            <p>A lógica é a base de tudo. Ela desenvolve seu raciocinio, sua capacidade
+                             de resolver problemas e torna o aprendizado de qualquer linguagem muito mais facil.
+                            </p>
+                        </div>
+                    </div>
+                    
+
+                </div>
+
+                <div class="linguagem__imagem">
+                    <img src="imagens/section_linguagem.png">
+                </div>
+
+                <div class="section__caminho">
+                    <div class="card">
+                        <article class="learning-card learning-card--required">
+
+                            <!-- Cabeçalho do card -->
+                            <div class="learning-card__header">
+
+                                <div class="learning-card__number">
+                                    01
+                                </div>
+
+                                <div class="learning-card__status">
+                                    OBRIGATÓRIO
+                                </div>
+
+                            </div>
+
+                            <!-- Conteúdo principal -->
+                            <div class="learning-card__content">
+
+                                <h3 class="learning-card__title">
+                                    Nível Aprendiz
+                                </h3>
+
+                                <h4 class="learning-card__subtitle">
+                                    Lógica e Pensamento
+                                    <br>
+                                    Computacional
+                                </h4>
+
+                                <p class="learning-card__description">
+                                    Desenvolva sua lógica, pensamento
+                                    algorítmico e aprenda a resolver problemas
+                                    de forma estruturada.
+                                </p>
+
+                            </div>
+
+                            <!-- Rodapé do card -->
+                            <div class="learning-card__footer">
+
+                                <div class="learning-card__duration">
+
+                                    <span class="learning-card__duration-icon">
+                                        ◷
+                                    </span>
+
+                                    <span>
+                                        Carga horária: 20h+
+                                    </span>
+
+                                </div>
+
+
+                                <a
+                                    href="#"
+                                    class="learning-card__button"
+                                >
+                                    Começar agora
+
+                                    <span>
+                                        →
+                                    </span>
+
+                                </a>
+
+                            </div>
+
+                        </article>
+                    </div>
+                </div>
+                <div class="section__caminho">
+                    <div class="card">
+                        <article class="learning-card learning-card--required">
+
+                            <!-- Cabeçalho do card -->
+                            <div class="learning-card__header">
+
+                                <div class="learning-card__number">
+                                    02
+                                </div>
+
+                                <div class="learning-card__status">
+                                    BLOQUEADO
+                                </div>
+
+                            </div>
+                            <!-- Conteúdo principal -->
+                            <div class="learning-card__content">
+
+                                <h3 class="learning-card__title">
+                                    Nível Iniciante
+                                </h3>
+
+                                <h4 class="learning-card__subtitle">
+                                    Introdução as linguagens
+                                    <br>
+                                    e programação
+                                </h4>
+
+                                <p class="learning-card__description">
+                                    Aprenda sua primeira linguagem de programação
+                                     e construa projetos simples.
+                                </p>
+
+                            </div>
+
+                            <div class="learning-card__footer">
+
+                                <div class="learning-card__duration">
+
+                                    <span class="learning-card__duration-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    </span>
+
+                                    <span>
+                                        Bloqueado até concluir o nível anterior
+                                    </span>
+
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
         </section>
+
+
+
+
+
+        <section id="roadmap" class="section__roadmap">
+        
+        </section>
+
 
     </main>
 
@@ -800,6 +957,13 @@ class View{
 
         echo '
             <link rel="stylesheet" href="css/dashboard.css">
+                <div class="dashboard-overlay"></div>
+                <button type="button" class="dashboard-menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+                
                 <div class="dashboard-container">
                     <aside class="dashboard-menu">
                         <a href="index.php" class="btn-voltar">
@@ -907,7 +1071,24 @@ class View{
                     <form class="form-painel editar-curso-form" action="dashboard.php" method="post" enctype="multipart/form-data" autocomplete="off">
                         <input type="hidden" name="dashboard_view" value="editar-curso">
                         <input type="hidden" id="editar-curso-id" name="id_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['id_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
-
+                        <div class="meta-dados">
+                            <div class="meta-item">
+                                <span>Criado por</span>
+                                <strong>' . htmlspecialchars((string) (($cursoEdicao['nome_admin_criador'] ?? $cursoEdicao['id_admin_criador'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Data de criação</span>
+                                <strong>' . htmlspecialchars((string) ($cursoEdicao['data_criacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Atualizado por</span>
+                                <strong>' . htmlspecialchars((string) (($cursoEdicao['nome_admin_editor'] ?? $cursoEdicao['id_admin_editor'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Última atualização</span>
+                                <strong>' . htmlspecialchars((string) ($cursoEdicao['data_atualizacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                        </div>
                         <div class="campo-formulario">
                             <label for="editar-curso-nome">Nome da Linguagem</label>
                             <input type="text" id="editar-curso-nome" name="nome_linguagem" value="' . htmlspecialchars((string) ($cursoEdicao['nome_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
@@ -986,6 +1167,24 @@ class View{
                     <form class="form-painel dados-selecionados" action="dashboard.php" method="post">
                         <input type="hidden" name="dashboard_view" value="editar-modulo">
                         <input type="hidden" name="id_modulo" value="' . htmlspecialchars((string) ($moduloEdicao['id_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        <div class="meta-dados">
+                            <div class="meta-item">
+                                <span>Criado por</span>
+                                <strong>' . htmlspecialchars((string) (($moduloEdicao['nome_admin_criador'] ?? $moduloEdicao['id_admin_criador'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Data de criação</span>
+                                <strong>' . htmlspecialchars((string) ($moduloEdicao['data_criacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Atualizado por</span>
+                                <strong>' . htmlspecialchars((string) (($moduloEdicao['nome_admin_editor'] ?? $moduloEdicao['id_admin_editor'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Última atualização</span>
+                                <strong>' . htmlspecialchars((string) ($moduloEdicao['data_atualizacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                        </div>
                         <div class="campo-formulario">
                             <label>Título do módulo</label>
                             <input type="text" name="titulo_modulo" value="' . htmlspecialchars((string) ($moduloEdicao['titulo_modulo'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
@@ -1034,6 +1233,24 @@ class View{
                     <form class="form-painel dados-selecionados" action="dashboard.php" method="post">
                         <input type="hidden" name="dashboard_view" value="editar-aula">
                         <input type="hidden" name="id_aula" value="' . htmlspecialchars((string) ($aulaEdicao['id_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        <div class="meta-dados">
+                            <div class="meta-item">
+                                <span>Criado por</span>
+                                <strong>' . htmlspecialchars((string) (($aulaEdicao['nome_admin_criador'] ?? $aulaEdicao['id_admin_criador'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Data de criação</span>
+                                <strong>' . htmlspecialchars((string) ($aulaEdicao['data_criacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Atualizado por</span>
+                                <strong>' . htmlspecialchars((string) (($aulaEdicao['nome_admin_editor'] ?? $aulaEdicao['id_admin_editor'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Última atualização</span>
+                                <strong>' . htmlspecialchars((string) ($aulaEdicao['data_atualizacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                        </div>
                         <div class="campo-formulario">
                             <label>Título da aula</label>
                             <input type="text" name="titulo_aula" value="' . htmlspecialchars((string) ($aulaEdicao['titulo_aula'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required>
@@ -1080,6 +1297,24 @@ class View{
                     <form class="form-painel dados-selecionados" action="dashboard.php" method="post">
                         <input type="hidden" name="dashboard_view" value="editar-exercicio">
                         <input type="hidden" name="id_exercicio" value="' . htmlspecialchars((string) ($exercicioEdicao['id_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '">
+                        <div class="meta-dados">
+                            <div class="meta-item">
+                                <span>Criado por</span>
+                                <strong>' . htmlspecialchars((string) (($exercicioEdicao['nome_admin_criador'] ?? $exercicioEdicao['id_admin_criador'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Data de criação</span>
+                                <strong>' . htmlspecialchars((string) ($exercicioEdicao['data_criacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Atualizado por</span>
+                                <strong>' . htmlspecialchars((string) (($exercicioEdicao['nome_admin_editor'] ?? $exercicioEdicao['id_admin_editor'] ?? '')), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                            <div class="meta-item">
+                                <span>Última atualização</span>
+                                <strong>' . htmlspecialchars((string) ($exercicioEdicao['data_atualizacao'] ?? ''), ENT_QUOTES, 'UTF-8') . '</strong>
+                            </div>
+                        </div>
                         <div class="campo-formulario"><label>Tipo do exercício</label><input type="text" value="' . htmlspecialchars((string) ($exercicioEdicao['tipo_exercicio'] ?? ''), ENT_QUOTES, 'UTF-8') . '" readonly></div>
                         <div class="campo-formulario"><label>Pergunta</label><textarea name="pergunta_exercicio" rows="5" required>' . htmlspecialchars((string) ($exercicioEdicao['pergunta'] ?? ''), ENT_QUOTES, 'UTF-8') . '</textarea></div>
                         <div class="campo-formulario"><label>Feedback de erro</label><input type="text" name="feedback_erro" value="' . htmlspecialchars((string) ($exercicioEdicao['feedback_erro'] ?? ''), ENT_QUOTES, 'UTF-8') . '"></div>

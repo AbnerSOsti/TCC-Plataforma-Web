@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const container = document.getElementById("dashboard-container-conteudo");
     const dashboardConteudo = document.getElementById("dashboard-conteudo");
     const mensagemContainer = document.getElementById("dashboard-mensagem");
+    
 
     if (!menuItems.length || !container || !dashboardConteudo) {
         return;
@@ -182,3 +183,74 @@ document.addEventListener("DOMContentLoaded", function () {
 
     carregarTela(dashboardConteudo.dataset.viewInicial || "gerenciar");
 });
+document.addEventListener("DOMContentLoaded", function () {
+    // 1. Seleção dos elementos (usando seletores genéricos e seguros)
+    const dashboardMenu = document.querySelector(".dashboard-menu");
+    const dashboardOverlay = document.querySelector(".dashboard-overlay");
+    const menuToggle = document.querySelector(".dashboard-menu-toggle");
+    const menuItems = document.querySelectorAll(".dashboard-menu a"); 
+
+    // 2. Função para fechar o menu
+    const fecharMenuMobile = function () {
+        if (dashboardMenu) dashboardMenu.classList.remove("is-open");
+        if (dashboardOverlay) dashboardOverlay.classList.remove("is-visible");
+        
+        if (menuToggle) {
+            menuToggle.classList.remove("is-active");
+            menuToggle.setAttribute("aria-expanded", "false");
+        }
+        document.body.classList.remove("dashboard-menu-open");
+    };
+
+    // 3. Função para abrir o menu
+    const abrirMenuMobile = function () {
+        if (dashboardMenu) dashboardMenu.classList.add("is-open");
+        if (dashboardOverlay) dashboardOverlay.classList.add("is-visible");
+        
+        if (menuToggle) {
+            menuToggle.classList.add("is-active");
+            menuToggle.setAttribute("aria-expanded", "true");
+        }
+        document.body.classList.add("dashboard-menu-open");
+    };
+
+    // 4. Evento de clique no botão Burger (Toggle)
+    if (menuToggle) {
+        menuToggle.addEventListener("click", function (e) {
+            e.preventDefault();
+            
+            // O 'toggle' adiciona a classe se não tiver, e remove se tiver. 
+            // Isso economiza linhas e evita erros de lógica.
+            const menuExiste = dashboardMenu ? dashboardMenu.classList.toggle("is-open") : false;
+            menuToggle.classList.toggle("is-active");
+            
+            // Ajusta a acessibilidade baseado se o menu está aberto ou não
+            if (menuExiste) {
+                menuToggle.setAttribute("aria-expanded", "true");
+                if (dashboardOverlay) dashboardOverlay.classList.add("is-visible");
+                document.body.classList.add("dashboard-menu-open");
+            } else {
+                menuToggle.setAttribute("aria-expanded", "false");
+                if (dashboardOverlay) dashboardOverlay.classList.remove("is-visible");
+                document.body.classList.remove("dashboard-menu-open");
+            }
+        });
+    }
+
+    // 5. Evento de clique no Overlay (fundo escuro)
+    if (dashboardOverlay) {
+        dashboardOverlay.addEventListener("click", fecharMenuMobile);
+    }
+
+    // 6. Evento para fechar ao clicar nos links internos (Mobile)
+    if (menuItems && menuItems.length > 0) {
+        menuItems.forEach(function (item) {
+            item.addEventListener("click", function () {
+                if (window.innerWidth <= 1024) {
+                    fecharMenuMobile();
+                }
+            });
+        });
+    }
+});
+

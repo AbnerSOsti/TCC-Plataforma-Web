@@ -36,5 +36,4 @@ $tipo = isset($_SESSION['tipo_usuario']) ? strtoupper((string) $_SESSION['tipo_u
         ?>
     </div>
 </body>
-<script src="https://fontawesome.com" crossorigin="anonymous"></script>
 </html>
