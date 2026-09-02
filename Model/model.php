@@ -790,7 +790,7 @@ class Model {
         $tipoExercicio = trim($_POST["tipo_exercicio"] ?? "");
         $pergunta = trim($_POST["pergunta_exercicio"] ?? "");
         $feedbackErro = trim($_POST["feedback_erro"] ?? "");
-        $tiposPermitidos = ["alternativa", "completar", "ordenar"];
+        $tiposPermitidos = ["multipla_escolha", "completar_lacunas", "ordenar_blocos"];
 
         if ($idAula === null) {
             return [
@@ -825,15 +825,15 @@ class Model {
 
             $idExercicio = $this->inserirExercicioBase($idAula, $tipoExercicio, $pergunta, $feedbackErro);
 
-            if ($tipoExercicio === "alternativa") {
+            if ($tipoExercicio === "multipla_escolha") {
                 $this->salvarExercicioAlternativa($idExercicio);
             }
 
-            if ($tipoExercicio === "completar") {
+            if ($tipoExercicio === "completar_lacunas") {
                 $this->salvarExercicioCompletar($idExercicio, $pergunta);
             }
 
-            if ($tipoExercicio === "ordenar") {
+            if ($tipoExercicio === "ordenar_blocos") {
                 $this->salvarExercicioOrdenar($idExercicio);
             }
 
@@ -1190,7 +1190,7 @@ class Model {
 
         try {
             $tipo = trim((string) $exercicio['tipo_exercicio']);
-            if ($tipo === 'alternativa') {
+            if ($tipo === 'multipla_escolha') {
                 $texto = trim($_POST['texto_opcao'] ?? '');
                 $correta = ($_POST['correta'] ?? '0') === '1' ? 1 : 0;
                 if ($texto === '') throw new RuntimeException('Preencha o texto da opção.');
@@ -1203,13 +1203,13 @@ class Model {
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':texto', $texto);
                 $stmt->bindParam(':correta', $correta, PDO::PARAM_INT);
-            } elseif ($tipo === 'completar') {
+            } elseif ($tipo === 'completar_lacunas') {
                 $texto = trim($_POST['resposta_correta'] ?? '');
                 if ($texto === '') throw new RuntimeException('Preencha a resposta correta.');
                 $query = 'UPDATE exercicio_completar ec INNER JOIN exercicios e ON e.id_exercicio = ec.id_exercicio SET ec.resposta_correta = :texto WHERE ec.id = :id_item AND e.id_exercicio = :id_exercicio';
                 $stmt = $this->conn->prepare($query);
                 $stmt->bindParam(':texto', $texto);
-            } elseif ($tipo === 'ordenar' || $tipo === 'ordenacao') {
+            } elseif ($tipo === 'ordenar_blocos') {
                 $texto = trim($_POST['texto_bloco'] ?? '');
                 $ordem = $this->normalizarInteiroPositivo($_POST['ordem_correta'] ?? null);
                 if ($texto === '' || $ordem === null) throw new RuntimeException('Preencha o bloco e sua ordem válida.');
@@ -1246,7 +1246,7 @@ class Model {
             return ['status' => 'error', 'message' => 'Item do exercício não encontrado.', 'view' => 'editar-exercicio'];
         }
 
-        $mapa = ['alternativa' => ['exercicio_opcoes', 'id_opcao'], 'completar' => ['exercicio_completar', 'id'], 'ordenar' => ['exercicio_blocos', 'id_bloco'], 'ordenacao' => ['exercicio_blocos', 'id_bloco']];
+        $mapa = ['multipla_escolha' => ['exercicio_opcoes', 'id_opcao'], 'completar_lacunas' => ['exercicio_completar', 'id'], 'ordenar_blocos' => ['exercicio_blocos', 'id_bloco']];
         $tipo = trim((string) $exercicio['tipo_exercicio']);
         if (!isset($mapa[$tipo])) {
             return ['status' => 'error', 'message' => 'Tipo de exercício inválido.', 'view' => 'editar-exercicio'];
@@ -1914,13 +1914,13 @@ class Model {
             return [];
         }
 
-        if ($tipo === 'alternativa') {
+        if ($tipo === 'multipla_escolha') {
             return $this->listar_opcoes_por_exercicio($idExercicio);
         }
-        if ($tipo === 'ordenar' || $tipo === 'ordenacao') {
+        if ($tipo === 'ordenar_blocos') {
             return $this->listar_blocos_por_exercicio($idExercicio);
         }
-        if ($tipo === 'completar') {
+        if ($tipo === 'completar_lacunas') {
             try {
                 $stmt = $this->conn->prepare('SELECT id, resposta_correta FROM exercicio_completar WHERE id_exercicio = :id_exercicio ORDER BY id ASC');
                 $stmt->bindParam(':id_exercicio', $idExercicio, PDO::PARAM_INT);
@@ -1968,11 +1968,11 @@ class Model {
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $row['tipo_exercicio'] = trim($row['tipo_exercicio']);
 
-            if ($row['tipo_exercicio'] === 'alternativa') {
+            if ($row['tipo_exercicio'] === 'multipla_escolha') {
                 $row['opcoes'] = $this->listar_opcoes_por_exercicio($row['id_exercicio']);
-            } elseif ($row['tipo_exercicio'] === 'completar') {
+            } elseif ($row['tipo_exercicio'] === 'completar_lacunas') {
                 $row['resposta_correta'] = $this->obter_resposta_completar($row['id_exercicio']);
-            } elseif ($row['tipo_exercicio'] === 'ordenar' || $row['tipo_exercicio'] === 'ordenacao') {
+            } elseif ($row['tipo_exercicio'] === 'ordenar_blocos') {
                 $row['blocos'] = $this->listar_blocos_por_exercicio($row['id_exercicio']);
             } else {
                 $row['opcoes'] = [];

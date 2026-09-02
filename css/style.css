@@ -16,6 +16,8 @@ html {
     --color-text: #696868;
     --color-white: #fff;
     --color-purple: #d176ed;
+    --color-azul: #1e90ff;
+    --color-cinza: #b3b3b3;
 }
 body {
     font-family: var(--font-main);

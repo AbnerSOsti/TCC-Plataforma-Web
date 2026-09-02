@@ -10,13 +10,13 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    const titulos = {
-        conteudo: "Conteúdo",
-        cursos: "Escolha um Curso",
-        perfil: "Perfil",
-        config: "Configurações",
-        editar: "Editar Perfil"
-    };
+    // const titulos = {
+    //     conteudo: "Conteúdo",
+    //     cursos: "Escolha um Curso",
+    //     perfil: "Perfil",
+    //     config: "Configurações",
+    //     editar: "Editar Perfil"
+    // };
 
     const renderTemplate = function (templateId, container) {
         const template = document.getElementById(templateId);

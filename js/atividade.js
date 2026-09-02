@@ -37,7 +37,7 @@ function renderExercicio() {
     containerPergunta.textContent = exercicio.pergunta;
     containerRespostas.innerHTML = '';
 
-    if (exercicio.tipo_exercicio === 'alternativa') {
+    if (exercicio.tipo_exercicio === 'multipla_escolha') {
         exercicio.opcoes.forEach((opcao, index) => {
             const label = document.createElement('label');
             label.className = 'opcao-item';
@@ -47,11 +47,11 @@ function renderExercicio() {
             `;
             containerRespostas.appendChild(label);
         });
-    } else if (exercicio.tipo_exercicio === 'completar') {
+    } else if (exercicio.tipo_exercicio === 'completar_lacunas') {
         containerRespostas.innerHTML = `
             <input type="text" id="resposta-texto" placeholder="Digite sua resposta">
         `;
-    } else if (exercicio.tipo_exercicio === 'ordenar' || exercicio.tipo_exercicio === 'ordenacao') {
+    } else if (exercicio.tipo_exercicio === 'ordenar_blocos') {
         containerRespostas.innerHTML = '';
         containerRespostas.appendChild(document.createTextNode('Use os botões para ordenar os blocos na sequência correta.'));
 
@@ -157,7 +157,7 @@ btnResponder.addEventListener('click', () => {
     const exercicio = fila[0];
     let correta = false;
 
-    if (exercicio.tipo_exercicio === 'alternativa') {
+    if (exercicio.tipo_exercicio === 'multipla_escolha') {
         const escolhido = document.querySelector('input[name="resposta"]:checked');
         if (!escolhido) {
             feedback.textContent = 'Selecione uma opção antes de responder.';
@@ -166,10 +166,10 @@ btnResponder.addEventListener('click', () => {
         }
         const index = parseInt(escolhido.value, 10);
         correta = !!exercicio.opcoes[index]?.correta;
-    } else if (exercicio.tipo_exercicio === 'completar') {
+    } else if (exercicio.tipo_exercicio === 'completar_lacunas') {
         const resposta = document.getElementById('resposta-texto').value.trim().toLowerCase();
         correta = resposta === String(exercicio.resposta_correta).trim().toLowerCase();
-    } else if (exercicio.tipo_exercicio === 'ordenar' || exercicio.tipo_exercicio === 'ordenacao') {
+    } else if (exercicio.tipo_exercicio === 'ordenar_blocos') {
         const ordemAtual = exercicio.ordenacaoAtual || [];
         correta = ordemAtual.every((bloco, index) => bloco.ordem_correta === index + 1);
     }

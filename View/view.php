@@ -1,12 +1,7 @@
 <?php
 
 ob_start();
-
-
- 
-
 class View{
-
     public function header($string){
         if(!isset($_SESSION["login"]) == true) {
         echo '
@@ -42,390 +37,390 @@ class View{
         header("Location: sala.php");
         } else {
             echo '
-    <main>
-
-        <!-- =========================
-             HERO / PRIMEIRA SECTION
-        ========================== -->
-        <section class="hero">
-
-            <!-- Elementos decorativos -->
-            <div class="hero__background">
-                <span class="hero__orb hero__orb--one"></span>
-                <span class="hero__orb hero__orb--two"></span>
-                <span class="hero__grid"></span>
-            </div>
-
+        <main>
 
             <!-- =========================
-                 NAVBAR
+                HERO / PRIMEIRA SECTION
             ========================== -->
-            <header class="navbar">
+            <section class="hero">
 
-                <a href="#" class="navbar__logo">
-                    <span class="navbar__logo-icon">&lt;/&gt;</span>
-                    <span>Beginner Dev</span>
-                </a>
-
-
-                <nav class="navbar__links">
-
-                    <a href="#" class="navbar__link navbar__link--active">
-                        Início
-                    </a>
-
-                    <a href="#linguagens" class="navbar__link">
-                        Linguagens
-                    </a>
-
-                    <a href="#roadmap" class="navbar__link">
-                        Roadmap
-                    </a>
-
-                    <a href="#sobre" class="navbar__link">
-                        Sobre
-                    </a>
-
-                    <a href="#depoimentos" class="navbar__link">
-                        Depoimentos
-                    </a>
-
-                </nav>
-
-
-                <div class="navbar__actions">
-
-                    <a href="login.php" class="button button--outline">
-                        Entrar
-                    </a>
-
-                    <a href="cadastro.php" class="button button--primary">
-                        Começar agora
-                    </a>
-
+                <!-- Elementos decorativos -->
+                <div class="hero__background">
+                    <span class="hero__orb hero__orb--one"></span>
+                    <span class="hero__orb hero__orb--two"></span>
+                    <span class="hero__grid"></span>
                 </div>
 
 
-                <!-- Menu mobile -->
-                <input
-                    type="checkbox"
-                    id="menu-toggle"
-                    class="navbar__toggle"
-                >
+                <!-- =========================
+                    NAVBAR
+                ========================== -->
+                <header class="navbar">
 
-                <label
-                    for="menu-toggle"
-                    class="navbar__menu"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </label>
-
-            </header>
+                    <a href="#" class="navbar__logo">
+                        <span class="navbar__logo-icon">&lt;/&gt;</span>
+                        <span>Beginner Dev</span>
+                    </a>
 
 
-            <!-- =========================
-                 CONTEÚDO PRINCIPAL
-            ========================== -->
-            <div class="hero__content">
+                    <nav class="navbar__links">
 
-                <!-- Lado esquerdo -->
-                <div class="hero__text">
+                        <a href="#" class="navbar__link navbar__link--active">
+                            Início
+                        </a>
 
-                    <div class="hero__badge">
-                        <span>✦</span>
-                        APRENDA.
-                        <strong>PRATIQUE.</strong>
-                        EVOLUA.
-                    </div>
+                        <a href="#linguagens" class="navbar__link">
+                            Linguagens
+                        </a>
 
+                        <a href="#roadmap" class="navbar__link">
+                            Roadmap
+                        </a>
 
-                    <h1 class="hero__title">
-                        Aprenda programação
-                        <span>de forma prática,</span>
-                        <strong>moderna e divertida.</strong>
-                    </h1>
+                        <a href="#sobre" class="navbar__link">
+                            Sobre
+                        </a>
 
+                        <a href="#depoimentos" class="navbar__link">
+                            Depoimentos
+                        </a>
 
-                    <p class="hero__description">
-                        Do zero ao avançado com trilhas interativas,
-                        exercícios práticos e uma experiência feita
-                        para você evoluir <strong>no seu ritmo.</strong>
-                    </p>
+                    </nav>
 
 
-                    <div class="hero__buttons">
+                    <div class="navbar__actions">
 
-                        <a href="cadastro.php" class="button button--primary button--large">
+                        <a href="login.php" class="button button--outline">
+                            Entrar
+                        </a>
+
+                        <a href="cadastro.php" class="button button--primary">
                             Começar agora
-                            <span class="button__arrow">→</span>
-                        </a>
-
-
-                        <a href="#sobre" class="hero__play">
-
-                            <span class="hero__play-icon">
-                                ▶
-                            </span>
-
-                            <span>
-                                Ver como funciona
-                            </span>
-
                         </a>
 
                     </div>
 
-                </div>
 
-                <div class="hero__visual">
-                    <img src="imagens/hero.png">
-                
-                </div>
-            </div>
-            <!-- =========================
-                 ESTATÍSTICAS
-            ========================== -->
-            <div class="hero__stats">
+                    <!-- Menu mobile -->
+                    <input
+                        type="checkbox"
+                        id="menu-toggle"
+                        class="navbar__toggle"
+                    >
 
-                <div class="hero__stat">
+                    <label
+                        for="menu-toggle"
+                        class="navbar__menu"
+                    >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </label>
 
-                    <div class="hero__stat-icon">
-                        &lt;/&gt;
-                    </div>
-
-                    <div>
-                        <strong>+20</strong>
-                        <span>Linguagens</span>
-                    </div>
-
-                </div>
+                </header>
 
 
-                <div class="hero__stat">
+                <!-- =========================
+                    CONTEÚDO PRINCIPAL
+                ========================== -->
+                <div class="hero__content">
 
-                    <div class="hero__stat-icon hero__stat-icon--blue">
-                        ⚡
-                    </div>
+                    <!-- Lado esquerdo -->
+                    <div class="hero__text">
 
-                    <div>
-                        <strong>+800</strong>
-                        <span>Exercícios</span>
-                    </div>
-
-                </div>
-
-
-                <div class="hero__stat">
-
-                    <div class="hero__stat-icon hero__stat-icon--cyan">
-                        ◉
-                    </div>
-
-                    <div>
-                        <strong>+15k</strong>
-                        <span>Desenvolvedores</span>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- Indicador de scroll -->
-            <div class="hero__scroll">
-
-                <span class="hero__scroll-icon">
-                    ↓
-                </span>
-
-                <span>
-                    Role para explorar
-                </span>
-
-            </div>
-        </section>
-
-        <!-- =========================================
-            SECTION - JORNADA DE APRENDIZAGEM
-        ========================================= -->
-        <section id="linguagens" class="section-linguagem">
-            <div class="linguagem__content">
-                <div class="linguagem__text">
-
-                    <div class="linguagem__badge">
-                        <span>✦</span>
-                        SEU
-                        <strong>CAMINHO DE</strong>
-                        APRENDIZADO.
-                    </div>
-
-                    <h1 class="linguagem__title">
-                        Comece pelo essencial:
-                        <strong>Lógica e pensamento computacional.</strong>
-                    </h1>
-
-
-                    <p class="linguagem__description">
-                        Antes de aprender qualquer linguagem de programação, 
-                        construa uma base sólida que vai te acompanhar por toda sua jornada.
-                    </p>
-                    <div class="linguagem__ideia">
-                        <div class="lampada">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb-icon lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                        <div class="hero__badge">
+                            <span>✦</span>
+                            APRENDA.
+                            <strong>PRATIQUE.</strong>
+                            EVOLUA.
                         </div>
-                        <div class="ideia__descricao">
-                            <strong>Por que começar por aqui?</strong>
-                            <p>A lógica é a base de tudo. Ela desenvolve seu raciocinio, sua capacidade
-                             de resolver problemas e torna o aprendizado de qualquer linguagem muito mais facil.
-                            </p>
+
+
+                        <h1 class="hero__title">
+                            Aprenda programação
+                            <span>de forma prática,</span>
+                            <strong>moderna e divertida.</strong>
+                        </h1>
+
+
+                        <p class="hero__description">
+                            Do zero ao avançado com trilhas interativas,
+                            exercícios práticos e uma experiência feita
+                            para você evoluir <strong>no seu ritmo.</strong>
+                        </p>
+
+
+                        <div class="hero__buttons">
+
+                            <a href="cadastro.php" class="button button--primary button--large">
+                                Começar agora
+                                <span class="button__arrow">→</span>
+                            </a>
+
+
+                            <a href="#sobre" class="hero__play">
+
+                                <span class="hero__play-icon">
+                                    ▶
+                                </span>
+
+                                <span>
+                                    Ver como funciona
+                                </span>
+
+                            </a>
+
                         </div>
+
                     </div>
+
+                    <div class="hero__visual">
+                        <img src="imagens/hero.png">
                     
-
-                </div>
-
-                <div class="linguagem__imagem">
-                    <img src="imagens/section_linguagem.png">
-                </div>
-
-                <div class="section__caminho">
-                    <div class="card">
-                        <article class="learning-card learning-card--required">
-
-                            <!-- Cabeçalho do card -->
-                            <div class="learning-card__header">
-
-                                <div class="learning-card__number">
-                                    01
-                                </div>
-
-                                <div class="learning-card__status">
-                                    OBRIGATÓRIO
-                                </div>
-
-                            </div>
-
-                            <!-- Conteúdo principal -->
-                            <div class="learning-card__content">
-
-                                <h3 class="learning-card__title">
-                                    Nível Aprendiz
-                                </h3>
-
-                                <h4 class="learning-card__subtitle">
-                                    Lógica e Pensamento
-                                    <br>
-                                    Computacional
-                                </h4>
-
-                                <p class="learning-card__description">
-                                    Desenvolva sua lógica, pensamento
-                                    algorítmico e aprenda a resolver problemas
-                                    de forma estruturada.
-                                </p>
-
-                            </div>
-
-                            <!-- Rodapé do card -->
-                            <div class="learning-card__footer">
-
-                                <div class="learning-card__duration">
-
-                                    <span class="learning-card__duration-icon">
-                                        ◷
-                                    </span>
-
-                                    <span>
-                                        Carga horária: 20h+
-                                    </span>
-
-                                </div>
-
-
-                                <a
-                                    href="#"
-                                    class="learning-card__button"
-                                >
-                                    Começar agora
-
-                                    <span>
-                                        →
-                                    </span>
-
-                                </a>
-
-                            </div>
-
-                        </article>
                     </div>
                 </div>
-                <div class="section__caminho">
-                    <div class="card">
-                        <article class="learning-card learning-card--required">
+                <!-- =========================
+                    ESTATÍSTICAS
+                ========================== -->
+                <div class="hero__stats">
 
-                            <!-- Cabeçalho do card -->
-                            <div class="learning-card__header">
+                    <div class="hero__stat">
 
-                                <div class="learning-card__number">
-                                    02
-                                </div>
+                        <div class="hero__stat-icon">
+                            &lt;/&gt;
+                        </div>
 
-                                <div class="learning-card__status">
-                                    BLOQUEADO
-                                </div>
+                        <div>
+                            <strong>+20</strong>
+                            <span>Linguagens</span>
+                        </div>
 
+                    </div>
+
+
+                    <div class="hero__stat">
+
+                        <div class="hero__stat-icon hero__stat-icon--blue">
+                            ⚡
+                        </div>
+
+                        <div>
+                            <strong>+800</strong>
+                            <span>Exercícios</span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="hero__stat">
+
+                        <div class="hero__stat-icon hero__stat-icon--cyan">
+                            ◉
+                        </div>
+
+                        <div>
+                            <strong>+15k</strong>
+                            <span>Desenvolvedores</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Indicador de scroll -->
+                <div class="hero__scroll">
+
+                    <span class="hero__scroll-icon">
+                        ↓
+                    </span>
+
+                    <span>
+                        Role para explorar
+                    </span>
+
+                </div>
+            </section>
+
+            <!-- =========================================
+                SECTION - JORNADA DE APRENDIZAGEM
+            ========================================= -->
+            <section id="linguagens" class="section-linguagem">
+                <div class="linguagem__content">
+                    <div class="linguagem__text">
+
+                        <div class="linguagem__badge">
+                            <span>✦</span>
+                            SEU
+                            <strong>CAMINHO DE</strong>
+                            APRENDIZADO.
+                        </div>
+
+                        <h1 class="linguagem__title">
+                            Comece pelo essencial:
+                            <strong>Lógica e pensamento computacional.</strong>
+                        </h1>
+
+
+                        <p class="linguagem__description">
+                            Antes de aprender qualquer linguagem de programação, 
+                            construa uma base sólida que vai te acompanhar por toda sua jornada.
+                        </p>
+                        <div class="linguagem__ideia">
+                            <div class="lampada">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lightbulb-icon lucide-lightbulb"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
                             </div>
-                            <!-- Conteúdo principal -->
-                            <div class="learning-card__content">
-
-                                <h3 class="learning-card__title">
-                                    Nível Iniciante
-                                </h3>
-
-                                <h4 class="learning-card__subtitle">
-                                    Introdução as linguagens
-                                    <br>
-                                    e programação
-                                </h4>
-
-                                <p class="learning-card__description">
-                                    Aprenda sua primeira linguagem de programação
-                                     e construa projetos simples.
+                            <div class="ideia__descricao">
+                                <strong>Por que começar por aqui?</strong>
+                                <p>A lógica é a base de tudo. Ela desenvolve seu raciocinio, sua capacidade
+                                de resolver problemas e torna o aprendizado de qualquer linguagem muito mais facil.
                                 </p>
-
                             </div>
+                        </div>
+                        
 
-                            <div class="learning-card__footer">
+                    </div>
 
-                                <div class="learning-card__duration">
+                    <div class="linguagem__imagem">
+                        <img src="imagens/section_linguagem.png">
+                    </div>
 
-                                    <span class="learning-card__duration-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                                    </span>
+                    <div class="section__caminho">
+                        <div class="card">
+                            <article class="learning-card learning-card--required">
 
-                                    <span>
-                                        Bloqueado até concluir o nível anterior
-                                    </span>
+                                <!-- Cabeçalho do card -->
+                                <div class="learning-card__header">
+
+                                    <div class="learning-card__number">
+                                        01
+                                    </div>
+
+                                    <div class="learning-card__status">
+                                        OBRIGATÓRIO
+                                    </div>
 
                                 </div>
-                            </div>
-                        </article>
+
+                                <!-- Conteúdo principal -->
+                                <div class="learning-card__content">
+
+                                    <h3 class="learning-card__title">
+                                        Nível Aprendiz
+                                    </h3>
+
+                                    <h4 class="learning-card__subtitle">
+                                        Lógica e Pensamento
+                                        <br>
+                                        Computacional
+                                    </h4>
+
+                                    <p class="learning-card__description">
+                                        Desenvolva sua lógica, pensamento
+                                        algorítmico e aprenda a resolver problemas
+                                        de forma estruturada.
+                                    </p>
+
+                                </div>
+
+                                <!-- Rodapé do card -->
+                                <div class="learning-card__footer">
+
+                                    <div class="learning-card__duration">
+
+                                        <span class="learning-card__duration-icon">
+                                            ◷
+                                        </span>
+
+                                        <span>
+                                            Carga horária: 20h+
+                                        </span>
+
+                                    </div>
+
+
+                                    <a
+                                        href="#"
+                                        class="learning-card__button"
+                                    >
+                                        Começar agora
+
+                                        <span>
+                                            →
+                                        </span>
+
+                                    </a>
+
+                                </div>
+
+                            </article>
+                        </div>
+                    </div>
+                    <div class="section__caminho">
+                        <div class="card">
+                            <article class="learning-card learning-card--required">
+
+                                <!-- Cabeçalho do card -->
+                                <div class="learning-card__header">
+
+                                    <div class="learning-card__number">
+                                        02
+                                    </div>
+
+                                    <div class="learning-card__status">
+                                        BLOQUEADO
+                                    </div>
+
+                                </div>
+                                <!-- Conteúdo principal -->
+                                <div class="learning-card__content">
+
+                                    <h3 class="learning-card__title">
+                                        Nível Iniciante
+                                    </h3>
+
+                                    <h4 class="learning-card__subtitle">
+                                        Introdução as linguagens
+                                        <br>
+                                        e programação
+                                    </h4>
+
+                                    <p class="learning-card__description">
+                                        Aprenda sua primeira linguagem de programação
+                                        e construa projetos simples.
+                                    </p>
+
+                                </div>
+
+                                <div class="learning-card__footer">
+
+                                    <div class="learning-card__duration">
+
+                                        <span class="learning-card__duration-icon">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                        </span>
+
+                                        <span>
+                                            Bloqueado até concluir o nível anterior
+                                        </span>
+
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
 
 
 
 
-        <section id="roadmap" class="section__roadmap">
-        
-        </section>
+            <section id="roadmap" class="section__roadmap">
+            
+            </section>
 
 
-    </main>
+        </main>
 
             ';
         }
@@ -581,30 +576,72 @@ class View{
 
     public function Login_admin_page($string){
         echo '
-
-            <div class="login-container">
-                <div class="login-formulario">
+           <div class="login-container">
+                <div class="login-card">
                     <div class="login-titulo">
-                        <h1>Conecte-se</h1>
+                        <h1>Gerenciamento</h1>
+                        <p>Painel Administrativo.</p>
                     </div>
                     <form action="admin.php" method="post">
-                        <div class="login-inputs">
+                        <div class="formulario">
                         
 
-                            <input type="email" placeholder="Digite seu email" id="email_usuario" name="email_usuario" required><br>
-
-                            <input type="password" placeholder="Digite sua senha" id="senha_usuario" name="senha_usuario" required><br>
-
-                            <a href="index.php">Voltar para ao inicio</a>
+                            <div class="inputicon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mail-icon lucide-mail"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+                                <input type="email" placeholder="Digite seu email" id="email_usuario" name="email_usuario" required><br>
+                            </div>
+    
+                            <div class="inputicon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                <input type="password" placeholder="Digite sua senha" id="senha_usuario" name="senha_usuario" required><br>
+                                <button type="button" class="toggle-password" onclick="togglePasswordVisibility()">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-eye-icon lucide-eye"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </button>
+                            </div>
                             <div style="color: red;">'.$string.'</div>
-
+                            
                             <div class="login-btn">
                                 <input type="submit" name="btnLoginAdmin" value="Entrar">
                             </div>
+
                         </div>
 
                     </form>
-                <div>
+
+                    <div class="divisao">
+                        <hr>
+                        <p>ou escolha uma opção</p>
+                        <hr>
+                    </div>
+
+                    <div class="opcoes">
+                        <button onclick="window.location.href=\'cadastro.php\'">
+                            <div class="opcoes-texto">
+                                <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-user-icon lucide-circle-user"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662"/></svg></div>
+                                <div style="margin-right: 10px;">
+                                    <p>Criar Conta</p>
+                                </div>
+                                <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                            </div>
+                        </button>
+                        <button onclick="window.location.href=\'recuperarsenha.php\'">
+                            <div class="opcoes-texto">
+                                <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-lock-icon lucide-lock"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+                                <div style="margin-right: 10px;">
+                                    <p>Recuperar Acesso</p>
+                                </div>
+                                <div><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-right-icon lucide-arrow-right"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                            </div>
+                        </button>
+                    </div>
+
+
+                </div>
+
+                <button class="btn-voltar" onclick="window.location.href=\'index.php\'">
+                <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-left-icon lucide-arrow-left"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+                Voltar para o inicio</button>
+
             </div>
         ';
         
@@ -896,11 +933,11 @@ class View{
                 $idItem = $itemExercicio['id_opcao'] ?? $itemExercicio['id_bloco'] ?? $itemExercicio['id'] ?? '';
                 $camposItem = '';
 
-                if ($tipoExercicioEdicao === 'alternativa') {
+                if ($tipoExercicioEdicao === 'multipla_escolha') {
                     $camposItem = '<div class="linha-formulario"><div class="campo-formulario" style="flex:1"><label>Opção</label><input type="text" name="texto_opcao" value="' . htmlspecialchars((string) ($itemExercicio['texto_opcao'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div><div class="campo-formulario" style="width:180px"><label>Correta</label><select name="correta"><option value="0">Incorreta</option><option value="1"' . (!empty($itemExercicio['correta']) ? ' selected' : '') . '>Correta</option></select></div></div>';
-                } elseif ($tipoExercicioEdicao === 'completar') {
+                } elseif ($tipoExercicioEdicao === 'completar_lacunas') {
                     $camposItem = '<div class="campo-formulario"><label>Resposta correta</label><input type="text" name="resposta_correta" value="' . htmlspecialchars((string) ($itemExercicio['resposta_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div>';
-                } else {
+                } elseif ($tipoExercicioEdicao === 'ordenar_blocos') {
                     $camposItem = '<div class="linha-formulario"><div class="campo-formulario" style="flex:1"><label>Bloco</label><input type="text" name="texto_bloco" value="' . htmlspecialchars((string) ($itemExercicio['texto_bloco'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div><div class="campo-formulario campo-ordem-selecionado" style="width:140px"><label>Ordem</label><input type="number" name="ordem_correta" min="1" value="' . htmlspecialchars((string) ($itemExercicio['ordem_correta'] ?? ''), ENT_QUOTES, 'UTF-8') . '" required></div></div>';
                 }
 
@@ -1435,9 +1472,9 @@ class View{
                                 <label for="tipo_exercicio">Tipo do Exercicio</label>
                                 <select id="tipo_exercicio" name="tipo_exercicio" required>
                                     <option value="">Selecione o tipo</option>
-                                    <option value="alternativa">Multipla escolha</option>
-                                    <option value="completar">Completar lacunas</option>
-                                    <option value="ordenar">Ordenar blocos</option>
+                                    <option value="multipla_escolha">Multipla escolha</option>
+                                    <option value="completar_lacunas">Completar lacunas</option>
+                                    <option value="ordenar_blocos">Ordenar blocos</option>
                                 </select>
                             </div>
                         </div>
@@ -1507,16 +1544,34 @@ class View{
             $html_modulos .= '
                 <div class="titulo-conteudo">
                     <h2>' . $modulo['titulo_modulo'] . '</h2>
+
+                    <button class="descricao-modulo" commandfor="meuModal" command="show-modal" title="Descrição do módulo">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-text-icon lucide-square-text"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>
+                    </button>
+                        
+                        <dialog id="meuModal">
+                            <span class="descricao-texto">' . $modulo['descricao_modulo'] . '</span>
+                            <button commandfor="meuModal" command="close">
+                                Fechar
+                            </button>
+                        </dialog>
+                
                 </div>
+                <div class="container-aula">
             ';
             
             foreach ($aula as $itemAula) {
                 if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
                     $level_counter++;
                     $html_modulos .= '
-                        <a id="'.$itemAula['id_aula'].'" href="atividade.php?id_aula=' .$itemAula['id_aula']. '" class="btn-selecionar" title="'.$itemAula['titulo_aula'].'">Level ' . $level_counter . '</a>
+                    
+                        <a id="'.$itemAula['id_aula'].'" 
+                        href="atividade.php?id_aula=' .$itemAula['id_aula']. '" 
+                        class="btn-selecionar" title="'.$itemAula['titulo_aula'].'">Aula ' . $level_counter . '</a>
+                    
                     ';
                 }
+                echo '</div>';
             }
         }
 
@@ -1573,18 +1628,25 @@ class View{
 
         $messageInicio = trim((string) $messageInicio);
         if ($selectedLinguagem) {
-            $conteudo_principal = '<div class="conteudo-atividade"><div class="conteudo-aulas">' . $html_modulos . '</div></div>';
-        } else {
             $conteudo_principal = '
-                <div class="conteudo-aviso">
-                    <div class="texto-aviso">
-                        <h2>Selecione um curso</h2>
-                        <p>Para visualizar os módulos, escolha um curso na aba Cursos.</p>
-                        ' . ($messageInicio !== '' ? '<div class="mensagem-aviso">' . htmlspecialchars($messageInicio, ENT_QUOTES, 'UTF-8') . '</div>' : '') . '
-                    </div>
+            <div class="conteudo-atividade">
+                <div class="conteudo-aulas">
+                    ' . $html_modulos . '
                 </div>
+            </div>
             ';
-        }
+            } else {
+                $conteudo_principal = '
+                    <div class="conteudo-aviso">
+                        <div class="texto-aviso">
+                            <h2>Selecione um curso</h2>
+                            <p>Para visualizar os módulos, escolha um curso na aba Cursos.</p>
+                            ' . ($messageInicio !== '' ? '<div class="mensagem-aviso">' . htmlspecialchars($messageInicio, ENT_QUOTES, 'UTF-8') . '</div>' : '') . '
+                            
+                        </div>
+                    </div>
+                ';
+            }
 
         if(!isset($_SESSION["login"]) == false) {
 
