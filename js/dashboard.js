@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const dashboardMenu = document.querySelector(".dashboard-menu");
     const dashboardOverlay = document.querySelector(".dashboard-overlay");
     const menuToggle = document.querySelector(".dashboard-menu-toggle");
+    let filtroGerenciarAtual = "todos";
     
 
     const fecharMenuMobile = function () {
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (menuToggle) {
             menuToggle.classList.remove("is-active");
+            menuToggle.setAttribute("aria-label", "Abrir menu");
             menuToggle.setAttribute("aria-expanded", "false");
         }
 
@@ -32,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (menuToggle) {
             menuToggle.classList.add("is-active");
+            menuToggle.setAttribute("aria-label", "Fechar menu");
             menuToggle.setAttribute("aria-expanded", "true");
         }
 
@@ -59,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     menuItems.forEach(function (item) {
         item.addEventListener("click", function () {
-            if (window.innerWidth <= 900) {
+            if (window.innerWidth <= 1024) {
                 fecharMenuMobile();
             }
         });
@@ -169,6 +172,68 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 
+    const normalizarTexto = function (valor) {
+        return String(valor || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .trim();
+    };
+
+    const aplicarFiltrosGerenciar = function () {
+        const campoBusca = container.querySelector(".campo-pesquisa");
+        const botoesFiltro = container.querySelectorAll(".admin-curso-filtro-btn");
+        const listaCursos = container.querySelector(".lista-cursos");
+        const cards = container.querySelectorAll(".lista-cursos .curso-card");
+        const estadoVazio = container.querySelector(".admin-curso-sem-resultados");
+        const busca = normalizarTexto(campoBusca ? campoBusca.value : "");
+        let totalVisivel = 0;
+
+        cards.forEach(function (card) {
+            const nomeCurso = normalizarTexto(card.dataset.nome);
+            const nivelCurso = normalizarTexto(card.dataset.nivel);
+            const atendeBusca = !busca || nomeCurso.includes(busca);
+            const atendeFiltro = filtroGerenciarAtual === "todos" || nivelCurso === filtroGerenciarAtual;
+            const deveMostrar = atendeBusca && atendeFiltro;
+
+            card.classList.toggle("is-filtered-out", !deveMostrar);
+            if (deveMostrar) {
+                totalVisivel++;
+            }
+        });
+
+        if (listaCursos) {
+            listaCursos.classList.toggle("is-empty", totalVisivel === 0);
+        }
+
+        if (estadoVazio) {
+            estadoVazio.hidden = totalVisivel !== 0;
+        }
+
+        botoesFiltro.forEach(function (botao) {
+            botao.classList.toggle("active", (botao.dataset.filtro || "todos") === filtroGerenciarAtual);
+        });
+    };
+
+    const registrarFiltrosGerenciar = function () {
+        const campoBusca = container.querySelector(".campo-pesquisa");
+        const botoesFiltro = container.querySelectorAll(".admin-curso-filtro-btn");
+
+        if (!campoBusca) {
+            return;
+        }
+
+        campoBusca.addEventListener("input", aplicarFiltrosGerenciar);
+        botoesFiltro.forEach(function (botao) {
+            botao.addEventListener("click", function () {
+                filtroGerenciarAtual = botao.dataset.filtro || "todos";
+                aplicarFiltrosGerenciar();
+            });
+        });
+
+        aplicarFiltrosGerenciar();
+    };
+
     // Template rendering
     const renderTemplate = function (templateId) {
         const template = document.getElementById("template-" + templateId);
@@ -222,6 +287,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         });
+
+        if (templateId === "gerenciar") {
+            filtroGerenciarAtual = "todos";
+            registrarFiltrosGerenciar();
+        }
     };
 
     const marcarMenuAtivo = function (view) {
@@ -233,6 +303,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const carregarTela = function (view) {
         renderTemplate(view);
         marcarMenuAtivo(view);
+
+        const botaoNovo = container.querySelector(".btn-novo");
+        if (botaoNovo) {
+            botaoNovo.addEventListener("click", function () {
+                const viewDestino = botaoNovo.dataset.view || "linguagem";
+                carregarTela(viewDestino);
+            });
+        }
     };
 
     menuItems.forEach(function (item) {

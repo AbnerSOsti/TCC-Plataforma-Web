@@ -867,38 +867,33 @@ body.dashboard-menu-open {
 
 @media (max-width: 1024px){
     .dashboard-menu-toggle {
-        display: flex; /* Mudado de block para flex para ativar o alinhamento */
+        display: flex;
     }
+
     .dashboard-container{
         display: block;
         height: 100vh;
     }
 
-    /* .dashboard-menu{
+    .dashboard-menu {
         position: fixed;
-        left: 0;
+        left: -290px;
         top: 0;
         bottom: 0;
         width: min(82vw, 300px);
         min-width: min(82vw, 300px);
         height: 100vh;
         padding: 72px 16px 24px;
-        transform: translateX(-110%);
-        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.28);
         border-right: none;
         border-radius: 0 18px 18px 0;
+        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.28);
         overflow-y: auto;
-    } */
-     .dashboard-menu {
-        position: fixed;
-        left: -250px; /* Começa escondido para fora da tela */
+        z-index: 60;
         transition: left 0.3s ease;
-        /* ... outros estilos do seu menu ... */
     }
 
-    /* Quando o JS adicionar a classe 'is-open', ele aparece */
     .dashboard-menu.is-open {
-        left: 0; 
+        left: 0;
     }
 
     .dashboard-menu h2{
@@ -915,59 +910,6 @@ body.dashboard-menu-open {
 }
 
 @media (max-width: 900px){
-    .dashboard-menu-toggle {
-        display: flex;
-    }
-
-    .dashboard-container {
-        display: block;
-        height: 100vh;
-    }
-
-    /* .dashboard-menu {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: min(82vw, 300px);
-        min-width: min(82vw, 300px);
-        height: 100vh;
-        padding: 72px 16px 24px;
-        transform: translateX(-110%);
-        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.28);
-        border-right: none;
-        border-radius: 0 18px 18px 0;
-        overflow-y: auto;
-    }
-
-    .dashboard-menu.is-open {
-        transform: translateX(0);
-    } */
-     .dashboard-menu {
-        position: fixed;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: min(82vw, 300px);
-        min-width: min(82vw, 300px);
-        height: 100vh;
-        padding: 72px 16px 24px;
-        transform: translateX(-110%);
-        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.28);
-        border-right: none;
-        border-radius: 0 18px 18px 0;
-        overflow-y: auto;
-        
-        /* ADICIONE ESTAS DUAS LINHAS ABAIXO: */
-        z-index: 60; /* Garante que fique acima do formulário (.dashboard-conteudo) */
-        transition: transform 0.3s ease-in-out; /* Faz o menu deslizar suavemente */
-    }
-
-    .dashboard-menu.is-open {
-        transform: translateX(0);
-    }
-     
-
     .dashboard-conteudo {
         width: 100%;
         height: 100vh;
@@ -977,12 +919,7 @@ body.dashboard-menu-open {
     .dashboard-cabecalho h1 {
         font-size: 1.5rem;
     }
-
-    .dashboard-card-grid {
-        grid-template-columns: 1fr;
-    }
 }
-
 @media (max-width: 760px){
     .dashboard-container{
         display: block;
@@ -1035,11 +972,16 @@ body.dashboard-menu-open {
 
     .gerenciar-cursos .barra-filtros {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .gerenciar-cursos .campo-pesquisa {
         min-width: 0;
         width: 100%;
+    }
+
+    .gerenciar-cursos .admin-curso-filtros {
+        justify-content: flex-start;
     }
 }
 
@@ -1089,8 +1031,14 @@ body.dashboard-menu-open {
 
 .gerenciar-cursos .barra-filtros{
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
+    padding: 14px;
+    border: 1px solid #ece7ff;
+    border-radius: 14px;
+    background: #faf9ff;
 }
 
 .gerenciar-cursos .campo-pesquisa{
@@ -1116,10 +1064,97 @@ body.dashboard-menu-open {
     box-shadow: 0 0 0 3px rgba(124,77,255,.12);
 }
 
+.gerenciar-cursos .barra-filtros select{
+    display: none;
+}
+
+.gerenciar-cursos .admin-curso-filtros{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.gerenciar-cursos .admin-curso-filtro-btn{
+    border: 1px solid rgba(124, 77, 255, 0.18);
+    background: #ffffff;
+    color: #4b5563;
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: .78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gerenciar-cursos .admin-curso-filtro-btn.active{
+    background: #8b5cf6;
+    color: #ffffff;
+    border-color: #8b5cf6;
+    box-shadow: 0 6px 14px rgba(139, 92, 246, 0.22);
+}
+
+.gerenciar-cursos .admin-curso-filtro-btn:hover{
+    transform: translateY(-1px);
+}
+
+.gerenciar-cursos .admin-curso-sem-resultados{
+    padding: 28px 20px;
+    border: 1px dashed #cfc5f7;
+    border-radius: 14px;
+    background: #faf9ff;
+    color: #5b6478;
+    text-align: center;
+}
+
+.gerenciar-cursos .admin-curso-sem-resultados strong,
+.gerenciar-cursos .admin-curso-sem-resultados p{
+    display: block;
+    margin: 0;
+}
+
+.gerenciar-cursos .admin-curso-sem-resultados p{
+    margin-top: 6px;
+    font-size: .92rem;
+}
+
+@media (max-width: 760px){
+    .gerenciar-cursos .topo-gerenciar{
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .gerenciar-cursos .btn-novo{
+        width: 100%;
+    }
+
+    .gerenciar-cursos .barra-filtros{
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .gerenciar-cursos .campo-pesquisa{
+        width: 100%;
+        min-width: 0;
+    }
+
+    .gerenciar-cursos .admin-curso-filtros{
+        justify-content: flex-start;
+    }
+
+}
+
 .gerenciar-cursos .lista-cursos{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 24px;
+}
+
+.gerenciar-cursos .lista-cursos.is-empty,
+.gerenciar-cursos .curso-card.is-filtered-out{
+    display: none !important;
 }
 
 .gerenciar-cursos .curso-card{

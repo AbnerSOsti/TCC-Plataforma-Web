@@ -496,7 +496,7 @@ class Model {
             return "exercicio";
         }
 
-        return "modulo";
+        return "gerenciar";
     }
 
     public function obter_aba_dashboard_ativa() {
@@ -1547,12 +1547,32 @@ class Model {
         }
 
         try {
-            $query = "SELECT a.id_aula, a.titulo_aula, a.id_modulo, m.titulo_modulo
+            $query = "SELECT a.id_aula, a.titulo_aula, a.id_modulo, m.titulo_modulo, a.ordem_aula, m.ordem_modulo
                       FROM aulas a
                       INNER JOIN modulos m ON m.id_modulo = a.id_modulo
-                      ORDER BY m.ordem_modulo ASC, a.ordem_aula ASC, a.id_aula ASC";
+                      ORDER BY COALESCE(m.ordem_modulo, 2147483647) ASC, COALESCE(a.ordem_aula, 2147483647) ASC, a.id_aula ASC";
             $stmt = $this->conn->query($query);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $aulas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            usort($aulas, function ($a, $b) {
+                $ordemModuloA = (int) ($a['ordem_modulo'] ?? 2147483647);
+                $ordemModuloB = (int) ($b['ordem_modulo'] ?? 2147483647);
+
+                if ($ordemModuloA === $ordemModuloB) {
+                    $ordemAulaA = (int) ($a['ordem_aula'] ?? 2147483647);
+                    $ordemAulaB = (int) ($b['ordem_aula'] ?? 2147483647);
+
+                    if ($ordemAulaA === $ordemAulaB) {
+                        return ((int)($a['id_aula'] ?? 0)) <=> ((int)($b['id_aula'] ?? 0));
+                    }
+
+                    return $ordemAulaA <=> $ordemAulaB;
+                }
+
+                return $ordemModuloA <=> $ordemModuloB;
+            });
+
+            return $aulas;
         } catch (PDOException $e) {
             return [];
         }
@@ -1795,12 +1815,26 @@ class Model {
         
         $query ="
         SELECT id_modulo, titulo_modulo, descricao_modulo, ordem_modulo FROM modulos
-        WHERE id_linguagem = :id_linguagem ORDER BY ordem_modulo ASC";
+        WHERE id_linguagem = :id_linguagem
+        ORDER BY COALESCE(ordem_modulo, 2147483647) ASC, id_modulo ASC";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(":id_linguagem", $linguagem_id, PDO::PARAM_INT);
         $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $modulos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        usort($modulos, function ($a, $b) {
+            $ordemA = (int) ($a['ordem_modulo'] ?? 2147483647);
+            $ordemB = (int) ($b['ordem_modulo'] ?? 2147483647);
+
+            if ($ordemA === $ordemB) {
+                return ((int)($a['id_modulo'] ?? 0)) <=> ((int)($b['id_modulo'] ?? 0));
+            }
+
+            return $ordemA <=> $ordemB;
+        });
+
+        return $modulos;
     }
 
     public function buscar_modulo_por_id($id_modulo){
@@ -2032,6 +2066,37 @@ class Model {
         $stmt->bindParam(':id', $id_linguagem, PDO::PARAM_INT);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function listar_aulas_concluidas_por_usuario($id_usuario, $id_linguagem = null) {
+        if (!$this->conn || !$id_usuario) {
+            return [];
+        }
+
+        $query = "SELECT pa.id_aula
+                  FROM progresso_aula pa
+                  INNER JOIN aulas a ON a.id_aula = pa.id_aula
+                  INNER JOIN modulos m ON m.id_modulo = a.id_modulo
+                  WHERE pa.id_usuario = :id_usuario
+                    AND pa.status = 'concluida'";
+
+        if ($id_linguagem) {
+            $query .= " AND m.id_linguagem = :id_linguagem";
+        }
+
+        $query .= " GROUP BY pa.id_aula";
+
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+
+        if ($id_linguagem) {
+            $stmt->bindParam(':id_linguagem', $id_linguagem, PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+
+        $aulas = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+        return array_map('intval', $aulas);
     }
 
     public function salvar_progresso_aula($id_usuario, $id_aula, $total_exercicios, $exercicios_corretos) {

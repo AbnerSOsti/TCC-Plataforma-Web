@@ -68,7 +68,7 @@ class Controller {
             $status = (($result["status"] ?? "") === "success") ? "success" : "error";
 
             if (($result["status"] ?? "") === "success") {
-                $view = $result["view"] ?? "modulo";
+                $view = $result["view"] ?? "gerenciar";
                 $location = "dashboard.php?view=" . urlencode($view) . "&message=" . urlencode($message) . "&status=" . urlencode($status);
                 $params = $result["params"] ?? [];
                 if (is_array($params)) {
@@ -218,6 +218,74 @@ class Controller {
 
         $aula = $model->listar_aulas();
         $linguagens = $model->listar_linguagens();
+
+        $aulasConcluidasUsuario = [];
+        if ($userId && $selectedLinguagem) {
+            $aulasConcluidasUsuario = $model->listar_aulas_concluidas_por_usuario($userId, (int) ($selectedLinguagem['id_linguagem'] ?? 0));
+        }
+
+        $aulasConcluidasSet = array_fill_keys($aulasConcluidasUsuario, true);
+        $aulasDaLinguagem = [];
+
+        if ($selectedLinguagem && !empty($modulos)) {
+            foreach ($modulos as $modulo) {
+                $idModulo = (int)($modulo['id_modulo'] ?? 0);
+                foreach ($aula as $itemAula) {
+                    if ((int)($itemAula['id_modulo'] ?? 0) === $idModulo) {
+                        $aulasDaLinguagem[] = $itemAula;
+                    }
+                }
+            }
+
+            usort($aulasDaLinguagem, function ($a, $b) {
+                $ordemModuloA = (int) ($a['ordem_modulo'] ?? 2147483647);
+                $ordemModuloB = (int) ($b['ordem_modulo'] ?? 2147483647);
+
+                if ($ordemModuloA === $ordemModuloB) {
+                    $ordemAulaA = (int) ($a['ordem_aula'] ?? 2147483647);
+                    $ordemAulaB = (int) ($b['ordem_aula'] ?? 2147483647);
+
+                    if ($ordemAulaA === $ordemAulaB) {
+                        return ((int)($a['id_aula'] ?? 0)) <=> ((int)($b['id_aula'] ?? 0));
+                    }
+
+                    return $ordemAulaA <=> $ordemAulaB;
+                }
+
+                return $ordemModuloA <=> $ordemModuloB;
+            });
+        }
+
+        $statusAulasMap = [];
+        foreach ($aulasDaLinguagem as $indice => $itemAula) {
+            $idAula = (int)($itemAula['id_aula'] ?? 0);
+            if ($idAula <= 0) {
+                continue;
+            }
+
+            if (isset($aulasConcluidasSet[$idAula])) {
+                $statusAulasMap[$idAula] = 'concluida';
+                continue;
+            }
+
+            $bloqueada = false;
+            for ($i = 0; $i < $indice; $i++) {
+                $idAnterior = (int)($aulasDaLinguagem[$i]['id_aula'] ?? 0);
+                if ($idAnterior > 0 && !isset($aulasConcluidasSet[$idAnterior])) {
+                    $bloqueada = true;
+                    break;
+                }
+            }
+
+            $statusAulasMap[$idAula] = $bloqueada ? 'bloqueada' : 'pendente';
+        }
+
+        foreach ($aula as &$itemAula) {
+            $idAula = (int)($itemAula['id_aula'] ?? 0);
+            $itemAula['estado_aula'] = $statusAulasMap[$idAula] ?? ($userId ? 'pendente' : 'desbloqueada');
+        }
+        unset($itemAula);
+
         $visao->SalaGeralPage($modulos, $aula, $linguagens, $selectedLinguagem, $messageInicio, $enrolledLinguagens);
     }
 

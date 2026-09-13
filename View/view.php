@@ -354,8 +354,7 @@ class View{
 
                             </article>
                         </div>
-                    </div>
-                    <div class="section__caminho">
+
                         <div class="card">
                             <article class="learning-card learning-card--required">
 
@@ -407,6 +406,8 @@ class View{
                                 </div>
                             </article>
                         </div>
+
+
                     </div>
                 </div>
             </section>
@@ -773,6 +774,16 @@ class View{
             foreach ($linguagens as $linguagem) {
             $imgRaw = $linguagem['img'] ?? '';
             $imgRaw = is_string($imgRaw) ? trim($imgRaw) : '';
+            $nomeCurso = (string) ($linguagem['nome_linguagem'] ?? '');
+            $nivelCurso = (string) ($linguagem['nivel'] ?? '');
+            $nivelFiltro = strtr(strtolower($nivelCurso), [
+                'á' => 'a', 'à' => 'a', 'ã' => 'a', 'â' => 'a',
+                'é' => 'e', 'ê' => 'e', 'í' => 'i', 'ó' => 'o',
+                'ô' => 'o', 'õ' => 'o', 'ú' => 'u', 'ç' => 'c'
+            ]);
+            $nivelClasse = in_array($nivelFiltro, ['iniciante', 'intermediario', 'avancado'], true)
+                ? $nivelFiltro
+                : 'padrao';
 
             if ($imgRaw === '') {
                 $imgSrc = 'imagens/img_curso.png';
@@ -781,22 +792,22 @@ class View{
             }
 
             $html_gerenciar .='
-            <div class="curso-card" data-linguagem-id="' . htmlspecialchars($linguagem['id_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '">
+            <div class="curso-card" data-linguagem-id="' . htmlspecialchars($linguagem['id_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '" data-nome="' . htmlspecialchars($nomeCurso, ENT_QUOTES, 'UTF-8') . '" data-nivel="' . htmlspecialchars($nivelFiltro, ENT_QUOTES, 'UTF-8') . '">
 
                                 <div class="curso-img">
-                                    <img src="' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="">
+                                    <img src="' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="' . htmlspecialchars($nomeCurso, ENT_QUOTES, 'UTF-8') . '">
                                 </div>
 
                                 <div class="curso-info">
 
-                                    <h3>' . htmlspecialchars($linguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '</h3>
+                                    <h3>' . htmlspecialchars($nomeCurso, ENT_QUOTES, 'UTF-8') . '</h3>
 
                                     <p style="flex: 1;">
                                         ' . htmlspecialchars($linguagem['descricao'] ?? '', ENT_QUOTES, 'UTF-8') . '
                                     </p>
 
-                                    <span class="badge iniciante">
-                                        ' . htmlspecialchars($linguagem['nivel'] ?? '', ENT_QUOTES, 'UTF-8') . '
+                                    <span class="badge ' . $nivelClasse . '">
+                                        ' . htmlspecialchars($nivelCurso, ENT_QUOTES, 'UTF-8') . '
                                     </span>
 
                                     <form class="form-editar-curso" action="dashboard.php" method="get">
@@ -995,14 +1006,14 @@ class View{
         echo '
             <link rel="stylesheet" href="css/dashboard.css">
                 <div class="dashboard-overlay"></div>
-                <button type="button" class="dashboard-menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <button type="button" class="dashboard-menu-toggle" aria-label="Abrir menu" aria-controls="dashboard-menu" aria-expanded="false">
                     <span></span>
                     <span></span>
                     <span></span>
                 </button>
                 
                 <div class="dashboard-container">
-                    <aside class="dashboard-menu">
+                    <aside class="dashboard-menu" id="dashboard-menu">
                         <a href="index.php" class="btn-voltar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
@@ -1065,15 +1076,16 @@ class View{
                             <h1>Cursos</h1>
                             <p>Gerencie todos os cursos cadastrados na plataforma.</p>
                         </div>
-                        <button class="btn-novo" type="button" >
+                        <button class="btn-novo" type="button" data-view="linguagem">
                             + Novo Curso
                         </button>
                     </div>
                     <div class="barra-filtros">
                         <input
-                            type="text"
+                            type="search"
                             placeholder="Pesquisar curso..."
-                            class="campo-pesquisa">
+                            class="campo-pesquisa"
+                            aria-label="Pesquisar curso">
                         <select>
                             <option>Todos os níveis</option>
                             <option>Iniciante</option>
@@ -1086,9 +1098,19 @@ class View{
                             <option>A-Z</option>
                             <option>Z-A</option>
                         </select>
+                        <div class="admin-curso-filtros" aria-label="Filtrar por nível">
+                            <button type="button" class="admin-curso-filtro-btn active" data-filtro="todos">Todos</button>
+                            <button type="button" class="admin-curso-filtro-btn" data-filtro="iniciante">Iniciante</button>
+                            <button type="button" class="admin-curso-filtro-btn" data-filtro="intermediario">Intermediário</button>
+                            <button type="button" class="admin-curso-filtro-btn" data-filtro="avancado">Avançado</button>
+                        </div>
                     </div>
                     <div class="lista-cursos">
                         ' .$html_gerenciar. '
+                    </div>
+                    <div class="admin-curso-sem-resultados" hidden>
+                        <strong>Nenhum curso encontrado.</strong>
+                        <p>Tente outro termo ou altere o filtro selecionado.</p>
                     </div>
                 </div>
             </template>
@@ -1494,7 +1516,6 @@ class View{
                 </div>
             </template>
 
-            <script src="js/dashboard.js" defer></script>
         ';
     }
 
@@ -1509,21 +1530,24 @@ class View{
         foreach ($linguagens as $linguagem) {
             $imgRaw = $linguagem['img'] ?? '';
             $imgRaw = is_string($imgRaw) ? trim($imgRaw) : '';
+            $nomeCurso = htmlspecialchars((string)($linguagem['nome_linguagem'] ?? 'Curso'), ENT_QUOTES, 'UTF-8');
+            $nivelCurso = strtolower((string)($linguagem['nivel'] ?? ''));
 
-            if ($imgRaw === '') {
-                $imgSrc = 'imagens/img_curso.png';
+            $imagemHtml = '';
+            if ($imgRaw !== '') {
+                $imagemHtml = '<img src="' . htmlspecialchars($imgRaw, ENT_QUOTES, 'UTF-8') . '" alt="' . $nomeCurso . '">';
             } else {
-                $imgSrc = $imgRaw;
+                $imagemHtml = '<img src="imagens/img_curso.png" alt="' . $nomeCurso . '">';
             }
 
             $html_listarcursos .= '
-                <div class="curso-card">
+                <div class="curso-card" data-nome="' . strtolower(htmlspecialchars((string)($linguagem['nome_linguagem'] ?? ''), ENT_QUOTES, 'UTF-8')) . '" data-nivel="' . htmlspecialchars($nivelCurso, ENT_QUOTES, 'UTF-8') . '">
                     <div class="img-curso">
-                        <img src="' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="Logo">
+                        ' . $imagemHtml . '
                     </div>
                     <div class="estrutura">
                         <div class="titulo">
-                            <h3>' . htmlspecialchars($linguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '</h3>
+                            <h3>' . $nomeCurso . '</h3>
                         </div>
                         <div class="descricao">
                             <p>' . htmlspecialchars($linguagem['descricao'] ?? '', ENT_QUOTES, 'UTF-8') . '</p>
@@ -1539,40 +1563,97 @@ class View{
             ';
         }
         
-        foreach ($modulos as $modulo) {
-            
-            $html_modulos .= '
-                <div class="titulo-conteudo">
-                    <h2>' . $modulo['titulo_modulo'] . '</h2>
+        foreach ($modulos as $indexModulo => $modulo) {
+            $tituloModulo = htmlspecialchars((string)($modulo['titulo_modulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+            $descricaoModulo = htmlspecialchars((string)($modulo['descricao_modulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+            $idModulo = (int)($modulo['id_modulo'] ?? 0);
+            $aulasDoModulo = [];
 
-                    <button class="descricao-modulo" commandfor="meuModal" command="show-modal" title="Descrição do módulo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-text-icon lucide-square-text"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg>
-                    </button>
-                        
-                        <dialog id="meuModal">
-                            <span class="descricao-texto">' . $modulo['descricao_modulo'] . '</span>
-                            <button commandfor="meuModal" command="close">
-                                Fechar
-                            </button>
-                        </dialog>
-                
-                </div>
-                <div class="container-aula">
-            ';
-            
             foreach ($aula as $itemAula) {
-                if ($itemAula['id_modulo'] == $modulo['id_modulo']) {
-                    $level_counter++;
-                    $html_modulos .= '
-                    
-                        <a id="'.$itemAula['id_aula'].'" 
-                        href="atividade.php?id_aula=' .$itemAula['id_aula']. '" 
-                        class="btn-selecionar" title="'.$itemAula['titulo_aula'].'">Aula ' . $level_counter . '</a>
-                    
-                    ';
+                if ((int)($itemAula['id_modulo'] ?? 0) === $idModulo) {
+                    $aulasDoModulo[] = $itemAula;
                 }
-                echo '</div>';
             }
+
+            $totalAulas = count($aulasDoModulo);
+            $aulasConcluidas = 0;
+            $aulasHtml = '';
+
+            foreach ($aulasDoModulo as $indiceAula => $itemAula) {
+                $numeroAula = $indiceAula + 1;
+                $tituloAula = htmlspecialchars((string)($itemAula['titulo_aula'] ?? ''), ENT_QUOTES, 'UTF-8');
+                $descricaoAula = htmlspecialchars((string)($itemAula['descricao_aula'] ?? ''), ENT_QUOTES, 'UTF-8');
+                $idAula = (int)($itemAula['id_aula'] ?? 0);
+                $estadoAula = $itemAula['estado_aula'] ?? 'pendente';
+                $aulaConcluida = $estadoAula === 'concluida';
+                $aulaBloqueada = $estadoAula === 'bloqueada';
+
+                if ($aulaConcluida) {
+                    $aulasConcluidas++;
+                }
+
+                $badgeHtml = '';
+                $botaoHtml = '';
+
+                if ($aulaConcluida) {
+                    $badgeHtml = '<span class="check-badge success">✓ Concluído</span>';
+                    $botaoHtml = '<a href="atividade.php?id_aula=' . $idAula . '" class="aula-revisar-btn" title="Abrir aula">Revisar</a>';
+                } elseif ($aulaBloqueada) {
+                    $badgeHtml = '<span class="check-badge locked" aria-label="Aula bloqueada"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 1 1 8 0v3"></path></svg> Bloqueada</span>';
+                    $botaoHtml = '<button type="button" class="aula-revisar-btn disabled" disabled aria-disabled="true" tabindex="-1">Revisar</button>';
+                } else {
+                    $badgeHtml = '<span class="check-badge pending">Pendente</span>';
+                    $botaoHtml = '<a href="atividade.php?id_aula=' . $idAula . '" class="aula-revisar-btn" title="Abrir aula">Revisar</a>';
+                }
+
+                $aulasHtml .= '
+                    <div class="modulo-aula-item ' . ($aulaConcluida ? 'is-complete' : '') . ' ' . ($aulaBloqueada ? 'is-blocked' : '') . '">
+                        <div class="aula-numero">' . $numeroAula . '</div>
+                        <div class="aula-info">
+                            <div class="aula-titulo">Aula ' . $numeroAula . ' - ' . $tituloAula . '</div>
+                            <div class="aula-descricao">' . ($descricaoAula !== '' ? $descricaoAula : 'Continue sua jornada com esta aula.') . '</div>
+                        </div>
+                        <div class="aula-actions">
+                            ' . $badgeHtml . '
+                            ' . $botaoHtml . '
+                        </div>
+                    </div>
+                ';
+            }
+
+            $html_modulos .= '
+                <section class="modulo-card" data-modulo="' . $idModulo . '">
+                    <div class="modulo-header">
+                        <div class="modulo-header-main">
+                            <span class="modulo-badge">' . ($indexModulo + 1) . '</span>
+                            <div class="modulo-header-text">
+                                <h2>Módulo ' . ($indexModulo + 1) . ': ' . $tituloModulo . '</h2>
+                            </div>
+                        </div>
+
+                        <div class="modulo-actions">
+                            <div class="modulo-progress">
+                                <span class="progress-check" style="background: #1d9b5d; color: #ffffff;">✓</span>
+                                <span>' . $aulasConcluidas . ' / ' . $totalAulas . ' aulas</span>
+                            </div>
+
+                            <button class="modulo-toggle" type="button" aria-label="Expandir módulo" aria-expanded="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m6 9 6 6 6-6"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="modulo-body">
+                        <div class="modulo-description-box">
+                            <span class="modulo-description-label">Descrição do módulo</span>
+                            <p>' . ($descricaoModulo !== '' ? $descricaoModulo : 'Aprofunde os conceitos deste módulo e avance na sua jornada.') . '</p>
+                        </div>
+                        ' . $aulasHtml . '
+                    </div>
+                </section>
+            ';
         }
 
         // $selectedHtml = '';
@@ -1585,46 +1666,7 @@ class View{
         //     $dataViewInicial = 'conteudo';
         // }
 
-        if (is_array($enrolledLinguagens) && count($enrolledLinguagens) > 0) {
-            foreach ($enrolledLinguagens as $linguagem) {
-                $imgRaw = $linguagem['img'] ?? '';
-                $imgRaw = is_string($imgRaw) ? trim($imgRaw) : '';
-                $imgSrc = $imgRaw === '' ? 'imagens/img_curso.png' : $imgRaw;
-
-                $html_inscritos .= '
-                    <div class="curso-card">
-                        <div class="img-curso">
-                            <img src="' . htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8') . '" alt="Logo">
-                        </div>
-                        <div class="estrutura">
-                            <div class="titulo">
-                                <h3>' . htmlspecialchars($linguagem['nome_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '</h3>
-                            </div>
-                            <div class="descricao">
-                                <p>' . htmlspecialchars($linguagem['descricao'] ?? '', ENT_QUOTES, 'UTF-8') . '</p>
-                            </div>
-                            <div class="nivel">
-                                <p>' . htmlspecialchars($linguagem['nivel'] ?? '', ENT_QUOTES, 'UTF-8') . '</p>
-                            </div>
-                            <div class="btn-selecionarcurso">
-                                <a href="sala.php?linguagem=' . htmlspecialchars($linguagem['id_linguagem'] ?? '', ENT_QUOTES, 'UTF-8') . '" >Selecionar</a>
-                            </div>
-                        </div>
-                    </div>
-                ';
-            }
-
-            $html_inscritos = '
-                <div class="cursos-inscritos">
-                    <div class="curso-titulo-area">
-                        <h2>Meus Cursos</h2>
-                    </div>
-                    <div class="cursos-lista">
-                        ' . $html_inscritos . '
-                    </div>
-                </div>
-            ';
-        }
+        $html_inscritos = '';
 
         $messageInicio = trim((string) $messageInicio);
         if ($selectedLinguagem) {
@@ -1635,22 +1677,80 @@ class View{
                 </div>
             </div>
             ';
-            } else {
-                $conteudo_principal = '
-                    <div class="conteudo-aviso">
-                        <div class="texto-aviso">
-                            <h2>Selecione um curso</h2>
-                            <p>Para visualizar os módulos, escolha um curso na aba Cursos.</p>
-                            ' . ($messageInicio !== '' ? '<div class="mensagem-aviso">' . htmlspecialchars($messageInicio, ENT_QUOTES, 'UTF-8') . '</div>' : '') . '
-                            
+        } else {
+            $conteudo_principal = '';
+        }
+
+        $nomeUsuarioPerfil = trim((string)($_SESSION['nome_usuario'] ?? 'Usuário'));
+        $emailUsuarioPerfil = trim((string)($_SESSION['email_usuario'] ?? 'usuario@dominio.com'));
+
+        $perfilCursosHtml = '';
+        if (is_array($enrolledLinguagens) && count($enrolledLinguagens) > 0) {
+            $modelPerfil = new Model();
+
+            foreach ($enrolledLinguagens as $linguagem) {
+                $cursoNome = htmlspecialchars((string)($linguagem['nome_linguagem'] ?? 'Curso'), ENT_QUOTES, 'UTF-8');
+                $cursoImg = trim((string)($linguagem['img'] ?? ''));
+                $cursoImgSrc = $cursoImg !== '' ? htmlspecialchars($cursoImg, ENT_QUOTES, 'UTF-8') : 'imagens/img_curso.png';
+
+                $idLing = (int)($linguagem['id_linguagem'] ?? 0);
+                $porcentagemCurso = 0;
+
+                if ($idLing > 0) {
+                    $modulosCurso = $modelPerfil->listar_modulo_por_linguagem($idLing);
+                    $totalAulasCurso = 0;
+                    $aulasConcluidasCurso = 0;
+
+                    foreach ($modulosCurso as $moduloCurso) {
+                        $idModuloCurso = (int)($moduloCurso['id_modulo'] ?? 0);
+                        foreach ($aula as $itemAula) {
+                            if ((int)($itemAula['id_modulo'] ?? 0) === $idModuloCurso) {
+                                $totalAulasCurso++;
+                                if (($itemAula['estado_aula'] ?? null) === 'concluida') {
+                                    $aulasConcluidasCurso++;
+                                }
+                            }
+                        }
+                    }
+
+                    if ($totalAulasCurso > 0) {
+                        $porcentagemCurso = (int) round(($aulasConcluidasCurso / $totalAulasCurso) * 100);
+                    }
+                }
+
+                $porcentagemCurso = max(0, min(100, $porcentagemCurso));
+                $progressDeg = ($porcentagemCurso / 100) * 360;
+
+                $perfilCursosHtml .= '
+                    <div class="perfil-curso-item">
+                        <a href="sala.php?linguagem=' . $idLing . '" class="perfil-curso-link" aria-label="Abrir curso ' . $cursoNome . '">
+                            <div class="perfil-curso-ring" style="--progress: ' . $porcentagemCurso . '; --progress-deg: ' . $progressDeg . 'deg;">
+                                <div class="perfil-curso-ring-inner">
+                                    <img src="' . $cursoImgSrc . '" alt="' . $cursoNome . '">
+                                </div>
+                            </div>
+                        </a>
+                        <div class="perfil-curso-meta">
+                            <span class="perfil-curso-nome">' . $cursoNome . '</span>
+                            <span class="perfil-curso-percent">' . $porcentagemCurso . '% concluído</span>
                         </div>
                     </div>
                 ';
             }
+        } else {
+            $perfilCursosHtml = '<div class="perfil-vazio">Você ainda não está cadastrado em nenhum curso.</div>';
+        }
 
         if(!isset($_SESSION["login"]) == false) {
 
        echo '
+            <div class="sala-overlay"></div>
+            <button type="button" class="sala-menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
             <div class="sala-container">
                 <div class="sala-menu">
 
@@ -1705,55 +1805,6 @@ class View{
 
                         </button>
 
-                        <button type="button" class="menu-item" data-view="perfil">
-
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M20 21a8 8 0 0 0-16 0"/>
-                                <circle cx="12" cy="7" r="4"/>
-                            </svg>
-
-                            <span>Perfil</span>
-
-                        </button>
-
-                        <div class="dropdown">
-
-                            <button type="button" class="menu-item dropdown-btn" data-view="config">
-
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    width="20"
-                                    height="20"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2">
-                                    <circle cx="12" cy="12" r="3"/>
-                                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1 .6 1.65 1.65 0 0 0-.33 1V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-.33-1 1.65 1.65 0 0 0-1-.6 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-.6-1 1.65 1.65 0 0 0-1-.33H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1-.33 1.65 1.65 0 0 0 .6-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06A2 2 0 1 1 7.13 3.6l.06.06A1.65 1.65 0 0 0 9 4.6h.2a1.65 1.65 0 0 0 1-.6 1.65 1.65 0 0 0 .33-1V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 .33 1 1.65 1.65 0 0 0 1 .6h.2a1.65 1.65 0 0 0 1.82-.33l.06-.06A2 2 0 1 1 20.4 7.13l-.06.06A1.65 1.65 0 0 0 19.4 9v.2a1.65 1.65 0 0 0 .6 1 1.65 1.65 0 0 0 1 .33H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1 .33 1.65 1.65 0 0 0-.6 1z"/>
-                                </svg>
-
-                                <span>Configurações</span>
-
-                            </button>
-
-                            <div class="dropdown-content">
-
-                                <button type="button" class="menu-item" data-view="editar">
-                                    Editar Perfil
-                                </button>
-
-                                <a href="dashboard.php">Dashboard</a>
-
-                                <a href="sair.php">Sair</a>
-
-                            </div>
-
-                        </div>
 
                     </nav>
 
@@ -1774,9 +1825,33 @@ class View{
                 </div>
 
                 <div class="sala-conteudo" id="sala-conteudo" data-view-inicial="' . ($selectedLinguagem ? 'conteudo' : 'cursos') . '">
-                    <div class="sala-cabecalho">
-                        <h1 id="sala-titulo"></h1>
+                    <div class="sala-topbar">
+                        <div class="sala-topbar-spacer"></div>
+
+                        <div class="user-dropdown">
+                            <button type="button" class="user-dropdown-button" aria-label="Abrir menu do usuário">
+                                <span class="user-avatar" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21a8 8 0 0 0-16 0"/>
+                                        <circle cx="12" cy="7" r="4"/>
+                                    </svg>
+                                </span>
+
+                                <span class="user-name">' . htmlspecialchars((string)($_SESSION['nome_usuario'] ?? 'Usuário'), ENT_QUOTES, 'UTF-8') . '</span>
+                                <span class="user-caret" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m6 9 6 6 6-6"/>
+                                    </svg>
+                                </span>
+                            </button>
+
+                            <div class="user-dropdown-menu" aria-label="Menu do usuário">
+                                <button type="button" class="user-dropdown-item menu-item" data-view="perfil">Perfil</button>
+                                <a href="sair.php" class="user-dropdown-item logout-item">Sair</a>
+                            </div>
+                        </div>
                     </div>
+
                     <div id="sala-formulario"></div>
                 </div>
             </div>
@@ -1789,22 +1864,28 @@ class View{
 
             <template id="template-cursos">
             <div class="curso-container">
-                '.$html_inscritos.'
                 <div class="curso-cabecalho">
                     <div class="filtrar-busca">
                         <p>Selecione a linguagem que deseja aprender.</p>
                         <div class="buscar">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d176ed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search-icon lucide-search"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
-                            <input type="text" placeholder="Pesquisar Linguagem...">
+                            <input type="text" class="curso-search-input" placeholder="Pesquisar Linguagem...">
                         </div>
                     </div>
-                    <div class="espaco">A</div>
-                    <div class="filtrar">A</div>
-                    
+                    <div class="curso-filtros" aria-label="Filtros de cursos">
+                        <button type="button" class="curso-filtro-btn active" data-filtro="todos">Todos</button>
+                        <button type="button" class="curso-filtro-btn" data-filtro="iniciante">Iniciante</button>
+                        <button type="button" class="curso-filtro-btn" data-filtro="intermediario">Intermediário</button>
+                        <button type="button" class="curso-filtro-btn" data-filtro="avancado">Avançado</button>
+                    </div>
                 </div>
                 <div class="conteudo-cursos">
                     <div class="cursos-lista">
                         '.$html_listarcursos.'
+                    </div>
+                    <div class="curso-sem-resultados" hidden>
+                        <strong>Nenhum curso encontrado.</strong>
+                        <p>Tente outra palavra-chave ou altere o filtro selecionado.</p>
                     </div>
                 </div>
             </div>
@@ -1812,45 +1893,40 @@ class View{
 
             <template id="template-perfil">
                 <div class="conteudo-perfil">
-                    <h2>Informações do Usuário</h2>
-                    <div class="perfil-info">
+                    <div class="perfil-header">
+                        <div class="perfil-avatar">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21a8 8 0 0 0-16 0"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2>Perfil</h2>
+                            <p>Informações do usuário</p>
+                        </div>
+                    </div>
+
+                    <div class="perfil-info-card">
                         <div class="campo-info">
                             <label>Nome:</label>
-                            <span id="nome-usuario">Carregando...</span>
+                            <span>' . htmlspecialchars($nomeUsuarioPerfil, ENT_QUOTES, 'UTF-8') . '</span>
                         </div>
                         <div class="campo-info">
                             <label>Email:</label>
-                            <span id="email-usuario">Carregando...</span>
+                            <span>' . htmlspecialchars($emailUsuarioPerfil, ENT_QUOTES, 'UTF-8') . '</span>
                         </div>
-                        <div class="campo-info">
-                            <label>Progresso Geral:</label>
-                            <div class="progresso-bar">
-                                <div class="progresso-fill" style="width: 0%;"></div>
-                            </div>
-                            <span id="progresso-percentual">0%</span>
-                        </div>
-                        <!-- Outras informações de progresso -->
                     </div>
-                </div>
-            </template>
 
-            <template id="template-config">
-                <div class="conteudo-config">
-                    <h2>Configurações</h2>
-                    <form class="form-config">
-                        <div class="campo-formulario">
-                            <label for="notificacoes">Notificações:</label>
-                            <input type="checkbox" id="notificacoes" name="notificacoes">
+                    <hr class="perfil-divisor">
+
+                    <div class="perfil-cursos-section">
+                        <div class="perfil-cursos-header">
+                            <h3>Cursos matriculados</h3>
                         </div>
-                        <div class="campo-formulario">
-                            <label for="tema">Tema:</label>
-                            <select id="tema" name="tema">
-                                <option value="claro">Claro</option>
-                                <option value="escuro">Escuro</option>
-                            </select>
+                        <div class="perfil-cursos-list">
+                            ' . $perfilCursosHtml . '
                         </div>
-                        <button type="submit" class="btn-salvar">Salvar Configurações</button>
-                    </form>
+                    </div>
                 </div>
             </template>
 
