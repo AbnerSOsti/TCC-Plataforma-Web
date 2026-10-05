@@ -6,12 +6,12 @@
     --color-text: #696868;
     --color-white: #ffffff;
     --color-purple: #d176ed;
-    --color-azul: #1e90ff;
+    --color-azul: var(--color-purple);
     --color-cinza: #b3b3b3;
     --color-bg-light: #f8fafc;
     --border-radius: 12px;
     --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-    --shadow-hover: 0 20px 30px -10px rgba(30, 144, 255, 0.18);
+    --shadow-hover: 0 20px 30px -10px rgba(209, 118, 237, 0.18);
     --transition-fast: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -131,15 +131,15 @@ body {
 }
 
 .btn-primary {
-    background-color: var(--color-azul);
+    background-color: var(--color-purple);
     color: var(--color-white);
-    box-shadow: 0 4px 14px rgba(30, 144, 255, 0.3);
+    box-shadow: 0 4px 14px rgba(209, 118, 237, 0.3);
 }
 
 .btn-primary:hover {
-    background-color: #1a7ae8;
+    background-color: #b964dd;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(30, 144, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(209, 118, 237, 0.4);
 }
 
 .btn-outline {
@@ -167,8 +167,8 @@ body {
 
 .hero-section {
     padding: 5rem 0 4rem;
-    background: radial-gradient(circle at top right, rgba(209, 118, 237, 0.1), transparent 45%),
-        radial-gradient(circle at bottom left, rgba(30, 144, 255, 0.1), transparent 45%);
+    background: radial-gradient(circle at top right, rgba(209, 118, 237, 0.14), transparent 45%),
+        radial-gradient(circle at bottom left, rgba(209, 118, 237, 0.12), transparent 45%);
 }
 
 .hero-section .hero-grid {
@@ -183,8 +183,8 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 1rem;
-    background-color: rgba(30, 144, 255, 0.12);
-    color: var(--color-azul);
+    background-color: rgba(209, 118, 237, 0.12);
+    color: var(--color-purple);
     border-radius: 50px;
     font-size: 0.85rem;
     font-weight: 600;
@@ -330,8 +330,8 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: rgba(30, 144, 255, 0.12);
-    color: var(--color-azul);
+    background-color: rgba(209, 118, 237, 0.12);
+    color: var(--color-purple);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -459,8 +459,8 @@ body {
 }
 
 .course-section .modules-grid .module-card .module-tag-1 {
-    background: rgba(30, 144, 255, 0.15);
-    color: var(--color-azul);
+    background: rgba(209, 118, 237, 0.15);
+    color: var(--color-purple);
 }
 
 .course-section .modules-grid .module-card .module-tag-2 {
@@ -520,8 +520,8 @@ body {
 }
 
 .features-section .methods-grid .method-card .method-header .method-icon-1 {
-    background-color: rgba(30, 144, 255, 0.12);
-    color: var(--color-azul);
+    background-color: rgba(209, 118, 237, 0.12);
+    color: var(--color-purple);
 }
 
 .features-section .methods-grid .method-card .method-header .method-icon-2 {
@@ -628,7 +628,7 @@ body {
     border-radius: var(--border-radius);
     padding: 2rem;
     box-shadow: var(--shadow-soft);
-    border-left: 5px solid var(--color-azul);
+    border-left: 5px solid var(--color-purple);
     display: flex;
     align-items: center;
     gap: 2rem;
@@ -638,8 +638,8 @@ body {
     width: 54px;
     height: 54px;
     border-radius: 50%;
-    background-color: rgba(30, 144, 255, 0.12);
-    color: var(--color-azul);
+    background-color: rgba(209, 118, 237, 0.12);
+    color: var(--color-purple);
     display: flex;
     align-items: center;
     justify-content: center;

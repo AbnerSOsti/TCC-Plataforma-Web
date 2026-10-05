@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/cadastro_usuario.css">
 
-    <title>Cadastro</title>
+    <title>Beginner Dev | Cadastro</title>
 </head>
 <body>
     <div class="container">
