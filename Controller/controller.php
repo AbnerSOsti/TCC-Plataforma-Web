@@ -257,7 +257,48 @@ class Controller {
         }
 
         $statusAulasMap = [];
-        foreach ($aulasDaLinguagem as $indice => $itemAula) {
+        $aulasPorModulo = [];
+
+        foreach ($aulasDaLinguagem as $itemAula) {
+            $idModulo = (int)($itemAula['id_modulo'] ?? 0);
+            if ($idModulo <= 0) {
+                continue;
+            }
+            $aulasPorModulo[$idModulo][] = $itemAula;
+        }
+
+        $moduloConcluidoMap = [];
+        foreach ($modulos as $modulo) {
+            $idModulo = (int)($modulo['id_modulo'] ?? 0);
+            if ($idModulo <= 0) {
+                continue;
+            }
+
+            $aulasModulo = $aulasPorModulo[$idModulo] ?? [];
+            $moduloConcluido = true;
+
+            foreach ($aulasModulo as $itemAula) {
+                $idAula = (int)($itemAula['id_aula'] ?? 0);
+                if ($idAula > 0 && !isset($aulasConcluidasSet[$idAula])) {
+                    $moduloConcluido = false;
+                    break;
+                }
+            }
+
+            $moduloConcluidoMap[$idModulo] = $moduloConcluido;
+        }
+
+        $moduloAnteriorPorModulo = [];
+        $moduloAnterior = null;
+        foreach ($modulos as $modulo) {
+            $idModulo = (int)($modulo['id_modulo'] ?? 0);
+            if ($idModulo > 0) {
+                $moduloAnteriorPorModulo[$idModulo] = $moduloAnterior;
+                $moduloAnterior = $idModulo;
+            }
+        }
+
+        foreach ($aulasDaLinguagem as $itemAula) {
             $idAula = (int)($itemAula['id_aula'] ?? 0);
             if ($idAula <= 0) {
                 continue;
@@ -268,12 +309,27 @@ class Controller {
                 continue;
             }
 
-            $bloqueada = false;
-            for ($i = 0; $i < $indice; $i++) {
-                $idAnterior = (int)($aulasDaLinguagem[$i]['id_aula'] ?? 0);
-                if ($idAnterior > 0 && !isset($aulasConcluidasSet[$idAnterior])) {
-                    $bloqueada = true;
+            $idModulo = (int)($itemAula['id_modulo'] ?? 0);
+            $aulasModulo = $aulasPorModulo[$idModulo] ?? [];
+            $indiceAulaNoModulo = null;
+
+            foreach ($aulasModulo as $index => $aulaModulo) {
+                if ((int)($aulaModulo['id_aula'] ?? 0) === $idAula) {
+                    $indiceAulaNoModulo = $index;
                     break;
+                }
+            }
+
+            $bloqueada = false;
+            if ($indiceAulaNoModulo === 0) {
+                $moduloAnteriorId = $moduloAnteriorPorModulo[$idModulo] ?? null;
+                if ($moduloAnteriorId !== null && !($moduloConcluidoMap[$moduloAnteriorId] ?? false)) {
+                    $bloqueada = true;
+                }
+            } else {
+                $idAulaAnterior = (int)($aulasModulo[$indiceAulaNoModulo - 1]['id_aula'] ?? 0);
+                if ($idAulaAnterior > 0 && !isset($aulasConcluidasSet[$idAulaAnterior])) {
+                    $bloqueada = true;
                 }
             }
 
@@ -303,34 +359,41 @@ class Controller {
 
         $model = new Model();
         $visao = new View();
-        $id_usuario = $_SESSION["id_usuario"];
+        $id_usuario = (int) $_SESSION["id_usuario"];
 
-        if ($id_aula && $id_usuario) {
-            $aulaDetalhe = $model->obter_aula_por_id($id_aula);
-            if ($aulaDetalhe) {
-                $model->atualizar_configuracao_usuario($id_usuario, [
-                    'id_linguagem_atual' => $aulaDetalhe['id_linguagem'] ?? null,
-                    'id_modulo_atual' => $aulaDetalhe['id_modulo'] ?? null,
-                    'id_aula_atual' => $id_aula,
-                    'ultima_linguagem_acessada' => $aulaDetalhe['id_linguagem'] ?? null,
-                    'atualizar_ultimo_acesso' => true,
-                ]);
-            }
+        $idAulaValida = $id_aula !== null ? (int) $id_aula : 0;
+        if ($idAulaValida <= 0) {
+            header("Location: sala.php");
+            exit();
         }
+
+        $aulaDetalhe = $model->obter_aula_por_id($idAulaValida);
+        if (!$aulaDetalhe || !$model->pode_acessar_aula($id_usuario, $idAulaValida)) {
+            header("Location: sala.php");
+            exit();
+        }
+
+        $model->atualizar_configuracao_usuario($id_usuario, [
+            'id_linguagem_atual' => $aulaDetalhe['id_linguagem'] ?? null,
+            'id_modulo_atual' => $aulaDetalhe['id_modulo'] ?? null,
+            'id_aula_atual' => $idAulaValida,
+            'ultima_linguagem_acessada' => $aulaDetalhe['id_linguagem'] ?? null,
+            'atualizar_ultimo_acesso' => true,
+        ]);
 
         if($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["acao"]) && $_POST["acao"] === "salvar_progresso") {
             $total_exercicios = (int) ($_POST["total_exercicios"] ?? 0);
             $exercicios_corretos = (int) ($_POST["exercicios_corretos"] ?? 0);
 
-            $model->salvar_progresso_aula($id_usuario, $id_aula, $total_exercicios, $exercicios_corretos);
+            $model->salvar_progresso_aula($id_usuario, $idAulaValida, $total_exercicios, $exercicios_corretos);
 
             header("Location: sala.php");
             exit;
         }
         
         $aula = $model->listar_aulas();
-        $atividade = $id_aula ? $model->listar_atividade_por_aula($id_aula) : [];
-        $visao->AtividadePage($aula, $atividade, $id_aula);
+        $atividade = $model->listar_atividade_por_aula($idAulaValida);
+        $visao->AtividadePage($aula, $atividade, $idAulaValida);
     }
 
 }

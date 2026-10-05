@@ -36,3 +36,13 @@
     }
   });
 </script>
+<script>
+        const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+        const navLinks = document.getElementById("navLinks");
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener("click", function() {
+                navLinks.classList.toggle("active");
+            });
+        }
+</script>

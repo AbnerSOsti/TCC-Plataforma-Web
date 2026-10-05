@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const dashboardMenu = document.querySelector(".dashboard-menu");
     const dashboardOverlay = document.querySelector(".dashboard-overlay");
     const menuToggle = document.querySelector(".dashboard-menu-toggle");
+    const userDropdown = document.querySelector(".dashboard-user-dropdown");
+    const userDropdownButton = document.querySelector(".dashboard-user-dropdown-button");
     let filtroGerenciarAtual = "todos";
     
 
@@ -58,6 +60,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (dashboardOverlay) {
         dashboardOverlay.addEventListener("click", fecharMenuMobile);
+    }
+
+    if (userDropdown && userDropdownButton) {
+        userDropdownButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            const estaAberto = userDropdown.classList.toggle("open");
+            userDropdownButton.setAttribute("aria-expanded", String(estaAberto));
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!userDropdown.contains(event.target)) {
+                userDropdown.classList.remove("open");
+                userDropdownButton.setAttribute("aria-expanded", "false");
+            }
+        });
     }
 
     menuItems.forEach(function (item) {

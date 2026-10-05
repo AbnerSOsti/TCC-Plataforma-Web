@@ -150,6 +150,7 @@ class Model {
                         $_SESSION["login"] = true;
                         $_SESSION["id_usuario"] = $user['id_usuario'];
                         $_SESSION["nome_usuario"] = $user['nome_usuario'];
+                        $_SESSION["email_usuario"] = $user['email_usuario'];
                         $_SESSION["tipo_usuario"] = $user['tipo_usuario'];
 
                         $this->garantir_configuracao_usuario($user['id_usuario']);
@@ -1547,7 +1548,7 @@ class Model {
         }
 
         try {
-            $query = "SELECT a.id_aula, a.titulo_aula, a.id_modulo, m.titulo_modulo, a.ordem_aula, m.ordem_modulo
+            $query = "SELECT a.id_aula, a.titulo_aula, a.conteudo_aula, a.id_modulo, m.titulo_modulo, a.ordem_aula, m.ordem_modulo
                       FROM aulas a
                       INNER JOIN modulos m ON m.id_modulo = a.id_modulo
                       ORDER BY COALESCE(m.ordem_modulo, 2147483647) ASC, COALESCE(a.ordem_aula, 2147483647) ASC, a.id_aula ASC";
@@ -1668,6 +1669,25 @@ class Model {
         try {
             $query = "SELECT id_usuario, id_linguagem_atual, id_modulo_atual, id_aula_atual, ultimo_acesso, ultimo_login, ultima_linguagem_acessada, tema
                       FROM usuario_configuracao
+                      WHERE id_usuario = :id_usuario
+                      LIMIT 1";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(':id_usuario', $id_usuario, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    public function obter_usuario_por_id($id_usuario){
+        if (!$this->conn || !$id_usuario) {
+            return [];
+        }
+
+        try {
+            $query = "SELECT id_usuario, nome_usuario, email_usuario, tipo_usuario
+                      FROM cadastro_usuario
                       WHERE id_usuario = :id_usuario
                       LIMIT 1";
             $stmt = $this->conn->prepare($query);
@@ -2097,6 +2117,107 @@ class Model {
 
         $aulas = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
         return array_map('intval', $aulas);
+    }
+
+    public function pode_acessar_aula($id_usuario, $id_aula) {
+        if (!$this->conn || !$id_usuario || !$id_aula) {
+            return false;
+        }
+
+        $idAula = $this->normalizarInteiroPositivo($id_aula);
+        if ($idAula === null || $idAula <= 0) {
+            return false;
+        }
+
+        $aula = $this->obter_aula_por_id($idAula);
+        if (!$aula) {
+            return false;
+        }
+
+        $idLinguagemAula = (int) ($aula['id_linguagem'] ?? 0);
+        if ($idLinguagemAula <= 0) {
+            return false;
+        }
+
+        $configuracao = $this->obter_configuracao_usuario($id_usuario);
+        $linguagemAtual = $configuracao['ultima_linguagem_acessada'] ?? $configuracao['id_linguagem_atual'] ?? null;
+        if ($linguagemAtual !== null && (int) $linguagemAtual !== $idLinguagemAula) {
+            return false;
+        }
+
+        $aulasCurso = $this->listar_aulas_por_linguagem($idLinguagemAula);
+        if (empty($aulasCurso)) {
+            return false;
+        }
+
+        $aulasConcluidas = $this->listar_aulas_concluidas_por_usuario($id_usuario, $idLinguagemAula);
+        $aulasConcluidasSet = array_fill_keys($aulasConcluidas, true);
+
+        $aulasPorModulo = [];
+        foreach ($aulasCurso as $itemAula) {
+            $idModulo = (int) ($itemAula['id_modulo'] ?? 0);
+            if ($idModulo > 0) {
+                $aulasPorModulo[$idModulo][] = $itemAula;
+            }
+        }
+
+        $moduloConcluidoMap = [];
+        foreach ($aulasPorModulo as $idModulo => $aulasModulo) {
+            $moduloConcluido = true;
+            foreach ($aulasModulo as $itemAula) {
+                $idAulaModulo = (int) ($itemAula['id_aula'] ?? 0);
+                if ($idAulaModulo > 0 && empty($aulasConcluidasSet[$idAulaModulo])) {
+                    $moduloConcluido = false;
+                    break;
+                }
+            }
+            $moduloConcluidoMap[$idModulo] = $moduloConcluido;
+        }
+
+        $indiceAulaAtual = null;
+        $idModuloAtual = null;
+        $idModuloAnterior = null;
+
+        foreach ($aulasCurso as $indice => $itemAula) {
+            $idModuloCurso = (int) ($itemAula['id_modulo'] ?? 0);
+            if ($idModuloAtual !== null && $idModuloCurso !== $idModuloAtual) {
+                $idModuloAnterior = $idModuloAtual;
+            }
+
+            $idModuloAtual = $idModuloCurso;
+            if ((int) ($itemAula['id_aula'] ?? 0) === $idAula) {
+                $indiceAulaAtual = $indice;
+                break;
+            }
+        }
+
+        if ($indiceAulaAtual === null) {
+            return false;
+        }
+
+        $aulasDoModuloAtual = $aulasPorModulo[$idModuloAtual] ?? [];
+        $indiceAulaNoModulo = null;
+
+        foreach ($aulasDoModuloAtual as $indiceModulo => $itemAula) {
+            if ((int) ($itemAula['id_aula'] ?? 0) === $idAula) {
+                $indiceAulaNoModulo = $indiceModulo;
+                break;
+            }
+        }
+
+        if ($indiceAulaNoModulo === 0) {
+            if ($idModuloAnterior !== null && empty($moduloConcluidoMap[$idModuloAnterior])) {
+                return false;
+            }
+            return true;
+        }
+
+        $idAulaAnterior = (int) ($aulasDoModuloAtual[$indiceAulaNoModulo - 1]['id_aula'] ?? 0);
+        if ($idAulaAnterior > 0 && empty($aulasConcluidasSet[$idAulaAnterior])) {
+            return false;
+        }
+
+        return true;
     }
 
     public function salvar_progresso_aula($id_usuario, $id_aula, $total_exercicios, $exercicios_corretos) {

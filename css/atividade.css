@@ -1,12 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --color-fundo: #010823;
+    --color-red: #be0000;
+    --color-black: #333333;
+    --font-main: "Poppins", sans-serif;
+    --color-text: #696868;
+    --color-white: #ffffff;
+    --color-purple: #d176ed;
+    --color-azul: #1e90ff;
+    --color-cinza: #b3b3b3;
+    --color-bg-light: #f4f7fb;
+    --color-green: #27c93f;
+    --color-green-hover: #1f9a31;
+    --color-border: #e2e8f0;
+    --border-radius: 14px;
+    --shadow-card: 0 10px 30px rgba(1, 8, 35, 0.08);
+    --transition-fast: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    margin: 0;
+    background-color: var(--color-bg-light);
+    color: var(--color-black);
+    font-family: var(--font-main);
+}
+
 .atividade-page {
     max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #202124;
+    font-family: var(--font-main);
+    color: var(--color-black);
 }
 
 .atividade-header {
@@ -15,48 +43,63 @@
     justify-content: space-between;
     align-items: center;
     gap: 12px;
+    background-color: var(--color-white);
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0 0 18px 18px;
+    padding: 1.15rem 2rem;
+    box-shadow: 0 6px 20px rgba(1, 8, 35, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 20;
 }
 
 .btn-cancelar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
-    color: #333;
-    border: 1px solid #d1d5db;
-    padding: 10px 18px;
+    gap: 0.5rem;
+    background: var(--color-white);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    padding: 0.62rem 1.2rem;
     border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    font-size: 0.88rem;
+    transition: var(--transition-fast);
 }
 
 .btn-cancelar:hover {
-    background: #f2f4f7;
-    border-color: #a1a9b8;
+    background: #f1f5f9;
+    color: var(--color-black);
+    border-color: #cbd5e1;
 }
 
 .atividade-progresso {
     width: 100%;
-    max-width: 620px;
+    max-width: 500px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .barra-progresso {
     width: 100%;
-    height: 18px;
-    background: #e5e7eb;
-    border-radius: 12px;
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 20px;
     overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.06);
 }
 
 .barra-progresso-fill {
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #22c55e 0%, #14b8a6 100%);
-    border-radius: 12px;
+    background: linear-gradient(90deg, var(--color-azul), var(--color-green));
+    border-radius: 20px;
     transition: width 0.4s ease;
 }
 
@@ -64,29 +107,44 @@
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    font-size: 0.95rem;
-    color: #4b5563;
+    font-size: 0.75rem;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.progresso-info span:first-child {
+    color: var(--color-azul);
+    font-weight: 700;
+}
+
+.progresso-info span:last-child {
+    color: var(--color-text);
 }
 
 .atividade-conteudo {
     display: flex;
     justify-content: center;
+    padding-top: 0.8rem;
 }
 
 .exercicio-card {
     width: 100%;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-    padding: 32px;
+    background: var(--color-white);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
+    padding: 2.2rem;
     max-width: 760px;
+    position: relative;
+    transition: var(--transition-fast);
 }
 
 .exercicio-card h2 {
-    font-size: 1.5rem;
-    margin-bottom: 24px;
-    line-height: 1.35;
+    font-size: 1.35rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.5;
+    color: var(--color-fundo);
+    font-weight: 700;
 }
 
 #respostas {
@@ -107,9 +165,15 @@
     justify-content: space-between;
     gap: 14px;
     background: #f8fafc;
-    border: 1px solid #d1d5db;
-    border-radius: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
     padding: 14px 16px;
+    transition: var(--transition-fast);
+}
+
+.bloco-ordenar:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
 }
 
 .bloco-ordenar .texto-bloco {
@@ -124,20 +188,20 @@
 }
 
 .btn-mover {
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     border: none;
     border-radius: 10px;
-    background: #d1d5db;
-    color: #111827;
+    background: #d7e7ff;
+    color: var(--color-fundo);
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: var(--transition-fast);
 }
 
 .btn-mover:hover {
-    background: #9ca3af;
-    color: #ffffff;
+    background: var(--color-azul);
+    color: var(--color-white);
 }
 
 .opcao-item {
@@ -145,34 +209,55 @@
     align-items: center;
     gap: 12px;
     background: #f9fafb;
-    border: 1px solid #d1d5db;
-    border-radius: 14px;
-    padding: 14px 16px;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
     cursor: pointer;
-    transition: border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.opcao-item input[type="radio"] {
-    accent-color: #22c55e;
+    transition: var(--transition-fast);
 }
 
 .opcao-item:hover {
-    border-color: #9ca3af;
+    border-color: #c7d2fe;
     background: #f3f4f6;
+    transform: translateY(-1px);
+}
+
+.opcao-item input[type="radio"] {
+    accent-color: var(--color-azul);
+    width: 18px;
+    height: 18px;
+}
+
+.opcao-item:has(input:checked) {
+    border-color: var(--color-azul);
+    background: rgba(30, 144, 255, 0.06);
+    box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.08);
+}
+
+.opcao-item:has(input:checked) span {
+    color: var(--color-fundo);
+    font-weight: 600;
 }
 
 #resposta-texto {
     width: 100%;
-    padding: 14px 16px;
-    border: 1px solid #d1d5db;
-    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
     font-size: 1rem;
+    color: var(--color-fundo);
     outline: none;
+    transition: var(--transition-fast);
+    background: #ffffff;
 }
 
 #resposta-texto:focus {
-    border-color: #22c55e;
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.12);
+    border-color: var(--color-azul);
+    box-shadow: 0 0 0 4px rgba(30, 144, 255, 0.1);
+}
+
+#resposta-texto::placeholder {
+    color: var(--color-cinza);
 }
 
 .btn-responder,
@@ -182,41 +267,105 @@
     justify-content: center;
     width: 100%;
     max-width: 240px;
-    padding: 14px 18px;
+    padding: 0.9rem 2.2rem;
     border: none;
-    border-radius: 14px;
-    background: #22c55e;
-    color: #ffffff;
+    border-radius: 10px;
+    background: var(--color-green);
+    color: var(--color-white);
     font-size: 1rem;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: var(--transition-fast);
 }
 
 .btn-responder:hover,
 .btn-continuar:hover {
-    background: #16a34a;
+    background: var(--color-green-hover);
     transform: translateY(-1px);
 }
 
 .feedback {
     margin-top: 18px;
-    padding: 14px 16px;
-    border-radius: 14px;
+    padding: 1.1rem 1.2rem 1.1rem 1rem;
+    border-radius: 12px;
     font-weight: 600;
-    min-height: 46px;
+    min-height: 50px;
+    line-height: 1.5;
+    display: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    animation: fadeIn 0.25s ease;
+    font-size: 0.92rem;
+}
+
+.feedback::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    background: currentColor;
+    opacity: 0.9;
 }
 
 .feedback-sucesso {
-    background: #dcfce7;
+    background: #ecfdf5;
     color: #166534;
     border: 1px solid #bbf7d0;
+    display: block;
+}
+
+.feedback-sucesso::before {
+    content: "✓";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(22, 101, 52, 0.12);
+    color: #166534;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.feedback-sucesso {
+    padding-left: 2.5rem;
 }
 
 .feedback-erro {
-    background: #fee2e2;
+    background: #fff5f5;
     color: #991b1b;
     border: 1px solid #fecaca;
+    display: block;
+}
+
+.feedback-erro::before {
+    content: "!";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(153, 27, 27, 0.12);
+    color: #991b1b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.feedback-erro {
+    padding-left: 2.5rem;
 }
 
 .atividade-footer {
@@ -225,26 +374,33 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 16px;
+    margin-top: -8px;
 }
 
 .tempo-final {
     font-size: 0.98rem;
     color: #374151;
-    background: #f8fafc;
+    background: rgba(255, 255, 255, 0.7);
     border: 1px solid #e5e7eb;
-    padding: 14px 18px;
-    border-radius: 14px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.05);
 }
 
 @media (max-width: 760px) {
     .atividade-page {
-        margin: 20px;
-        padding: 16px;
+        margin: 0;
+        padding: 0 16px 24px;
     }
 
     .atividade-header {
         flex-direction: column;
         align-items: stretch;
+        padding: 1rem 1rem 1.2rem;
+    }
+
+    .atividade-progresso {
+        max-width: 100%;
     }
 
     .atividade-footer {
@@ -256,5 +412,13 @@
     .btn-responder,
     .btn-continuar {
         width: 100%;
+    }
+
+    .exercicio-card {
+        padding: 1.5rem;
+    }
+
+    .exercicio-card h2 {
+        font-size: 1.15rem;
     }
 }
