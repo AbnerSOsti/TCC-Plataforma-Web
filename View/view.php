@@ -1280,7 +1280,11 @@ class View{
                             <label for="nivel_linguagem">Nível</label>
                             <input type="text" id="nivel_linguagem" name="nivel_linguagem" placeholder="Ex: Iniciante">
                         </div>
-                        <div class="campo-img">
+                        <div class="campo-imagem">
+                            <label class="campo-imagem-label" for="img">
+                                <span class="campo-imagem-botao">Escolher imagem</span>
+                                <span class="campo-imagem-nome" id="img-file-name">Nenhum arquivo selecionado</span>
+                            </label>
                             <input type="file" id="img" name="img" accept="image/*">
                         </div>
                         <button type="submit" name="btnSalvarLinguagem" class="btn-salvar">Salvar Linguagem</button>

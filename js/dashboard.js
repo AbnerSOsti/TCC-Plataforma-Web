@@ -85,6 +85,23 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    const configurarInputArquivo = function () {
+        document.querySelectorAll('.campo-imagem input[type="file"]').forEach(function (input) {
+            const nomeArquivo = input.closest('.campo-imagem')?.querySelector('.campo-imagem-nome');
+            if (!nomeArquivo) {
+                return;
+            }
+
+            const atualizarTexto = function () {
+                const arquivo = input.files && input.files.length > 0 ? input.files[0].name : 'Nenhum arquivo selecionado';
+                nomeArquivo.textContent = arquivo;
+            };
+
+            input.addEventListener('change', atualizarTexto);
+            atualizarTexto();
+        });
+    };
+
     if (!menuItems.length || !container || !dashboardConteudo) {
         return;
     }
@@ -309,6 +326,8 @@ document.addEventListener("DOMContentLoaded", function () {
             filtroGerenciarAtual = "todos";
             registrarFiltrosGerenciar();
         }
+
+        configurarInputArquivo();
     };
 
     const marcarMenuAtivo = function (view) {
